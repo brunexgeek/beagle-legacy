@@ -23,15 +23,15 @@ public class Main
 
 			System.out.println("Compiling '" + fileName + "'");
 			IScanner scanner = new Scanner(context, new ScanString(fileName, content));
-			/*if (false)
+			if (true)
 			{
 				Token tok;
-				while ((tok = scanner.readToken()) != null)
+				while ((tok = scanner.readToken()).type != TokenType.TOK_EOF)
 				{
 					System.out.println(tok);
 				}
 			}
-			else*/
+			else
 			{
 				Parser parser = new Parser(context, scanner);
 				ICompilationUnit unit = parser.parse();
@@ -39,7 +39,7 @@ public class Main
 				IModule module = new Module( new Name("beagle"));
 				module.addCompilationUnit(unit);
 				CodeGenerator codegen = new CodeGenerator(System.out);
-				codegen.visitModule(module);
+				codegen.visitModule(module, null);
 			}
 		}
 	}

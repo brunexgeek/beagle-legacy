@@ -5,18 +5,18 @@ import java.util.List;
 public interface IMethodDeclaration extends ITreeElement
 {
 
-	public ITypeReference getType();
+	public IModifiers getModifiers();
 	
-	public List<IFormalParameter> getParameters();
+	public ITypeReference getReturnType();
 	
 	public IName getName();
 	
+	public List<IFormalParameter> getParameters();
+		
 	public IMethodBody getBody();
 	
 	public boolean isContructor();
-	
-	public IModifiers getModifiers();
-	
+		
 	public ITypeBody getParent();
 	
 	public void setParent( ITypeBody parent );

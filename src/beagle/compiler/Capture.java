@@ -17,12 +17,17 @@ public class Capture
 		buffer = new char[size];
 	}
 	
+	/**
+	 * Append a character into the capture buffer.
+	 * 
+	 * @param value
+	 */
 	public void push( char value )
 	{
 		if (index < buffer.length)
 			buffer[index++] = value;
 	}
-	
+		
 	public void push( String value )
 	{
 		for (int i = 0; i < value.length(); ++i)

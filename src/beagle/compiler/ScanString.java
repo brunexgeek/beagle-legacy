@@ -27,11 +27,13 @@ public class ScanString
 	public static final char EOL = 0x0A;
 		
 	/**
-	 * The input buffer, index of next character to be read, index of one past
-	 * last character in buffer.
+	 * The input buffer.
 	 */
 	protected char[] buffer;
 
+	/**
+	 * Index of next character to be read
+	 */
 	protected int index;
 
 	protected int bufferSize;
@@ -72,12 +74,12 @@ public class ScanString
 		while (total > 0 && content[total-1] == '\n')
 			--total;
 		
+		// check if the content is empty
 		if (total == 0)
 		{
-			char[] buffer = new char[3];
-			buffer[0] = BOL;
-			buffer[1] = EOL;
-			buffer[2] = EOI;
+			char[] buffer = new char[2];
+			buffer[0] = EOL;
+			buffer[1] = EOI;
 			return buffer;
 		}
 
@@ -86,12 +88,11 @@ public class ScanString
 			if (content[i] == '\n') ++lines;
 		lines++;
 		
-		// ensure space for BOL markers and the ending EOL+EOI markers
-		char[] buffer = new char[total + 2 + lines];
+		// ensure space for ending EOL+EOI markers
+		char[] buffer = new char[total + 2];
 		
-		int i = 0, j = 1;
+		int i = 0, j = 0;
 		
-		buffer[0] = BOL;
 		while (i < total)
 		{
 			char value = content[i];
@@ -101,10 +102,7 @@ public class ScanString
 				buffer[j] = ' ';
 			else
 				buffer[j] = value;
-			
-			if (value == '\n')
-				buffer[++j] = BOL;
-			
+		
 			++j;
 			++i;
 		}
@@ -189,32 +187,34 @@ public class ScanString
 			throw new IndexOutOfBoundsException("Not enough space to push a character");
 	}
 
-	protected void next()
+	protected char next()
 	{
-		next(1);
+		return next(1);
 	}
 	
-	protected void next( int count )
+	protected char next( int count )
 	{
-		if (count <= 0) return;
+		if (count <= 0) return peek();
 		if (index + count < bufferSize)
 			index += count;
 		else
 			index = bufferSize - 1;
+		return peek();
 	}
     
-	protected void previous()
+	protected char previous()
 	{
-		previous(1);
+		return previous(1);
 	}
 	
-	protected void previous( int count )
+	protected char previous( int count )
 	{
-		if (count <= 0) return;
+		if (count <= 0) return peek();
 		if (index - count >= 0)
 			index -= count;
 		else
 			index = 0;
+		return peek();
 	}
 	
     public void unescape( char[] data )
@@ -272,4 +272,9 @@ public class ScanString
     	throw new NumberFormatException("'" + value + "' is not a valid hexadecimal digit");
     }
 
+    @Override
+    public String toString()
+    {
+    	return peek() + "";
+    }
 }

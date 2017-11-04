@@ -10,12 +10,8 @@ public class Scanner implements IScanner
 	
 	private CompilationListener listener; 
 	
-	private int indentSize = 0;
-	
-	private int currentIndentSize = 0;
-	
 	private CompilationContext context;
-	
+		
 	Scanner( CompilationContext context, ScanString source )
 	{
 		this.source = source;
@@ -28,7 +24,10 @@ public class Scanner implements IScanner
 	{
 		while (true)
 		{
-			switch (source.pull())
+			char last = source.peek();
+			if (last == ScanString.BOI) last = '\n';
+			
+			switch (source.next())
 			{
 				case 'A':
 				case 'B':
@@ -86,27 +85,22 @@ public class Scanner implements IScanner
 				case '_':
 					return processIdentifier();
 				case '/':
-					// discard block comments
+					// capture block comments
 					if (source.peek(1) == '*')
 					{
-						LookaheadStatus status;
-						while ((status = source.lookahead('*', '/')) == LookaheadStatus.NO_MATCH)
-							source.next();
-						if (status == LookaheadStatus.EOI)
-							listener.onError(source.location, "Unterminated block comment");
-						else
-							source.next(2);
+						processBlockComment();
 						break;
 					}
-					// discard inline comments
+					// capture inline comments
 					if (source.peek(1) == '/')
 					{
-						while (source.peek(1) != '\n' && source.peek(1) != ScanString.EOI)
-							source.next();
+						processInlineComment();
 						break;
 					}
+					
 					if (source.peek(1) == '=')
 						return TokenType.TOK_DIV_ASSIGN.createToken();
+					
 					return TokenType.TOK_DIV.createToken();
 				case '"':
 				case '\'':
@@ -291,92 +285,14 @@ public class Scanner implements IScanner
 					return TokenType.TOK_XOR.createToken();
 					
 				case '\n':
+					if (last == '\n') break;
 					return TokenType.TOK_EOL.createToken();
 
 				case ScanString.BOL:
-					// ignores empty lines
-					if (source.peek(1) == '\n')
-					{
-						source.next();
-						break;
-					}
-					if (source.peek(1) == ' ' || source.peek(1) == '\t')
-					{
-						source.next();
-						char type = source.peek();
-						int size = 1;
-						
-						while (source.peek(1) == type)
-						{
-							source.next();
-							++size;
-						}
-						// ignores lines with only white spaces
-						if (source.peek(1) == '\n')
-						{
-							source.next();
-							break;
-						}
-						
-						if (indentSize == 0 && size > 0)
-						{
-							indentSize = currentIndentSize = size;
-							// check for inconsistencies
-							if (source.peek(1) == ' ' || source.peek(1) == '\t')
-							{
-								listener.onError(source.location, "Mixed tabs and spaces on indentation");
-								return null;
-							}
-							
-							return TokenType.TOK_INDENT.createToken();
-						}
-						if (size > 0)
-						{
-							// compute the difference between current and new indentantion
-							int diff = size - currentIndentSize;
-
-							// valid indentations are increments of indentSize (TOK_INDENT) or
-							// decrements of any multiple of indentSize (TOK_DEDENT)
-							
-							// check if we have a valid increment indentation
-							if (diff == indentSize)
-							{
-								currentIndentSize += indentSize;
-								return TokenType.TOK_INDENT.createToken();
-							}
-							else
-							if (diff < 0 && (Math.abs(diff) % indentSize) == 0)
-							{
-								diff = Math.abs(diff) / indentSize - 1;
-
-								// insert a special character to emit the remaining TOK_DEDENT
-								// later
-								for (int i = 0; i < diff; ++i)
-									source.push(ScanString.BOL);
-
-								currentIndentSize -= indentSize;
-								return TokenType.TOK_DEDENT.createToken();
-							}
-							else
-							{
-								// indentation changed, but is invalid
-								listener.onError(source.location, "Inconsistent identation");
-								return null;
-							}
-						}
-					}
 					break;
-
+				
 				case ScanString.EOI:
-					if (currentIndentSize > 0)
-					{
-						// insert an artificial EOI to return here one more time
-						source.push(ScanString.EOI);
-						
-						currentIndentSize -= indentSize;
-						return TokenType.TOK_DEDENT.createToken();
-					}
-					return null;
+					return TokenType.TOK_EOF.createToken();
 					
 				default:
 					if (Character.isWhitespace(source.peek()) || source.peek() == ScanString.BOI)
@@ -391,8 +307,9 @@ public class Scanner implements IScanner
 	{
 		char type = source.peek();
 		source.next();
+		
 		Capture capture = new Capture();
-		while (source.peek() != '\n' && source.peek() != type && source.peek() != ScanString.EOI)
+		while (source.peek() != type && source.peek() != ScanString.EOI)
 		{
 			capture.push(source.peek());
 			if (source.peek() == '\\')
@@ -412,6 +329,73 @@ public class Scanner implements IScanner
 			return new Token(TokenType.TOK_STRING_LITERAL, capture.toString());
 	}
 
+	private Token processBlockComment()
+	{
+		TokenType type = TokenType.TOK_COMMENT;
+		source.next(2);
+		
+		if (source.peek() == '*')
+		{
+			source.next();
+			type = TokenType.TOK_DOCSTRING;
+		}
+		
+		Capture capture = new Capture();
+		while (source.peek() != ScanString.EOI && source.lookahead('*', '/') != LookaheadStatus.MATCH)
+		{
+			capture.push(source.peek());
+			if (source.peek() == '\\')
+			{
+				// FIXME: validate escape sequence
+				capture.push(source.peek(1));
+				source.next(2);
+			}
+			else
+				source.next();
+		}
+		
+		if (source.lookahead('*', '/') != LookaheadStatus.MATCH)
+		{
+			return returnError("Unterminated block comment");
+		}
+		else
+		{
+			source.next(1); // skip the '*' (but not the '/')
+			discardWhiteSpaces();
+			return new Token(type, capture.toString());
+		}
+	}
+	
+	private void discardWhiteSpaces()
+	{
+		while (true)
+		{
+			switch (source.peek(1))
+			{
+				case '\n':
+				case ' ':
+				case '\t':
+					source.next();
+					continue;
+				default:
+					return;
+			}
+		}
+	}
+	
+	private Token processInlineComment()
+	{
+		source.next(2);
+		
+		Capture capture = new Capture();
+		while (source.peek() != '\n' && source.peek() != ScanString.EOI)
+		{
+			capture.push(source.peek());
+			source.next();
+		}
+		return new Token(TokenType.TOK_COMMENT, capture.toString());
+	}
+	
 	/*private Token emitIfLookahead( TokenType type, char... values)
 	{
 		//if (values.length == 0) 
@@ -567,8 +551,7 @@ public class Scanner implements IScanner
 				(current >= '0' && current <= '9') ||
 				current == '_')
 			{
-				source.next();
-				capture.push(current);
+				capture.push(source.next());
 			}
 			else
 				break;

@@ -4,13 +4,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import beagle.compiler.tree.CompilationUnit;
-import beagle.compiler.tree.FormatParameter;
+import beagle.compiler.tree.FieldDeclaration;
+import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.ICompilationUnit;
+import beagle.compiler.tree.IFieldDeclaration;
 import beagle.compiler.tree.IFormalParameter;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
 import beagle.compiler.tree.ITypeReference;
@@ -39,10 +42,40 @@ public class Parser
 		this.context = context;
 	}
 	
+	public boolean expected( TokenType... types )
+	{
+		for (TokenType type : types )
+		{
+			if (tokens.peek().type == type) return true;
+		}
+		
+		context.throwExpected(tokens.peek().type, types);
+		return false;
+	}
+	
+	public void discardComments()
+	{
+		while (tokens.peek().type == TokenType.TOK_DOCSTRING || 
+			tokens.peek().type == TokenType.TOK_COMMENT ||
+			tokens.peek().type == TokenType.TOK_EOL)
+			tokens.discard();
+	}
+	
+	public void discardWhiteSpaces()
+	{
+		while (true)
+		{
+			TokenType current = tokens.peek().type;
+			if (current == TokenType.TOK_EOL)
+				continue;
+			break;
+		}
+	}
+	
 	/**
 	 * Parse the following grammar:
 	 * 
-	 *   CompilationUnit := PackageDeclaration ImportDeclaration* TypeDeclaration
+	 *   CompilationUnit := PackageDeclaration ImportDeclaration* TypeDeclaration+
 	 * 
 	 * @return
 	 */
@@ -50,14 +83,12 @@ public class Parser
 	{
 		Token current = tokens.peek();
 		IPackage pack = null;
-		
-		if (current.type == TokenType.TOK_PACKAGE)
+				
+		// FIXME: 'package' must be optional
+		if (expected(TokenType.TOK_PACKAGE))
 			pack = parsePackage();
 		else
-		{
-			context.listener.onError(null, "Syntax error, 'package' expected");
 			return null;
-		}
 		
 		ICompilationUnit unit = new CompilationUnit(fileName, pack);
 		
@@ -69,12 +100,16 @@ public class Parser
 			if (imp == null) break;
 			current = tokens.peek();
 		}
-		
-		ITypeDeclaration type = parseType(unit);
-		
-		unit.addType(type);
+
+		while (tokens.peek().type != TokenType.TOK_EOF)
+		{
+			ITypeDeclaration type = parseType(unit);
+			if (type == null) return null;
+			unit.addType(type);
+		}
 		return unit;
 	}
+	
 	
 	/**
 	 * Parse the following grammar:
@@ -100,6 +135,8 @@ public class Parser
 				tokens.discard(2);
 			}
 		}
+		else
+			context.listener.onError(null, "Invalid name");
 		
 		return result;
 	}
@@ -173,11 +210,7 @@ public class Parser
 		
 		// ensures we have a 'class' or 'interface' keyword
 		TokenType type = tokens.peekType();
-		if (type != TokenType.TOK_CLASS /*&& type.type != TokenType.TOK_INTERFACE*/)
-		{
-			context.listener.onError(null, "Expected 'class' or 'interface' keyword");
-			return null;
-		}
+		if (!expected(TokenType.TOK_CLASS)) return null;
 		tokens.discard();
 
 		// parse the type name
@@ -224,29 +257,28 @@ public class Parser
 		{
 			tokens.discard();
 			
-			TypeBody body = new TypeBody(); 
+			TypeBody body = new TypeBody();
 			
-			IModifiers modifiers = parseModifiers();
-			IName typeName = parseName();
-			IName name = parseName();
-			
-			if (typeName != null && name == null)
+			while (tokens.peekType() != TokenType.TOK_DEDENT)
 			{
-				// assume we have a constructor
-				name = typeName;
-			}
-			
-			// check whether we have a method or constructor
-			if (tokens.peekType() == TokenType.TOK_LEFT_PAR)
-			{
-				tokens.discard();
-				List<IFormalParameter> params = parseFormatParameters();
-				tokens.discard(TokenType.TOK_RIGHT_PAR);
-				
+				IModifiers modifiers = parseModifiers();
+				IName typeName = parseName();
 				ITypeReference type = new TypeReference(typeName);
-				IMethodDeclaration method = new MethodDeclaration(modifiers, type, name, params, null);
-				method.setParent(body);
-				body.getMethods().add(method);
+				
+				if (tokens.peekType() == TokenType.TOK_LEFT_PAR ||
+					tokens.lookahead(TokenType.TOK_NAME, TokenType.TOK_LEFT_PAR))
+				{
+					parseMethodDeclaration(modifiers, type, body);
+				}
+				else
+				if (tokens.peekType() == TokenType.TOK_NAME)
+				{
+					IName name = parseName();
+					IFieldDeclaration field = new FieldDeclaration(modifiers, type, name);
+					field.setParent(body);
+					body.getFields().add(field);
+					tokens.discard(); // EOL
+				}
 			}
 			
 			return body;
@@ -255,6 +287,29 @@ public class Parser
 		return null;
 	}
 
+	private void parseMethodDeclaration( IModifiers modifiers, ITypeReference type, ITypeBody body )
+	{
+		IName name = null;
+		
+		if (tokens.peekType() == TokenType.TOK_LEFT_PAR)
+		{
+			// assume we have a constructor
+			name = type.getName();
+		}
+		else
+			name = parseName();
+		
+		tokens.discard();
+		List<IFormalParameter> params = parseFormatParameters();
+		tokens.discard(TokenType.TOK_RIGHT_PAR);
+		
+		IMethodDeclaration method = new MethodDeclaration(modifiers, type, name, params, null);
+		method.setParent(body);
+		body.getMethods().add(method);
+		tokens.discard(); // :
+		tokens.discard(); // EOL
+	}
+	
 	private List<IFormalParameter> parseFormatParameters()
 	{
 		IName typeName = parseName();
@@ -264,14 +319,14 @@ public class Parser
 			return null;
 		
 		List<IFormalParameter> result = new LinkedList<>();
-		result.add( new FormatParameter(name, new TypeReference(typeName)) );
+		result.add( new FormalParameter(name, new TypeReference(typeName)) );
 		
 		while (tokens.peekType() == TokenType.TOK_COMA)
 		{
 			tokens.discard();
 			typeName = parseName();
 			name = parseName();
-			result.add( new FormatParameter(name, new TypeReference(typeName)) );
+			result.add( new FormalParameter(name, new TypeReference(typeName)) );
 		}
 		
 		return result;

@@ -9,6 +9,8 @@ public class TypeBody implements ITypeBody
 
 	List<IMethodDeclaration> methods;
 	
+	List<IFieldDeclaration> fields;
+	
 	ITypeDeclaration parent;
 
 	public TypeBody()
@@ -19,6 +21,7 @@ public class TypeBody implements ITypeBody
 	public TypeBody( ITypeDeclaration parent )
 	{
 		this.methods = new LinkedList<IMethodDeclaration>();
+		this.fields = new LinkedList<IFieldDeclaration>();
 		this.parent = parent;
 	}
 	
@@ -47,6 +50,12 @@ public class TypeBody implements ITypeBody
 	public void setParent( ITypeDeclaration parent)
 	{
 		this.parent = parent;
+	}
+
+	@Override
+	public List<IFieldDeclaration> getFields()
+	{
+		return fields;
 	}
 
 }

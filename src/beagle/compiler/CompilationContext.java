@@ -68,4 +68,13 @@ public class CompilationContext
 		return listener;
 	}
 	
+	public void throwExpected( TokenType found, TokenType... types )
+	{
+		String message = "Syntax error, expected ";
+		for (TokenType type : types)
+			message += "'" + type.getName() + "'";
+		message += " but found '" + found.getName() + "'";
+		listener.onError(null, message);
+	}
+
 }

@@ -37,7 +37,7 @@ public class Token
 	public String toString()
 	{
 		if (value != null)
-			return "Token [Type: " + type.toString() + ";  Value: " + value + "]";
+			return "Token [Type: " + type.toString() + "  Value: " + value + "]";
 		else
 			return "Token [Type: " + type.toString() + "]";
 	}

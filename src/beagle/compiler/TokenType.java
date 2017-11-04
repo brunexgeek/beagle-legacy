@@ -28,6 +28,7 @@ public enum TokenType
 	TOK_LONG("long", true),
 	TOK_NATIVE("native", true),
 	TOK_NEW("new", true),
+	TOK_INTERNAL("internal", true),
 	TOK_PACKAGE("package", true),
 	TOK_PRIVATE("private", true),
 	TOK_PROTECTED("protected", true),
@@ -41,8 +42,6 @@ public enum TokenType
 	TOK_WRITELOCK("writelock", true),
 	TOK_THIS("this", true),
 	TOK_THROW("throw", true),
-	TOK_VOID("void", true),
-	TOK_VOLATILE("volatile", true),
 	TOK_WHILE("while", true),
 	TOK_NAME,
 	TOK_CONTINUE("continue", true),
@@ -79,8 +78,8 @@ public enum TokenType
 	TOK_NE("!=", false),
 	TOK_LE("<=", false),
 	TOK_GE(">=", false),
-	TOK_AND("&&", false),
-	TOK_OR("||", false),
+	TOK_AND("and", false),
+	TOK_OR("or", false),
 	TOK_INC("++", false),
 	TOK_DEC("--", false),
 	TOK_PLUS("+", false),
@@ -104,14 +103,11 @@ public enum TokenType
 	TOK_SHL_ASSIGN("<<=", false),
 	TOK_SHR_ASSIGN(">>=", false),
 	TOK_MOD_ASSIGN("%=", false),
-	TOK_EOL,
+	TOK_EOL("end of line", false),
 	TOK_VARARG("vararg", true),
 	TOK_INDENT,
 	TOK_DEDENT,
 	TOK_IN("in", true),
-	TOK_RANGE("range", true),
-	TOK_PASS("pass", true),
-	TOK_NULLABLE("nullable", true),
 	TOK_HEX_LITERAL,
 	TOK_BIN_LITERAL,
 	TOK_OCT_LITERAL,
@@ -119,7 +115,10 @@ public enum TokenType
 	TOK_BACK_SLASH("\\", false),
 	TOK_NEG_ASSIGN("~=", false),
 	TOK_NOT_ASSIGN("!=", false),
-	TOK_FP_LITERAL;
+	TOK_FP_LITERAL, 
+	TOK_COMMENT, 
+	TOK_DOCSTRING, 
+	TOK_EOF("end of file", false);
 
 	private static HashMap<String, TokenType> lookup = new HashMap<>();
 
@@ -176,7 +175,10 @@ public enum TokenType
 	protected static TokenType getType(String name)
 	{
 		if (lookup.containsKey(name))
-			return lookup.get(name);
+		{
+			TokenType item = lookup.get(name);
+			if (item.isKeyword) return item;
+		}
 		return TOK_NAME;
 	}
 
@@ -196,6 +198,12 @@ public enum TokenType
 			return new Token(this);
 		else
 			return new Token(this, name);
+	}
+	
+	public String getName()
+	{
+		if (name == null || name.isEmpty()) return name();
+		return name;
 	}
 
 }

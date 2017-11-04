@@ -5,13 +5,14 @@ import java.io.PrintStream;
 
 import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ICompilationUnit;
+import beagle.compiler.tree.IFieldDeclaration;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModule;
 import beagle.compiler.tree.IPackage;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.TreeVisitor;
 
-public class CodeGenerator extends TreeVisitor
+public class CodeGenerator extends TreeVisitor<Object>
 {
 
 	protected OutputStream output;
@@ -25,48 +26,62 @@ public class CodeGenerator extends TreeVisitor
 	}
 	
 	@Override
-	public void visitCompilationUnit(ICompilationUnit target)
+	public void visitCompilationUnit(ICompilationUnit target, Object context)
 	{
-		super.visitCompilationUnit(target);
+		super.visitCompilationUnit(target, context);
 	}
 
 	@Override
-	public void visitTypeDeclaration(ITypeDeclaration current)
+	public void visitTypeDeclaration(ITypeDeclaration current, Object context)
 	{
-		super.visitTypeDeclaration(current);
+		printer.println("; Type '" + current.getQualifiedName() + "'");
+		
+		printer.print("%.dyn.");
+		printer.print(current.getQualifiedName());
+		printer.print(" = type { %.classref");
+		
+		for (IFieldDeclaration field : current.getBody().getFields())
+		{
+			printer.print(", %.dyn.");
+			printer.print(field.getType().getQualifiedName());
+		}
+		
+		printer.println(" }");
+		
+		super.visitTypeDeclaration(current, context);
 	}
 
 	@Override
-	public void visitImport(IPackage target)
+	public void visitImport(IPackage target, Object context)
 	{
-		super.visitImport(target);
+		super.visitImport(target, context);
 	}
 
 	@Override
-	public void visitPackage(IPackage target)
+	public void visitPackage(IPackage target, Object context)
 	{
-		super.visitPackage(target);
+		super.visitPackage(target, context);
 	}
 
 	@Override
-	public void visitModule(IModule target)
+	public void visitModule(IModule target, Object context)
 	{
 		printer.println("; module '" + target.getName().getQualifiedName() + "'");
-		super.visitModule(target);
+		super.visitModule(target, context);
 	}
 
 	@Override
-	public void visitTypeBody(ITypeBody target)
+	public void visitTypeBody(ITypeBody target, Object context)
 	{
-		super.visitTypeBody(target);
+		super.visitTypeBody(target, context);
 	}
 
 	@Override
-	public void visitMethodDeclaration(IMethodDeclaration target)
+	public void visitMethodDeclaration(IMethodDeclaration target, Object context)
 	{
 		printer.println("; method of '" + target.getParent().getParent().getName().getQualifiedName() + "'");
 		printer.println("define void @" + target.getName().getQualifiedName() + "() {}");
-		super.visitMethodDeclaration(target);
+		super.visitMethodDeclaration(target, context);
 	}
 
 }

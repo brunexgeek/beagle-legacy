@@ -28,7 +28,7 @@ public class MethodDeclaration implements IMethodDeclaration
 	}
 
 	@Override
-	public ITypeReference getType()
+	public ITypeReference getReturnType()
 	{
 		return type;
 	}

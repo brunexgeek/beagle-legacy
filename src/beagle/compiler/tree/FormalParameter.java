@@ -2,14 +2,14 @@ package beagle.compiler.tree;
 
 import java.io.PrintStream;
 
-public class FormatParameter implements IFormalParameter
+public class FormalParameter implements IFormalParameter
 {
 
 	private ITypeReference type;
 	
 	private IName name;
 	
-	public FormatParameter( IName name, ITypeReference type )
+	public FormalParameter( IName name, ITypeReference type )
 	{
 		this.type = type;
 		this.name = name;
