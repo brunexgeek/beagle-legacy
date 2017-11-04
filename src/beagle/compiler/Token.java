@@ -6,10 +6,12 @@ public class Token
 	protected TokenType type;
 
 	protected String value;
+	
+	protected SourceLocation location;
 
-	public Token(TokenType type)
+	public Token(SourceLocation location, TokenType type)
 	{
-		this(type, null);
+		this(location, type, null);
 	}
 
 	/**
@@ -21,14 +23,16 @@ public class Token
 	 * 
 	 * @param value
 	 */
-	public Token(String value)
+	public Token(SourceLocation location, String value)
 	{
+		this.location = location.clone();
 		this.type = TokenType.getType(value);
 		this.value = value;
 	}
 
-	public Token(TokenType type, String value)
+	public Token(SourceLocation location, TokenType type, String value)
 	{
+		this.location = location.clone();
 		this.type = type;
 		this.value = value;
 	}

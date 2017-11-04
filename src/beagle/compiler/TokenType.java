@@ -58,7 +58,7 @@ public enum TokenType
 	TOK_INT64("int64", true),
 	TOK_TRUE("true", true),
 	TOK_FALSE("false", true),
-	TOK_LEFT_PAR("(", false), 
+	TOK_LEFT_PAR("(", false),
 	TOK_RIGHT_PAR(")", false),
 	TOK_LEFT_BRACE("{", false),
 	TOK_RIGHT_BRACE("}", false),
@@ -115,15 +115,17 @@ public enum TokenType
 	TOK_BACK_SLASH("\\", false),
 	TOK_NEG_ASSIGN("~=", false),
 	TOK_NOT_ASSIGN("!=", false),
-	TOK_FP_LITERAL, 
-	TOK_COMMENT, 
-	TOK_DOCSTRING, 
-	TOK_EOF("end of file", false);
+	TOK_FP_LITERAL,
+	TOK_COMMENT,
+	TOK_DOCSTRING,
+	TOK_EOF("end of file", false),
+	TOK_VAR("var", true),
+	TOK_DEF("def", true);
 
 	private static HashMap<String, TokenType> lookup = new HashMap<>();
 
 	private String name;
-	
+
 	private boolean isKeyword;
 
 	static
@@ -141,18 +143,18 @@ public enum TokenType
 
 	/**
 	 * Create a token type for keywords, operators and symbols.
-	 * 
+	 *
 	 * <p>
 	 * If the token type contains a non-null keyword, this keyword will be used
 	 * when looking up for matches in the {@link getType} method.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Token types created with this contructor will have a default Token
 	 * instance which can used by {@link Scanner} implementations to avoid
 	 * object creation.
 	 * </p>
-	 * 
+	 *
 	 * @param keyword
 	 */
 	private TokenType(String name, boolean isKeyword)
@@ -163,12 +165,12 @@ public enum TokenType
 
 	/**
 	 * Return a token type given the identifier.
-	 * 
+	 *
 	 * <p>
 	 * If no match is found, the method returns {@link TOK_NAME} or
 	 * {@link TOK_QNAME} (if the identifier contains one or more dots).
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -184,22 +186,22 @@ public enum TokenType
 
 	/**
 	 * Returns the default token instance.
-	 * 
+	 *
 	 * <p>
 	 * If the token type does not have a default instance, this method return
 	 * {@code null} instead.
 	 * </p>
-	 * 
+	 *
 	 * @return
 	 */
-	public Token createToken( /*SourceLocation location*/ )
+	public Token createToken( SourceLocation location )
 	{
 		if (name == null)
-			return new Token(this);
+			return new Token(location, this);
 		else
-			return new Token(this, name);
+			return new Token(location, this, name);
 	}
-	
+
 	public String getName()
 	{
 		if (name == null || name.isEmpty()) return name();

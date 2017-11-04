@@ -10,22 +10,22 @@ public class ScanString
 	 * Begin of input.
 	 */
 	public static final char BOI = 0x01;
-	
+
 	/**
 	 * End of input.
 	 */
 	public static final char EOI = 0x04;
-	
+
 	/**
 	 * Begin of line.
 	 */
 	public static final char BOL = 0x02;
-	
+
 	/**
 	 * End of line.
 	 */
 	public static final char EOL = 0x0A;
-		
+
 	/**
 	 * The input buffer.
 	 */
@@ -39,22 +39,22 @@ public class ScanString
 	protected int bufferSize;
 
 	protected CompilationListener listener;
-	
+
 	protected SourceLocation location;
-	
+
 	/**
-	 * Create a scanner from the input array. 
+	 * Create a scanner from the input array.
 	 */
 	public ScanString(String fileName, char[] content)
 	{
 		location = new SourceLocation(fileName);
 		//unescape(input);
-		
+
 		buffer = preprocess(content);
 		bufferSize = buffer.length;
 		index = -1;
 	}
-	
+
 	public ScanString(String fileName, String input)
 	{
 		this(fileName, input.toCharArray());
@@ -69,11 +69,11 @@ public class ScanString
 	{
 		int lines = 0;
 		int total = content.length;
-		
+
 		// discard every EOL at the end of the input
 		while (total > 0 && content[total-1] == '\n')
 			--total;
-		
+
 		// check if the content is empty
 		if (total == 0)
 		{
@@ -87,53 +87,31 @@ public class ScanString
 		for (int i = 0; i < total; ++i)
 			if (content[i] == '\n') ++lines;
 		lines++;
-		
+
 		// ensure space for ending EOL+EOI markers
 		char[] buffer = new char[total + 2];
-		
+
 		int i = 0, j = 0;
-		
+
 		while (i < total)
 		{
 			char value = content[i];
-			
+
 			// ignores most control characters
 			if (value != '\t' && value != '\n' && value < ' ')
 				buffer[j] = ' ';
 			else
 				buffer[j] = value;
-		
+
 			++j;
 			++i;
 		}
 		buffer[j++] = '\n';
 		buffer[j] = EOI;
-	
+
 		return buffer;
 	}
 
-	/**
-	 * Returns the next character.
-	 * 
-	 * <p>This is equivalent to call:
-	 * 
-	 * <pre>
-	 * {@code
-	 * next();
-	 * char value = peek();
-	 * }
-	 * </pre>
-	 * 
-	 * @return
-	 */
-	protected char pull()
-	{
-		if (index < bufferSize - 1)
-			return location.update(buffer[++index]);
-		else
-			return EOI;
-	}
-	
 	/**
 	 * Returns the current character, but do not advances.
 	 * @return
@@ -145,7 +123,7 @@ public class ScanString
 		else
 			return buffer[index];
 	}
-	
+
 	/**
 	 * Returns some future character, but do not advances.
 	 * @return
@@ -160,22 +138,22 @@ public class ScanString
 		else
 			return EOI;
 	}
-	
+
 	protected LookaheadStatus lookahead( char... values )
 	{
 		if (index >= bufferSize - 1)
 			return LookaheadStatus.EOI;
 		if (index + values.length >= bufferSize)
 			return LookaheadStatus.NO_MATCH;
-		
+
 		for (int i = 0; i < values.length; ++i)
 		{
-			if (buffer[index + i] != values[i]) 
+			if (buffer[index + i] != values[i])
 				return LookaheadStatus.NO_MATCH;
 		}
-		return LookaheadStatus.MATCH;			
+		return LookaheadStatus.MATCH;
 	}
-	
+
 	protected void push(char value)
 	{
 		if (index > 0)
@@ -191,22 +169,26 @@ public class ScanString
 	{
 		return next(1);
 	}
-	
+
 	protected char next( int count )
 	{
 		if (count <= 0) return peek();
-		if (index + count < bufferSize)
-			index += count;
-		else
-			index = bufferSize - 1;
-		return peek();
+
+		while(count > 0 && index + 1 < bufferSize)
+		{
+			++index;
+			--count;
+			location.update(buffer[index]);
+		}
+
+		return buffer[index];
 	}
-    
-	protected char previous()
+
+	/*protected char previous()
 	{
 		return previous(1);
 	}
-	
+
 	protected char previous( int count )
 	{
 		if (count <= 0) return peek();
@@ -215,8 +197,8 @@ public class ScanString
 		else
 			index = 0;
 		return peek();
-	}
-	
+	}*/
+
     public void unescape( char[] data )
     {
 		Integer i = new Integer(0);
@@ -241,7 +223,7 @@ public class ScanString
 		{
 			while (offset < data.length && data[offset] == 'u')
 				offset++;
-	
+
 			int end = offset + 3;
 			if (end < data.length)
 			{
@@ -261,7 +243,7 @@ public class ScanString
 		}
 		return ' ';
 	}
-    
+
     private int hexDigit(char value) {
         if (value >= '0' && value <= '9')
         	return value - '0';
@@ -277,4 +259,9 @@ public class ScanString
     {
     	return peek() + "";
     }
+
+	public SourceLocation getLocation()
+	{
+		return location;
+	}
 }

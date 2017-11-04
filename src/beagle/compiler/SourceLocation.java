@@ -1,6 +1,6 @@
 package beagle.compiler;
 
-public class SourceLocation
+public class SourceLocation implements Cloneable
 {
 
 	protected int line;
@@ -50,4 +50,9 @@ public class SourceLocation
 		return value;
 	}
 
+	@Override
+	public SourceLocation clone()
+	{
+		return new SourceLocation(fileName, line, column);		
+	}
 }

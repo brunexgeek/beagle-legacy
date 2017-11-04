@@ -7,25 +7,23 @@ public class TypeDeclaration implements ITypeDeclaration
 {
 
 	protected IPackage pack;
-	
+
 	protected boolean complete;
-	
+
 	protected ICompilationUnit parent;
-	
+
 	protected IModifiers modifiers;
 
 	protected IName name;
-	
-	protected ITypeReference extended;
 
-	protected List<ITypeReference> implemented;
-	
+	protected List<ITypeReference> extended;
+
 	protected ITypeBody body;
 
 
 	/**
 	 * Create a complete type declaration
-	 * 
+	 *
 	 * @param unit
 	 * @param modifiers
 	 * @param name
@@ -33,29 +31,28 @@ public class TypeDeclaration implements ITypeDeclaration
 	 * @param implemented
 	 * @param body
 	 */
-	public TypeDeclaration(ICompilationUnit parent, IModifiers modifiers, IName name, ITypeReference extended,
-			List<ITypeReference> implemented, ITypeBody body)
+	public TypeDeclaration(ICompilationUnit parent, IModifiers modifiers, IName name,
+			List<ITypeReference> extended, ITypeBody body)
 	{
 		if (name.getCount() > 1)
 			throw new IllegalArgumentException("Invalid simple name");
 		if (parent == null)
 			throw new IllegalArgumentException("Compilation unit can not be null");
-		
+
 		this.parent = parent;
 		this.name = name;
 		this.pack = parent.getPackage();
 		this.complete = true;
 		this.modifiers = modifiers;
 		this.extended = extended;
-		this.implemented = implemented;
 		this.body = body;
-		
-		body.setParent(this);
+
+		if (body != null) body.setParent(this);
 	}
 
 	/**
 	 * Create an incomplete type declaration
-	 * 
+	 *
 	 * @param pack
 	 * @param name
 	 */
@@ -65,18 +62,18 @@ public class TypeDeclaration implements ITypeDeclaration
 			throw new IllegalArgumentException("Invalid simple name");
 		if (pack == null)
 			throw new IllegalArgumentException("Package can not be null");
-		
+
 		this.parent = null;
 		this.name = name;
 		this.pack = pack;
 		this.complete = false;
 	}
-	
+
 	public TypeDeclaration( ICompilationUnit unit, IName name )
 	{
 
 	}
-	
+
 	@Override
 	public boolean isComplete()
 	{
@@ -87,7 +84,7 @@ public class TypeDeclaration implements ITypeDeclaration
 	{
 		complete = state;
 	}
-	
+
 	@Override
 	public IPackage getPackage()
 	{
@@ -117,7 +114,7 @@ public class TypeDeclaration implements ITypeDeclaration
 	{
 		return body;
 	}
-	
+
 	@Override
 	public void print(PrintStream out, int level)
 	{
@@ -135,18 +132,11 @@ public class TypeDeclaration implements ITypeDeclaration
 		if (extended != null)
 		{
 			Printer.indent(out, level + 1);
-			out.println("[Extends]");
-			extended.print(out, level + 2);
-		}
-
-		if (implemented != null)
-		{
-			Printer.indent(out, level + 1);
-			out.println("[Implements]");
-			for (ITypeReference item : implemented)
+			out.println("[Extended]");
+			for (ITypeReference item : extended)
 				item.print(out, level + 2);
 		}
-		
+
 		body.print(out, level + 1);
 	}
 

@@ -23,7 +23,7 @@ public class Main
 
 			System.out.println("Compiling '" + fileName + "'");
 			IScanner scanner = new Scanner(context, new ScanString(fileName, content));
-			if (true)
+			if (false)
 			{
 				Token tok;
 				while ((tok = scanner.readToken()).type != TokenType.TOK_EOF)
@@ -35,6 +35,7 @@ public class Main
 			{
 				Parser parser = new Parser(context, scanner);
 				ICompilationUnit unit = parser.parse();
+				if (unit == null) return;
 				//unit.print(System.out, 0);
 				IModule module = new Module( new Name("beagle"));
 				module.addCompilationUnit(unit);
@@ -68,7 +69,7 @@ public class Main
 			}
 			else
 				System.out.print("unknow:0:0");
-			System.out.print(": ");
+			System.out.print(": [E] ");
 			System.out.println(message);
 			return true;
 		}

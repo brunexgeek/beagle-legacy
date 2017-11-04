@@ -12,7 +12,7 @@ public class CompilationContext
 
 	/**
 	 * Map containing every known type.
-	 * 
+	 *
 	 * Types can be obtained from loading modules or from compilation units
 	 * (both complete and incomplete types).
 	 */
@@ -20,23 +20,23 @@ public class CompilationContext
 
 	/**
 	 * Map containing every known package.
-	 * 
+	 *
 	 * Packages can be obtained from loading modules or from compilation units.
 	 */
 	public HashMap<String, IPackage> packages;
 
-	
+
 	public CompilationListener listener;
-	
-	
+
+
 	public CompilationContext( CompilationListener listener )
 	{
 		this.types = new HashMap<>();
 		this.packages = new HashMap<>();
 		this.listener = listener;
 	}
-	
-	
+
+
 	public IPackage createPackage(IName packageName)
 	{
 		IPackage result = packages.get(packageName);
@@ -53,7 +53,7 @@ public class CompilationContext
 	{
 		if (name.isQualified())
 			throw new IllegalArgumentException("Invalid simple name");
-		
+
 		ITypeDeclaration result = types.get(name);
 		if (result == null)
 		{
@@ -62,19 +62,25 @@ public class CompilationContext
 		}
 		return result;
 	}*/
-	
+
 	public CompilationListener getListener()
 	{
 		return listener;
 	}
-	
-	public void throwExpected( TokenType found, TokenType... types )
+
+	public void throwExpected( Token found, TokenType... types )
 	{
+		boolean first = true;
 		String message = "Syntax error, expected ";
 		for (TokenType type : types)
+		{
+			if (!first) message += " or ";
 			message += "'" + type.getName() + "'";
-		message += " but found '" + found.getName() + "'";
-		listener.onError(null, message);
+			first = false;
+
+		}
+		message += " but found '" + found.type.getName() + "'";
+		listener.onError(found.location, message);
 	}
 
 }
