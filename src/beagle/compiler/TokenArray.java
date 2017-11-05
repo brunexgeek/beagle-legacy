@@ -74,6 +74,9 @@ public class TokenArray
 	/**
 	 * Check if the next tokens in the input sequence corresponds to the given ones.
 	 *
+	 * If isRequired is true and the lookahead fails, this function send a
+	 * compilation error to the current listener before returns.
+	 *
 	 * @param types
 	 * @return
 	 */

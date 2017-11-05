@@ -8,27 +8,30 @@ public class FieldDeclaration implements IFieldDeclaration
 {
 
 	protected IModifiers modifiers;
-	
+
 	protected ITypeReference type;
-	
+
 	protected LinkedList<IFieldVariable> variables;
-	
+
+	protected List<IAnnotation> annotations;
+
 	protected ITypeBody parent;
 
-	public FieldDeclaration( IModifiers modifiers, ITypeReference type, IName name )
+	public FieldDeclaration( List<IAnnotation> annotations, IModifiers modifiers, ITypeReference type, IName name )
 	{
+		this.annotations = annotations;
 		this.modifiers = modifiers;
 		this.type = type;
 		this.variables = new LinkedList<>();
 		if (name != null)
 			this.variables.add( new FieldVariable(name) );
 	}
-	
-	public FieldDeclaration( IModifiers modifiers, ITypeReference type )
+
+	public FieldDeclaration( List<IAnnotation> annotations, IModifiers modifiers, ITypeReference type )
 	{
-		this(modifiers, type, null);
+		this(annotations, modifiers, type, null);
 	}
-	
+
 	@Override
 	public void print(PrintStream out, int level)
 	{
@@ -69,5 +72,11 @@ public class FieldDeclaration implements IFieldDeclaration
 	{
 		this.parent = parent;
 	}
-	
+
+	@Override
+	public List<IAnnotation> getAnnotations()
+	{
+		return annotations;
+	}
+
 }

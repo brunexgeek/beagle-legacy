@@ -3,9 +3,11 @@ package beagle.compiler;
 import java.util.LinkedList;
 import java.util.List;
 
+import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.FieldDeclaration;
 import beagle.compiler.tree.FormalParameter;
+import beagle.compiler.tree.IAnnotation;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IFieldDeclaration;
 import beagle.compiler.tree.IFormalParameter;
@@ -210,8 +212,8 @@ public class Parser
 	 */
 	public ITypeDeclaration parseType( ICompilationUnit unit )
 	{
-		// parse the modifiers
-		IModifiers modifiers = parseModifiers(false);
+		List<IAnnotation> annots = parseAnnotations();
+		//IModifiers modifiers = parseModifiers(false);
 
 		// ensures we have a 'class' or 'interface' keyword
 		TokenType type = tokens.peekType();
@@ -222,13 +224,13 @@ public class Parser
 		IName name = parseName();
 
 		if (type == TokenType.TOK_CLASS)
-			return parseClass(unit, modifiers, name);
+			return parseClass(unit, annots, null, name);
 
 		return null;
 	}
 
 
-	public ITypeDeclaration parseClass( ICompilationUnit unit, IModifiers modifiers, IName name )
+	public ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers, IName name )
 	{
 		List<ITypeReference> extended = null;
 
@@ -239,7 +241,7 @@ public class Parser
 
 		TypeBody body = parseClassBody();
 
-		return new TypeDeclaration(unit, modifiers, name, extended, body);
+		return new TypeDeclaration(unit, annots, modifiers, name, extended, body);
 	}
 
 	private TypeBody parseClassBody()
@@ -250,39 +252,25 @@ public class Parser
 
 			TypeBody body = new TypeBody();
 
+			// parse every class member
 			while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
 			{
-				IModifiers modifiers = parseModifiers();
+				List<IAnnotation> annots = parseAnnotations();
+				//IModifiers modifiers = parseModifiers();
 
+				// variable or constant
 				if (tokens.peekType() == TokenType.TOK_VAR || tokens.peekType() == TokenType.TOK_CONST)
 				{
-					body.getFields().add( parseField(modifiers) );
+					body.getFields().add( parseField(annots, null) );
 				}
 				else
 				{
 					context.throwExpected(tokens.peek(), TokenType.TOK_VAR, TokenType.TOK_CONST);
 					break;
 				}
-
-				/*IName typeName = parseName();
-				ITypeReference type = new TypeReference(typeName);
-
-				if (tokens.peekType() == TokenType.TOK_LEFT_PAR ||
-					tokens.lookahead(TokenType.TOK_NAME, TokenType.TOK_LEFT_PAR))
-				{
-					parseMethodDeclaration(modifiers, type, body);
-				}
-				else
-				if (tokens.peekType() == TokenType.TOK_NAME)
-				{
-					IName name = parseName();
-					IFieldDeclaration field = new FieldDeclaration(modifiers, type, name);
-					field.setParent(body);
-					body.getFields().add(field);
-					tokens.discard(); // EOL
-				}*/
 			}
 
+			tokens.discard();
 			return body;
 		}
 
@@ -294,7 +282,7 @@ public class Parser
 	 *
 	 * @return
 	 */
-	private IFieldDeclaration parseField( IModifiers modifiers )
+	private IFieldDeclaration parseField( List<IAnnotation> annots, IModifiers modifiers )
 	{
 		// discard 'var' or 'const' keyword
 		tokens.discard();
@@ -308,7 +296,7 @@ public class Parser
 			type = new TypeReference( parseName() );
 		}
 
-		return new FieldDeclaration(modifiers, type, name);
+		return new FieldDeclaration(annots, modifiers, type, name);
 	}
 
 	private void parseMethodDeclaration( IModifiers modifiers, ITypeReference type, ITypeBody body )
@@ -404,6 +392,26 @@ public class Parser
 	public IModifiers parseModifiers()
 	{
 		return parseModifiers(false);
+	}
+
+	public List<IAnnotation> parseAnnotations()
+	{
+		if (tokens.peekType() != TokenType.TOK_AT)
+		{
+			return new LinkedList<IAnnotation>();
+		}
+
+		LinkedList<IAnnotation> output = new LinkedList<>();
+
+		while (tokens.peekType() == TokenType.TOK_AT)
+		{
+			tokens.discard();
+			IName name = parseName();
+			if (name == null) return null;
+			output.add( new Annotation( new TypeReference(name)));
+		}
+
+		return output;
 	}
 
 	/**

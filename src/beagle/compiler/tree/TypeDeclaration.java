@@ -18,6 +18,8 @@ public class TypeDeclaration implements ITypeDeclaration
 
 	protected List<ITypeReference> extended;
 
+	protected List<IAnnotation> annots;
+
 	protected ITypeBody body;
 
 
@@ -31,7 +33,7 @@ public class TypeDeclaration implements ITypeDeclaration
 	 * @param implemented
 	 * @param body
 	 */
-	public TypeDeclaration(ICompilationUnit parent, IModifiers modifiers, IName name,
+	public TypeDeclaration(ICompilationUnit parent, List<IAnnotation> annots, IModifiers modifiers, IName name,
 			List<ITypeReference> extended, ITypeBody body)
 	{
 		if (name.getCount() > 1)
@@ -40,6 +42,7 @@ public class TypeDeclaration implements ITypeDeclaration
 			throw new IllegalArgumentException("Compilation unit can not be null");
 
 		this.parent = parent;
+		this.annots = annots;
 		this.name = name;
 		this.pack = parent.getPackage();
 		this.complete = true;
@@ -138,6 +141,12 @@ public class TypeDeclaration implements ITypeDeclaration
 		}
 
 		body.print(out, level + 1);
+	}
+
+	@Override
+	public List<IAnnotation> getAnnotations()
+	{
+		return annots;
 	}
 
 }

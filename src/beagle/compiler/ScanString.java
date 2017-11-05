@@ -9,7 +9,7 @@ public class ScanString
 	/**
 	 * Begin of input.
 	 */
-	public static final char BOI = 0x01;
+	public static final	char BOI = 0x01;
 
 	/**
 	 * End of input.

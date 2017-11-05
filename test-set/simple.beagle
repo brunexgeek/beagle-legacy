@@ -1,0 +1,27 @@
+/**
+ * This is something to think about!
+ *
+ */
+
+package test
+
+import foo.bar.* 
+import baz.FooBar
+
+
+@Package 
+class Alice : Bob, Eve
+{
+
+	@Private
+	var variable : Foobar
+
+	const constant : int
+
+	@Public	
+	def myMethod( argument : double ) : int
+	{
+		return constant * argument
+	}
+
+}
