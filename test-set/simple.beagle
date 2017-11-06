@@ -8,6 +8,9 @@ package test
 import foo.bar.* 
 import baz.FooBar
 
+/** bla */
+
+/* asdasd */
 
 @Package 
 class Alice : Bob, Eve
@@ -16,7 +19,7 @@ class Alice : Bob, Eve
 	@Private
 	var variable : Foobar
 
-	const constant : int
+	const constant = "My constant"
 
 	@Public	
 	def myMethod( argument : double ) : int

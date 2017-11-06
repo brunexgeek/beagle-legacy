@@ -1,6 +1,11 @@
 package beagle.compiler;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import beagle.compiler.Token.LineBreak;
+import beagle.compiler.tree.Comment;
+import beagle.compiler.tree.IComment;
 
 /**
  * Extract tokens from the input source code.
@@ -8,51 +13,70 @@ import beagle.compiler.Token.LineBreak;
 public class Scanner implements IScanner
 {
 
-	protected ScanString source;
+	ScanString source;
 
-	private CompilationListener listener;
+	CompilationListener listener;
 
-	private CompilationContext context;
+	CompilationContext context;
 
-	private boolean ignoreEol = true;
+	boolean lineBreak = false;
+
+	List<IComment> comments;
 
 	Scanner( CompilationContext context, ScanString source )
 	{
 		this.source = source;
 		this.context = context;
 		this.listener = context.listener;
+		this.comments = new LinkedList<>();
 	}
 
-	protected LineBreak getLineBreak()
+	int getLineBreak()
 	{
-		return LineBreak.NONE;
+		int state = 0;
+
+		if (lineBreak)
+			state = LineBreak.BEFORE;
+		if (source.peek(1) == '\n')
+			state |= LineBreak.AFTER;
+
+		return state;
 	}
 
-	protected Token createToken( TokenType type )
+	Token createToken( TokenType type )
 	{
-		return new Token(source.location, getLineBreak(), type);
+		return createToken(type, null);
 	}
 
-	protected Token createToken( TokenType type, String name )
+	Token createToken( TokenType type, String name )
 	{
-		if (type == null)
-			return new Token(source.location, getLineBreak(), name);
-		else
-			return new Token(source.location, getLineBreak(), type, name);
+		int state = getLineBreak();
+		lineBreak = false;
+
+		Token output = new Token(source.location, state, (comments.size() > 0) ? comments : null, type, name);
+
+		if (comments.size() > 0)
+			comments = new LinkedList<>();
+
+		return output;
 	}
 
 	/**
 	 * Advance the cursor and process the current character.
 	 */
 	@Override
-	public Token readToken()
+	public
+	Token readToken()
 	{
 		while (true)
 		{
-			char last = source.peek();
-			if (last == ScanString.BOI) last = '\n';
+			if (source.next() == '\n')
+			{
+				lineBreak = true;
+				while (source.next() == '\n');
+			}
 
-			switch (source.next())
+			switch (source.peek())
 			{
 				case 'A':
 				case 'B':
@@ -113,13 +137,15 @@ public class Scanner implements IScanner
 					// capture block comments
 					if (source.peek(1) == '*')
 					{
-						processBlockComment();
+						IComment comm = processBlockComment();
+						if (comm != null) comments.add(comm);
 						break;
 					}
 					// capture inline comments
 					if (source.peek(1) == '/')
 					{
-						processInlineComment();
+						IComment comm = processInlineComment();
+						if (comm != null) comments.add(comm);
 						break;
 					}
 
@@ -309,10 +335,6 @@ public class Scanner implements IScanner
 					}
 					return createToken(TokenType.TOK_XOR);
 
-				case '\n':
-					if (ignoreEol || last == '\n') break;
-					return createToken(TokenType.TOK_EOL);
-
 				case ScanString.BOL:
 					break;
 
@@ -328,7 +350,7 @@ public class Scanner implements IScanner
 		}
 	}
 
-	private Token processString()
+	Token processString()
 	{
 		char type = source.peek();
 		source.next();
@@ -336,15 +358,9 @@ public class Scanner implements IScanner
 		Capture capture = new Capture();
 		while (source.peek() != type && source.peek() != ScanString.EOI)
 		{
+			// FIXME: validate and expands escape sequences
 			capture.push(source.peek());
-			if (source.peek() == '\\')
-			{
-				// FIXME: validate escape sequence
-				capture.push(source.peek(1));
-				source.next(2);
-			}
-			else
-				source.next();
+			source.next();
 		}
 		if (source.peek() != type)
 		{
@@ -354,7 +370,7 @@ public class Scanner implements IScanner
 			return createToken(TokenType.TOK_STRING_LITERAL, capture.toString());
 	}
 
-	private Token processBlockComment()
+	IComment processBlockComment()
 	{
 		TokenType type = TokenType.TOK_COMMENT;
 		source.next(2);
@@ -368,30 +384,26 @@ public class Scanner implements IScanner
 		Capture capture = new Capture();
 		while (source.peek() != ScanString.EOI && source.lookahead('*', '/') != LookaheadStatus.MATCH)
 		{
+			// FIXME: validate and expands escape sequences
 			capture.push(source.peek());
-			if (source.peek() == '\\')
-			{
-				// FIXME: validate escape sequence
-				capture.push(source.peek(1));
-				source.next(2);
-			}
-			else
-				source.next();
+			source.next();
 		}
 
 		if (source.lookahead('*', '/') != LookaheadStatus.MATCH)
 		{
-			return returnError("Unterminated block comment");
+			context.listener.onError(source.location, "Unterminated block comment");
+			return null;
 		}
 		else
 		{
 			source.next(1); // skip the '*' (but not the '/')
 			discardWhiteSpaces();
-			return createToken(type, capture.toString());
+
+			return new Comment(capture.toString(), type == TokenType.TOK_DOCSTRING);
 		}
 	}
 
-	private void discardWhiteSpaces()
+	void discardWhiteSpaces()
 	{
 		while (true)
 		{
@@ -408,7 +420,7 @@ public class Scanner implements IScanner
 		}
 	}
 
-	private Token processInlineComment()
+	IComment processInlineComment()
 	{
 		source.next(2);
 
@@ -418,7 +430,7 @@ public class Scanner implements IScanner
 			capture.push(source.peek());
 			source.next();
 		}
-		return createToken(TokenType.TOK_COMMENT, capture.toString());
+		return new Comment(capture.toString(), false);
 	}
 
 	/*private Token emitIfLookahead( TokenType type, char... values)
@@ -434,12 +446,12 @@ public class Scanner implements IScanner
 		return null;
 	}*/
 
-	private boolean isDigit(char value)
+	boolean isDigit(char value)
 	{
 		return (value >= '0' && value <= '9');
 	}
 
-	private Token processNumber()
+	Token processNumber()
 	{
 		TokenType type = TokenType.TOK_DEC_LITERAL;
 
@@ -496,13 +508,13 @@ public class Scanner implements IScanner
 		return createToken(type, capture.toString());
 	}
 
-	private Token returnError( String message )
+	Token returnError( String message )
 	{
 		listener.onError(source.location, message);
 		return null;
 	}
 
-	private Token processHexadecimal()
+	Token processHexadecimal()
 	{
 		Capture capture = new Capture();
 		capture.push("0x");
@@ -530,7 +542,7 @@ public class Scanner implements IScanner
 		}
 	}
 
-	private Token processBinary()
+	Token processBinary()
 	{
 		Capture capture = new Capture();
 		capture.push("0b");
@@ -564,7 +576,7 @@ public class Scanner implements IScanner
 	 *
 	 * @return
 	 */
-	private Token processIdentifier()
+	Token processIdentifier()
 	{
 		Capture capture = new Capture();
 
@@ -587,13 +599,15 @@ public class Scanner implements IScanner
 	}
 
 	@Override
-	public String getFileName()
+	public
+	String getFileName()
 	{
 		return source.location.fileName;
 	}
 
 	@Override
-	public CompilationContext getContext()
+	public
+	CompilationContext getContext()
 	{
 		return context;
 	}

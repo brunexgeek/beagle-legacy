@@ -144,18 +144,11 @@ public enum TokenType
 	/**
 	 * Create a token type for keywords, operators and symbols.
 	 *
-	 * <p>
 	 * If the token type contains a non-null keyword, this keyword will be used
 	 * when looking up for matches in the {@link getType} method.
-	 * </p>
 	 *
-	 * <p>
-	 * Token types created with this contructor will have a default Token
-	 * instance which can used by {@link Scanner} implementations to avoid
-	 * object creation.
-	 * </p>
-	 *
-	 * @param keyword
+	 * @param name
+	 * @param isKeyword
 	 */
 	private TokenType(String name, boolean isKeyword)
 	{
@@ -166,41 +159,20 @@ public enum TokenType
 	/**
 	 * Return a token type given the identifier.
 	 *
-	 * <p>
-	 * If no match is found, the method returns {@link TOK_NAME} or
-	 * {@link TOK_QNAME} (if the identifier contains one or more dots).
-	 * </p>
+	 * If no match is found, this method returns {@link TOK_NAME}.
 	 *
-	 * @param name
+	 * @param text
 	 * @return
 	 */
-	protected static TokenType getType(String name)
+	public static TokenType getType(String text)
 	{
-		if (lookup.containsKey(name))
+		if (lookup.containsKey(text))
 		{
-			TokenType item = lookup.get(name);
+			TokenType item = lookup.get(text);
 			if (item.isKeyword) return item;
 		}
 		return TOK_NAME;
 	}
-
-	/**
-	 * Returns the default token instance.
-	 *
-	 * <p>
-	 * If the token type does not have a default instance, this method return
-	 * {@code null} instead.
-	 * </p>
-	 *
-	 * @return
-	 */
-	/*public Token createToken( SourceLocation location, LineBreak lineBreak )
-	{
-		if (name == null)
-			return new Token(location, lineBreak, this);
-		else
-			return new Token(location, lineBreak, this, name);
-	}*/
 
 	public String getName()
 	{

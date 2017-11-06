@@ -20,7 +20,6 @@ import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
 import beagle.compiler.tree.ITypeReference;
 import beagle.compiler.tree.MethodDeclaration;
-import beagle.compiler.tree.Modifiers;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.Package;
 import beagle.compiler.tree.TypeBody;
@@ -28,7 +27,7 @@ import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeReference;
 
-public class Parser
+public class Parser implements IParser
 {
 
 	private String fileName;
@@ -44,7 +43,7 @@ public class Parser
 		this.context = context;
 	}
 
-	public boolean expected( TokenType... types )
+	boolean expected( TokenType... types )
 	{
 		for (TokenType type : types )
 		{
@@ -55,15 +54,7 @@ public class Parser
 		return false;
 	}
 
-	public void discardComments()
-	{
-		while (tokens.peek().type == TokenType.TOK_DOCSTRING ||
-			tokens.peek().type == TokenType.TOK_COMMENT ||
-			tokens.peek().type == TokenType.TOK_EOL)
-			tokens.discard();
-	}
-
-	public void discardWhiteSpaces()
+	void discardWhiteSpaces()
 	{
 		while (true)
 		{
@@ -77,10 +68,11 @@ public class Parser
 	/**
 	 * Parse the following grammar:
 	 *
-	 *   CompilationUnit := PackageDeclaration ImportDeclaration* TypeDeclaration+
+	 *   CompilationUnit := [ PackageDeclaration ] ImportDeclaration* TypeDeclaration+
 	 *
 	 * @return
 	 */
+	@Override
 	public ICompilationUnit parse()
 	{
 		Token current = tokens.peek();
@@ -112,7 +104,7 @@ public class Parser
 		return unit;
 	}
 
-	public IName parseName()
+	IName parseName()
 	{
 		return parseName(true);
 	}
@@ -125,25 +117,21 @@ public class Parser
 	 *
 	 * @return
 	 */
-	public IName parseName( boolean isQualified )
+	IName parseName( boolean isQualified )
 	{
-		Name result = null;
-		Token current = tokens.peek();
-		if (current.type == TokenType.TOK_NAME)
-		{
-			result = new Name(current.value);
-			tokens.discard();
+		if (!expected(TokenType.TOK_NAME))
+			return null;
 
-			while (isQualified)
-			{
-				if (!tokens.lookahead(TokenType.TOK_DOT, TokenType.TOK_NAME))
-					break;
-				result.append(tokens.peek(1).value);
-				tokens.discard(2);
-			}
+		Name result = new Name(tokens.peek().value);
+		tokens.discard();
+
+		while (isQualified)
+		{
+			if (!tokens.lookahead(TokenType.TOK_DOT, TokenType.TOK_NAME))
+				break;
+			result.append(tokens.peek(1).value);
+			tokens.discard(2);
 		}
-		else
-			context.listener.onError(null, "Invalid name");
 
 		return result;
 	}
@@ -151,11 +139,11 @@ public class Parser
 	/**
 	 * Parse the following grammar:
 	 *
-	 *  PackageDeclaration := "package" QualifiedName LF
+	 *  PackageDeclaration := "package" QualifiedName
 	 *
 	 * @return
 	 */
-	public IPackage parsePackage()
+	IPackage parsePackage()
 	{
 		if (tokens.peekType() == TokenType.TOK_PACKAGE)
 		{
@@ -174,7 +162,7 @@ public class Parser
 	 *
 	 * @return
 	 */
-	public ITypeImport parseImport()
+	ITypeImport parseImport()
 	{
 		if (tokens.peekType() == TokenType.TOK_IMPORT)
 		{
@@ -210,7 +198,7 @@ public class Parser
 	 *
 	 * @return
 	 */
-	public ITypeDeclaration parseType( ICompilationUnit unit )
+	ITypeDeclaration parseType( ICompilationUnit unit )
 	{
 		List<IAnnotation> annots = parseAnnotations();
 		//IModifiers modifiers = parseModifiers(false);
@@ -222,7 +210,7 @@ public class Parser
 	}
 
 
-	public ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers )
+	ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers )
 	{
 		if (!expected(TokenType.TOK_CLASS))
 			return null;
@@ -233,7 +221,7 @@ public class Parser
 		IName name = parseName();
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
-			extended = parseExtended();
+			extended = parseExtends();
 
 		if (tokens.peekType() == TokenType.TOK_EOL) tokens.discard();
 
@@ -242,7 +230,7 @@ public class Parser
 		return new TypeDeclaration(unit, annots, modifiers, name, extended, body);
 	}
 
-	private TypeBody parseClassBody()
+	TypeBody parseClassBody()
 	{
 		if (tokens.peekType() == TokenType.TOK_LEFT_BRACE)
 		{
@@ -280,7 +268,7 @@ public class Parser
 	 *
 	 * @return
 	 */
-	private IFieldDeclaration parseField( List<IAnnotation> annots, IModifiers modifiers )
+	IFieldDeclaration parseField( List<IAnnotation> annots, IModifiers modifiers )
 	{
 		// discard 'var' or 'const' keyword
 		tokens.discard();
@@ -297,7 +285,7 @@ public class Parser
 		return new FieldDeclaration(annots, modifiers, type, name);
 	}
 
-	private void parseMethodDeclaration( IModifiers modifiers, ITypeReference type, ITypeBody body )
+	void parseMethodDeclaration( IModifiers modifiers, ITypeReference type, ITypeBody body )
 	{
 		IName name = null;
 
@@ -320,7 +308,7 @@ public class Parser
 		tokens.discard(); // EOL
 	}
 
-	private List<IFormalParameter> parseFormatParameters()
+	List<IFormalParameter> parseFormatParameters()
 	{
 		IName typeName = parseName();
 		IName name = parseName();
@@ -345,13 +333,13 @@ public class Parser
 	/**
 	 * Parse the following grammar:
 	 *
-	 *    Implements = ":" QualifiedName [ "," QualifiedName ]*
+	 *    Extends = ":" QualifiedName [ "," QualifiedName ]*
 	 *
 	 * @return
 	 */
-	public List<ITypeReference> parseExtended()
+	List<ITypeReference> parseExtends()
 	{
-		List<ITypeReference> implemented = null;
+		List<ITypeReference> extended = null;
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
@@ -363,8 +351,8 @@ public class Parser
 				return null;
 			}
 
-			implemented = new LinkedList<ITypeReference>();
-			implemented.add( new TypeReference( parseName() ) );
+			extended = new LinkedList<ITypeReference>();
+			extended.add( new TypeReference( parseName() ) );
 
 			while (true)
 			{
@@ -372,27 +360,14 @@ public class Parser
 					break;
 
 				tokens.discard();
-				implemented.add( new TypeReference( parseName() ) );
+				extended.add( new TypeReference( parseName() ) );
 			}
 		}
 
-		return implemented;
+		return extended;
 	}
 
-	/**
-	 * Parse the following grammar:
-	 *
-	 *    Modifiers = [ TOK_PUBLIC | TOK_PROTECTED | TOK_PRIVATE | TOK_CONST ]
-	 *
-	 * @param required
-	 * @return
-	 */
-	public IModifiers parseModifiers()
-	{
-		return parseModifiers(false);
-	}
-
-	public List<IAnnotation> parseAnnotations()
+	List<IAnnotation> parseAnnotations()
 	{
 		if (tokens.peekType() != TokenType.TOK_AT)
 		{
@@ -410,60 +385,6 @@ public class Parser
 		}
 
 		return output;
-	}
-
-	/**
-	 * Parse the following grammar:
-	 *
-	 *    Modifiers = [ TOK_PUBLIC | TOK_PROTECTED | TOK_PRIVATE | TOK_CONST ]
-	 *
-	 * @param required
-	 * @return
-	 */
-	public IModifiers parseModifiers( boolean required )
-	{
-		int flags = 0;
-		boolean done = false;
-
-		// TODO: detect duplicated modifiers
-
-		while (!done)
-		{
-			switch (tokens.peekType(0))
-			{
-				case TOK_PUBLIC:
-					flags |= IModifiers.PUBLIC;
-					tokens.discard();
-					break;
-				case TOK_PROTECTED:
-					flags |= IModifiers.PROTECTED;
-					tokens.discard();
-					break;
-				case TOK_PRIVATE:
-					flags |= IModifiers.PRIVATE;
-					tokens.discard();
-					break;
-				case TOK_INTERNAL:
-					flags |= IModifiers.INTERNAL;
-					tokens.discard();
-					break;
-				case TOK_PACKAGE:
-					flags |= IModifiers.PACKAGE;
-					tokens.discard();
-					break;
-				case TOK_STATIC:
-					flags |= IModifiers.STATIC;
-					tokens.discard();
-					break;
-				default:
-					done = true;
-			}
-		}
-
-		//if (flags != 0 || !required)
-			return new Modifiers(flags);
-		/*else
-			return null;*/
 	}
 
 }

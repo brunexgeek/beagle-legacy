@@ -1,61 +1,94 @@
 package beagle.compiler;
 
+import java.util.List;
+
+import beagle.compiler.tree.IComment;
+
 public class Token
 {
 
-	protected TokenType type;
+	TokenType type;
 
-	protected String value;
+	String value;
 
-	protected SourceLocation location;
+	SourceLocation location;
 
-	protected LineBreak lineBreak;
+	int lineBreak;
 
-	public Token(SourceLocation location, LineBreak lineBreak, TokenType type)
-	{
-		this(location, lineBreak, type, null);
-	}
+	List<IComment> comments;
 
 	/**
-	 * Creates a token infering its type.
 	 *
-	 * If the value matches a known keyword, the token type is set to the
+	 * If {@code type} is null, creates a token infering its type. If the
+	 * value matches a known keyword, the token type is set to the
 	 * matched keyword type. Otherwise, the type {@link TokenType.TOK_NAME} is
 	 * used.
 	 *
+	 * The parameter {@code value} can be {@code null}.
+	 *
+	 * @param location
+	 * @param lineBreak
+	 * @param type
 	 * @param value
 	 */
-	public Token(SourceLocation location, LineBreak lineBreak, String value)
+	public Token(SourceLocation location, int lineBreak, List<IComment> comments, TokenType type, String value)
 	{
 		this.location = location.clone();
 		this.lineBreak = lineBreak;
-		this.type = TokenType.getType(value);
-		this.value = value;
-	}
-
-	public Token(SourceLocation location, LineBreak lineBreak, TokenType type, String value)
-	{
-		this.location = location.clone();
-		this.lineBreak = lineBreak;
-		this.type = type;
+		this.comments = comments;
+		if (type == null)
+			this.type = TokenType.getType(value);
+		else
+			this.type = type;
 		this.value = value;
 	}
 
 	@Override
 	public String toString()
 	{
-		String output = "Token [Type: " + type.toString() + "   LineBreak: " + lineBreak;
+		StringBuilder output = new StringBuilder();
+
+		output.append("Token [Type: ");
+		output.append(type.toString());
+
+		if (lineBreak != LineBreak.NONE)
+		{
+			output.append("   LineBreak: ");
+			output.append(lineBreak);
+		}
+
+		if (comments != null)
+		{
+			output.append("   Comments: ");
+			output.append(comments.size());
+		}
+
 		if (value != null)
-			output += "  Value: " + value;
-		return output + "]";
+		{
+			output.append("   Value: '");
+			if (value.length() < 12)
+				output.append(value);
+			else
+			{
+				output.append( value.substring(0, 9) );
+				output.append("...");
+			}
+			output.append('\'');
+		}
+
+		output.append(']');
+		return output.toString();
 	}
 
-	public static enum LineBreak
+	public static class LineBreak
 	{
-		NONE,
-		BEFORE,
-		AFTER,
-		BOTH
+		public static final int NONE = 0;
+
+		public static final int BEFORE = 2;
+
+		public static final int AFTER = 1;
+
+		public static final int BOTH = 3;
 	}
 
 }

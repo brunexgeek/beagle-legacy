@@ -33,7 +33,7 @@ public class Main
 			}
 			else
 			{
-				Parser parser = new Parser(context, scanner);
+				IParser parser = new Parser(context, scanner);
 				ICompilationUnit unit = parser.parse();
 				if (unit == null) return;
 				//unit.print(System.out, 0);
