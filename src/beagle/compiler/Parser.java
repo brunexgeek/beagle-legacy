@@ -215,24 +215,22 @@ public class Parser
 		List<IAnnotation> annots = parseAnnotations();
 		//IModifiers modifiers = parseModifiers(false);
 
-		// ensures we have a 'class' or 'interface' keyword
-		TokenType type = tokens.peekType();
-		if (!expected(TokenType.TOK_CLASS)) return null;
-		tokens.discard();
-
-		// parse the type name
-		IName name = parseName();
-
-		if (type == TokenType.TOK_CLASS)
-			return parseClass(unit, annots, null, name);
+		if (tokens.peekType() == TokenType.TOK_CLASS)
+			return parseClass(unit, annots, null);
 
 		return null;
 	}
 
 
-	public ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers, IName name )
+	public ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers )
 	{
+		if (!expected(TokenType.TOK_CLASS))
+			return null;
+		tokens.discard();
+
 		List<ITypeReference> extended = null;
+
+		IName name = parseName();
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 			extended = parseExtended();

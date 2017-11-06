@@ -16,14 +16,14 @@ public class Main
 	public static void main(String[] args) throws IOException
 	{
 		CompilationContext context = new CompilationContext(new Listener());
-		
+
 		for (String fileName : args)
 		{
 			String content = new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8);
 
 			System.out.println("Compiling '" + fileName + "'");
 			IScanner scanner = new Scanner(context, new ScanString(fileName, content));
-			if (false)
+			if (true)
 			{
 				Token tok;
 				while ((tok = scanner.readToken()).type != TokenType.TOK_EOF)

@@ -194,13 +194,13 @@ public enum TokenType
 	 *
 	 * @return
 	 */
-	public Token createToken( SourceLocation location )
+	/*public Token createToken( SourceLocation location, LineBreak lineBreak )
 	{
 		if (name == null)
-			return new Token(location, this);
+			return new Token(location, lineBreak, this);
 		else
-			return new Token(location, this, name);
-	}
+			return new Token(location, lineBreak, this, name);
+	}*/
 
 	public String getName()
 	{

@@ -1,5 +1,7 @@
 package beagle.compiler;
 
+import beagle.compiler.Token.LineBreak;
+
 /**
  * Extract tokens from the input source code.
  */
@@ -21,9 +23,22 @@ public class Scanner implements IScanner
 		this.listener = context.listener;
 	}
 
-	void setIgnoreEol( boolean state )
+	protected LineBreak getLineBreak()
 	{
-		ignoreEol = state;
+		return LineBreak.NONE;
+	}
+
+	protected Token createToken( TokenType type )
+	{
+		return new Token(source.location, getLineBreak(), type);
+	}
+
+	protected Token createToken( TokenType type, String name )
+	{
+		if (type == null)
+			return new Token(source.location, getLineBreak(), name);
+		else
+			return new Token(source.location, getLineBreak(), type, name);
 	}
 
 	/**
@@ -109,9 +124,9 @@ public class Scanner implements IScanner
 					}
 
 					if (source.peek(1) == '=')
-						return TokenType.TOK_DIV_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_DIV_ASSIGN);
 
-					return TokenType.TOK_DIV.createToken(source.getLocation());
+					return createToken(TokenType.TOK_DIV);
 				case '"':
 				case '\'':
 					return processString();
@@ -119,83 +134,83 @@ public class Scanner implements IScanner
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_EQ.createToken(source.getLocation());
+						return createToken(TokenType.TOK_EQ);
 					}
-					return TokenType.TOK_ASSIGN.createToken(source.getLocation());
+					return createToken(TokenType.TOK_ASSIGN);
 				case '+':
 					if (source.peek(1) == '+')
 					{
 						source.next();
-						return TokenType.TOK_INC.createToken(source.getLocation());
+						return createToken(TokenType.TOK_INC);
 					}
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_PLUS_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_PLUS_ASSIGN);
 					}
 					if (isDigit(source.peek(1)))
 					{
 						return processNumber();
 					}
-					return TokenType.TOK_PLUS.createToken(source.getLocation());
+					return createToken(TokenType.TOK_PLUS);
 				case '-':
 					if (source.peek(1) == '-')
 					{
 						source.next();
-						return TokenType.TOK_DEC.createToken(source.getLocation());
+						return createToken(TokenType.TOK_DEC);
 					}
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_MINUS_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_MINUS_ASSIGN);
 					}
 					if (isDigit(source.peek(1)))
 					{
 						return processNumber();
 					}
-					return TokenType.TOK_MINUS.createToken(source.getLocation());
+					return createToken(TokenType.TOK_MINUS);
 				case '*':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_MUL_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_MUL_ASSIGN);
 					}
-					return TokenType.TOK_MUL.createToken(source.getLocation());
+					return createToken(TokenType.TOK_MUL);
 				case '%':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_MOD_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_MOD_ASSIGN);
 					}
-					return TokenType.TOK_MOD.createToken(source.getLocation());
+					return createToken(TokenType.TOK_MOD);
 				case '&':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_BAND_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_BAND_ASSIGN);
 					}
 					if (source.peek(1) == '&')
 					{
 						source.next();
-						return TokenType.TOK_AND.createToken(source.getLocation());
+						return createToken(TokenType.TOK_AND);
 					}
-					return TokenType.TOK_BAND.createToken(source.getLocation());
+					return createToken(TokenType.TOK_BAND);
 				case '|':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_BOR_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_BOR_ASSIGN);
 					}
 					if (source.peek(1) == '|')
 					{
 						source.next();
-						return TokenType.TOK_OR.createToken(source.getLocation());
+						return createToken(TokenType.TOK_OR);
 					}
-					return TokenType.TOK_BOR.createToken(source.getLocation());
+					return createToken(TokenType.TOK_BOR);
 				case '.':
-					return TokenType.TOK_DOT.createToken(source.getLocation());
+					return createToken(TokenType.TOK_DOT);
 				case '\\':
-					return TokenType.TOK_BACK_SLASH.createToken(source.getLocation());
+					return createToken(TokenType.TOK_BACK_SLASH);
 				case '0':
 				case '1':
 				case '2':
@@ -208,24 +223,24 @@ public class Scanner implements IScanner
 				case '9':
 					return processNumber();
 				case '(':
-					return TokenType.TOK_LEFT_PAR.createToken(source.getLocation());
+					return createToken(TokenType.TOK_LEFT_PAR);
 				case ')':
-					return TokenType.TOK_RIGHT_PAR.createToken(source.getLocation());
+					return createToken(TokenType.TOK_RIGHT_PAR);
 				case '[':
-					return TokenType.TOK_LEFT_BRACKET.createToken(source.getLocation());
+					return createToken(TokenType.TOK_LEFT_BRACKET);
 				case ']':
-					return TokenType.TOK_RIGHT_BRACKET.createToken(source.getLocation());
+					return createToken(TokenType.TOK_RIGHT_BRACKET);
 				case '{':
-					return TokenType.TOK_LEFT_BRACE.createToken(source.getLocation());
+					return createToken(TokenType.TOK_LEFT_BRACE);
 				case '}':
-					return TokenType.TOK_RIGHT_BRACE.createToken(source.getLocation());
+					return createToken(TokenType.TOK_RIGHT_BRACE);
 				case '@':
-					return TokenType.TOK_AT.createToken(source.getLocation());
+					return createToken(TokenType.TOK_AT);
 				case '>':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_GREATER_THAN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_GREATER_THAN);
 					}
 					if (source.peek(1) == '>')
 					{
@@ -233,17 +248,17 @@ public class Scanner implements IScanner
 						if (source.peek(1) == '=')
 						{
 							source.next();
-							return TokenType.TOK_SHR_ASSIGN.createToken(source.getLocation());
+							return createToken(TokenType.TOK_SHR_ASSIGN);
 						}
 						else
-							return TokenType.TOK_SHR.createToken(source.getLocation());
+							return createToken(TokenType.TOK_SHR);
 					}
-					return TokenType.TOK_GREATER_THAN.createToken(source.getLocation());
+					return createToken(TokenType.TOK_GREATER_THAN);
 				case '<':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_LESS_THAN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_LESS_THAN);
 					}
 					if (source.peek(1) == '<')
 					{
@@ -251,58 +266,58 @@ public class Scanner implements IScanner
 						if (source.peek(1) == '=')
 						{
 							source.next();
-							return TokenType.TOK_SHL_ASSIGN.createToken(source.getLocation());
+							return createToken(TokenType.TOK_SHL_ASSIGN);
 						}
 						else
-							return TokenType.TOK_SHL.createToken(source.getLocation());
+							return createToken(TokenType.TOK_SHL);
 					}
-					return TokenType.TOK_LESS_THAN.createToken(source.getLocation());
+					return createToken(TokenType.TOK_LESS_THAN);
 
 				case ',':
-					return TokenType.TOK_COMA.createToken(source.getLocation());
+					return createToken(TokenType.TOK_COMA);
 
 				case ';':
-					return TokenType.TOK_SEMICOLON.createToken(source.getLocation());
+					return createToken(TokenType.TOK_SEMICOLON);
 
 				case ':':
-					return TokenType.TOK_COLON.createToken(source.getLocation());
+					return createToken(TokenType.TOK_COLON);
 
 				case '?':
-					return TokenType.TOK_QUEST.createToken(source.getLocation());
+					return createToken(TokenType.TOK_QUEST);
 
 				case '!':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_NE.createToken(source.getLocation());
+						return createToken(TokenType.TOK_NE);
 					}
-					return TokenType.TOK_BANG.createToken(source.getLocation());
+					return createToken(TokenType.TOK_BANG);
 
 				case '~':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_NEG_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_NEG_ASSIGN);
 					}
-					return TokenType.TOK_TILDE.createToken(source.getLocation());
+					return createToken(TokenType.TOK_TILDE);
 
 				case '^':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return TokenType.TOK_XOR_ASSIGN.createToken(source.getLocation());
+						return createToken(TokenType.TOK_XOR_ASSIGN);
 					}
-					return TokenType.TOK_XOR.createToken(source.getLocation());
+					return createToken(TokenType.TOK_XOR);
 
 				case '\n':
 					if (ignoreEol || last == '\n') break;
-					return TokenType.TOK_EOL.createToken(source.getLocation());
+					return createToken(TokenType.TOK_EOL);
 
 				case ScanString.BOL:
 					break;
 
 				case ScanString.EOI:
-					return TokenType.TOK_EOF.createToken(source.getLocation());
+					return createToken(TokenType.TOK_EOF);
 
 				default:
 					if (Character.isWhitespace(source.peek()) || source.peek() == ScanString.BOI)
@@ -336,7 +351,7 @@ public class Scanner implements IScanner
 			return returnError("Unterminated string");
 		}
 		else
-			return new Token(source.getLocation(), TokenType.TOK_STRING_LITERAL, capture.toString());
+			return createToken(TokenType.TOK_STRING_LITERAL, capture.toString());
 	}
 
 	private Token processBlockComment()
@@ -372,7 +387,7 @@ public class Scanner implements IScanner
 		{
 			source.next(1); // skip the '*' (but not the '/')
 			discardWhiteSpaces();
-			return new Token(source.getLocation(), type, capture.toString());
+			return createToken(type, capture.toString());
 		}
 	}
 
@@ -403,7 +418,7 @@ public class Scanner implements IScanner
 			capture.push(source.peek());
 			source.next();
 		}
-		return new Token(source.getLocation(), TokenType.TOK_COMMENT, capture.toString());
+		return createToken(TokenType.TOK_COMMENT, capture.toString());
 	}
 
 	/*private Token emitIfLookahead( TokenType type, char... values)
@@ -474,11 +489,11 @@ public class Scanner implements IScanner
 						break;
 				}
 
-				return new Token(source.getLocation(), TokenType.TOK_FP_LITERAL, capture.toString());
+				return createToken(TokenType.TOK_FP_LITERAL, capture.toString());
 			}
 		}
 
-		return new Token(source.getLocation(), type, capture.toString());
+		return createToken(type, capture.toString());
 	}
 
 	private Token returnError( String message )
@@ -508,7 +523,7 @@ public class Scanner implements IScanner
 		}
 
 		if (capture.length() > 2)
-			return new Token(source.getLocation(), TokenType.TOK_HEX_LITERAL, capture.toString());
+			return createToken(TokenType.TOK_HEX_LITERAL, capture.toString());
 		else
 		{
 			return returnError("Invalid hexadecimal literal");
@@ -534,7 +549,7 @@ public class Scanner implements IScanner
 		}
 
 		if (capture.length() > 2)
-			return new Token(source.getLocation(), TokenType.TOK_BIN_LITERAL, capture.toString());
+			return createToken(TokenType.TOK_BIN_LITERAL, capture.toString());
 		else
 		{
 			return returnError("Invalid binary literal");
@@ -568,7 +583,7 @@ public class Scanner implements IScanner
 				break;
 		}
 
-		return new Token(source.getLocation(), capture.toString());
+		return createToken(null, capture.toString());
 	}
 
 	@Override
