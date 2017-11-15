@@ -68,7 +68,7 @@ public class Parser implements IParser
 	/**
 	 * Parse the following grammar:
 	 *
-	 *   CompilationUnit := [ PackageDeclaration ] ImportDeclaration* TypeDeclaration+
+	 *   Unit: PackageDeclaration? ImportDeclaration* TypeDeclaration+
 	 *
 	 * @return
 	 */
@@ -78,11 +78,8 @@ public class Parser implements IParser
 		Token current = tokens.peek();
 		IPackage pack = null;
 
-		// FIXME: 'package' must be optional
-		if (expected(TokenType.TOK_PACKAGE))
+		if (tokens.peekType() == TokenType.TOK_PACKAGE)
 			pack = parsePackage();
-		else
-			return null;
 
 		ICompilationUnit unit = new CompilationUnit(fileName, pack);
 

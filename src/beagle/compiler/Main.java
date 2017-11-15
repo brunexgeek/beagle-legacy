@@ -23,7 +23,7 @@ public class Main
 
 			System.out.println("Compiling '" + fileName + "'");
 			IScanner scanner = new Scanner(context, new ScanString(fileName, content));
-			if (true)
+			if (false)
 			{
 				Token tok;
 				while ((tok = scanner.readToken()).type != TokenType.TOK_EOF)

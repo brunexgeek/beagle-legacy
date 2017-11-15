@@ -8,15 +8,20 @@ public class Package implements IPackage
 {
 
 	private IName name;
-	
+
 	private HashMap<String, ITypeDeclaration> types;
-	
+
 	public Package( IName name )
 	{
 		this.name = name;
 		types = new HashMap<String, ITypeDeclaration>();
 	}
-	
+
+	public Package()
+	{
+		this.name = null;
+	}
+
 	@Override
 	public String getQualifiedName()
 	{
@@ -32,20 +37,20 @@ public class Package implements IPackage
 	@Override
 	public ITypeDeclaration getType( String name )
 	{
-		return types.get(name); 
+		return types.get(name);
 	}
-	
+
 	public void addType( ITypeDeclaration type )
 	{
 		types.put(type.getQualifiedName(), type);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return "[" + getClass().getSimpleName() + "]";
 	}
-	
+
 	@Override
 	public void print( PrintStream out, int level )
 	{
@@ -68,5 +73,5 @@ public class Package implements IPackage
 	{
 		return getType(name.getQualifiedName());
 	}
-	
+
 }
