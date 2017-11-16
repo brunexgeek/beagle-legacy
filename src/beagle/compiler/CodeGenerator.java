@@ -3,28 +3,28 @@ package beagle.compiler;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ICompilationUnit;
-import beagle.compiler.tree.IFieldDeclaration;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModule;
 import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
+import beagle.compiler.tree.IVariableDeclaration;
 import beagle.compiler.tree.TreeVisitor;
 
 public class CodeGenerator extends TreeVisitor<Object>
 {
 
 	protected OutputStream output;
-	
+
 	protected PrintStream printer;
-	
+
 	public CodeGenerator( OutputStream output )
 	{
 		this.output = output;
 		this.printer = new PrintStream(output);
 	}
-	
+
 	@Override
 	public void visitCompilationUnit(ICompilationUnit target, Object context)
 	{
@@ -35,19 +35,19 @@ public class CodeGenerator extends TreeVisitor<Object>
 	public void visitTypeDeclaration(ITypeDeclaration current, Object context)
 	{
 		printer.println("; Type '" + current.getQualifiedName() + "'");
-		
+
 		printer.print("%.dyn.");
 		printer.print(current.getQualifiedName());
 		printer.print(" = type { %.classref");
-		
-		for (IFieldDeclaration field : current.getBody().getFields())
+
+		for (IVariableDeclaration field : current.getBody().getVariables())
 		{
 			printer.print(", %.dyn.");
 			printer.print(field.getType().getQualifiedName());
 		}
-		
+
 		printer.println(" }");
-		
+
 		super.visitTypeDeclaration(current, context);
 	}
 

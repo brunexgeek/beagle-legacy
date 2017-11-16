@@ -8,23 +8,26 @@ public class TypeBody implements ITypeBody
 {
 
 	List<IMethodDeclaration> methods;
-	
-	List<IFieldDeclaration> fields;
-	
+
+	List<IVariableDeclaration> variables;
+
+	List<IConstantDeclaration> constants;
+
 	ITypeDeclaration parent;
 
 	public TypeBody()
 	{
 		this(null);
 	}
-	
+
 	public TypeBody( ITypeDeclaration parent )
 	{
 		this.methods = new LinkedList<IMethodDeclaration>();
-		this.fields = new LinkedList<IFieldDeclaration>();
+		this.variables = new LinkedList<>();
+		this.constants = new LinkedList<>();
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public void print(PrintStream out, int level)
 	{
@@ -45,7 +48,7 @@ public class TypeBody implements ITypeBody
 	{
 		return parent;
 	}
-	
+
 	@Override
 	public void setParent( ITypeDeclaration parent)
 	{
@@ -53,9 +56,16 @@ public class TypeBody implements ITypeBody
 	}
 
 	@Override
-	public List<IFieldDeclaration> getFields()
+	public List<IVariableDeclaration> getVariables()
 	{
-		return fields;
+		return variables;
 	}
+
+	@Override
+	public List<IConstantDeclaration> getConstants()
+	{
+		return constants;
+	}
+
 
 }

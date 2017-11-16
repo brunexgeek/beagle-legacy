@@ -2,7 +2,7 @@ package beagle.compiler.tree;
 
 import java.util.List;
 
-public interface IFieldDeclaration extends ITreeElement
+public interface IVariableDeclaration extends ITreeElement
 {
 
 	List<IAnnotation> getAnnotations();

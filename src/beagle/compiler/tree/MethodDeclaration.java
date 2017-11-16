@@ -13,12 +13,14 @@ public class MethodDeclaration implements IMethodDeclaration
 	IMethodBody body;
 
 	IName name;
-	
+
 	IModifiers modifiers;
-	
+
 	ITypeBody parent;
 
-	public MethodDeclaration(IModifiers modifiers, ITypeReference type, IName name, List<IFormalParameter> parameters, IMethodBody body)
+	List<IAnnotation> annotations;
+
+	public MethodDeclaration(List<IAnnotation> annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IMethodBody body)
 	{
 		this.type = type;
 		this.name = name;
@@ -60,12 +62,12 @@ public class MethodDeclaration implements IMethodDeclaration
 		out.print("]  ");
 		Printer.print(out, "isContructor", isContructor());
 		out.println();
-		
+
 		if (modifiers != null)
 			modifiers.print(out, level + 1);
 		type.print(out, level + 1);
 		name.print(out, level + 1);
-		
+
 		Printer.indent(out, level + 1);
 		out.println("[FormalParameterList]");
 		for (IFormalParameter param : parameters)

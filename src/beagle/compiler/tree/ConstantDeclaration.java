@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FieldDeclaration implements IFieldDeclaration
+public class ConstantDeclaration implements IConstantDeclaration
 {
 
 	protected IModifiers modifiers;
@@ -17,19 +17,19 @@ public class FieldDeclaration implements IFieldDeclaration
 
 	protected ITypeBody parent;
 
-	public FieldDeclaration( List<IAnnotation> annotations, IModifiers modifiers, ITypeReference type, IName name )
+	public ConstantDeclaration( List<IAnnotation> annotations, ITypeReference type, IName name )
 	{
 		this.annotations = annotations;
-		this.modifiers = modifiers;
+		this.modifiers = null;
 		this.type = type;
 		this.variables = new LinkedList<>();
 		if (name != null)
 			this.variables.add( new FieldVariable(name) );
 	}
 
-	public FieldDeclaration( List<IAnnotation> annotations, IModifiers modifiers, ITypeReference type )
+	public ConstantDeclaration( List<IAnnotation> annotations, ITypeReference type )
 	{
-		this(annotations, modifiers, type, null);
+		this(annotations, type, null);
 	}
 
 	@Override

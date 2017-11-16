@@ -6,11 +6,13 @@ public interface ITypeBody extends ITreeElement
 {
 
 	List<IMethodDeclaration> getMethods();
-	
-	public List<IFieldDeclaration> getFields();
-	
+
+	public List<IVariableDeclaration> getVariables();
+
+	public List<IConstantDeclaration> getConstants();
+
 	ITypeDeclaration getParent();
-	
+
 	void setParent( ITypeDeclaration parent );
-		
+
 }

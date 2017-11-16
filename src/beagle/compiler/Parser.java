@@ -5,20 +5,21 @@ import java.util.List;
 
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.CompilationUnit;
-import beagle.compiler.tree.FieldDeclaration;
+import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.IAnnotation;
 import beagle.compiler.tree.ICompilationUnit;
-import beagle.compiler.tree.IFieldDeclaration;
+import beagle.compiler.tree.IConstantDeclaration;
 import beagle.compiler.tree.IFormalParameter;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
-import beagle.compiler.tree.ITypeBody;
+import beagle.compiler.tree.ITreeElement;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
 import beagle.compiler.tree.ITypeReference;
+import beagle.compiler.tree.IVariableDeclaration;
 import beagle.compiler.tree.MethodDeclaration;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.Package;
@@ -26,6 +27,7 @@ import beagle.compiler.tree.TypeBody;
 import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeReference;
+import beagle.compiler.tree.VariableDeclaration;
 
 public class Parser implements IParser
 {
@@ -66,7 +68,7 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * Parse the following grammar:
+	 * Parse a compilation unit.
 	 *
 	 *   Unit: PackageDeclaration? ImportDeclaration* TypeDeclaration+
 	 *
@@ -101,6 +103,7 @@ public class Parser implements IParser
 		return unit;
 	}
 
+
 	IName parseName()
 	{
 		return parseName(true);
@@ -108,7 +111,7 @@ public class Parser implements IParser
 
 
 	/**
-	 * Parse the following grammar:
+	 * Parse a name.
 	 *
 	 *   QualifiedName := TOK_NAME [ "." TOK_NAME ]*
 	 *
@@ -134,9 +137,9 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * Parse the following grammar:
+	 * Parse a package declaration.
 	 *
-	 *  PackageDeclaration := "package" QualifiedName
+	 *  Package: "package" QualifiedName
 	 *
 	 * @return
 	 */
@@ -153,9 +156,9 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * Parse the following grammar:
+	 * Parse a import declaration.
 	 *
-	 *  ImportDeclaration := "import" QualifiedName [ "." "*" ] LF
+	 *  Import: "import" QualifiedName ( "." "*" | "as" Name )?
 	 *
 	 * @return
 	 */
@@ -189,9 +192,9 @@ public class Parser implements IParser
 
 
 	/**
-	 * Parse the following grammar:
+	 * Parse a type definition:
 	 *
-	 *   TypeDeclaration := Modifiers [ "class" | "interface" | "enumration" ] Name
+	 *   Type: Class
 	 *
 	 * @return
 	 */
@@ -207,6 +210,16 @@ public class Parser implements IParser
 	}
 
 
+	/**
+	 * Parse a class definition.
+	 *
+	 *    Class: Annotation* "class" QualifiedName Extends? ClassBody?
+	 *
+	 * @param unit
+	 * @param annots
+	 * @param modifiers
+	 * @return
+	 */
 	ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers )
 	{
 		if (!expected(TokenType.TOK_CLASS))
@@ -227,6 +240,15 @@ public class Parser implements IParser
 		return new TypeDeclaration(unit, annots, modifiers, name, extended, body);
 	}
 
+	/**
+	 * Parse a class body.
+	 *
+	 *	  ClassBody: "{" Member* "}"
+	 *
+	 *    Member: ( Variable | Constant | Method )*
+	 *
+	 * @return
+	 */
 	TypeBody parseClassBody()
 	{
 		if (tokens.peekType() == TokenType.TOK_LEFT_BRACE)
@@ -242,9 +264,15 @@ public class Parser implements IParser
 				//IModifiers modifiers = parseModifiers();
 
 				// variable or constant
-				if (tokens.peekType() == TokenType.TOK_VAR || tokens.peekType() == TokenType.TOK_CONST)
+				if (tokens.peekType() == TokenType.TOK_CONST)
+					body.getConstants().add( (IConstantDeclaration) parseVariableOrConstant(annots) );
+				else
+				if (tokens.peekType() == TokenType.TOK_VAR)
+					body.getVariables().add( (IVariableDeclaration) parseVariableOrConstant(annots) );
+				else
+				if (tokens.peekType() == TokenType.TOK_DEF)
 				{
-					body.getFields().add( parseField(annots, null) );
+					body.getMethods().add( parseMethod(annots, body) );
 				}
 				else
 				{
@@ -263,15 +291,67 @@ public class Parser implements IParser
 	/**
 	 * Parse a variable.
 	 *
+	 *    Variable: Annotation* "var" Name ( ":" TypeReference )? ( "=" Expression )?
+	 *
+	 *    Constant: Annotation* "const" Name ( ":" TypeReference )? "=" Expression
+	 *
 	 * @return
 	 */
-	IFieldDeclaration parseField( List<IAnnotation> annots, IModifiers modifiers )
+	ITreeElement parseVariableOrConstant( List<IAnnotation> annots )
 	{
-		// discard 'var' or 'const' keyword
+		// get 'var' or 'const' keyword
+		TokenType kind = tokens.peekType();
 		tokens.discard();
 
 		IName name = parseName(false);
 		ITypeReference type = null;
+
+		// check whether we have the var/const type
+		if (tokens.peekType() == TokenType.TOK_COLON)
+		{
+			tokens.discard(1);
+			type = new TypeReference( parseName() );
+		}
+
+		if (tokens.peekType() == TokenType.TOK_ASSIGN)
+		{
+			tokens.discard(); // =
+			tokens.discard();
+			// TODO: parse expression
+		}
+		else
+		if (kind == TokenType.TOK_CONST)
+		{
+			expected(TokenType.TOK_ASSIGN);
+			return null;
+		}
+
+		if (kind == TokenType.TOK_CONST)
+			return new ConstantDeclaration(annots, type, name);
+		else
+			return new VariableDeclaration(annots, type, name);
+	}
+
+
+	/**
+	 * Parse a method.
+	 *
+	 *    Method: Annotation* “def” Name ParameterList ( ":" TypeReference )? Block?
+	 *
+	 * @param modifiers
+	 * @param type
+	 * @param body
+	 */
+	IMethodDeclaration parseMethod( List<IAnnotation> annots, TypeBody body )
+	{
+		if (!expected(TokenType.TOK_DEF)) return null;
+		tokens.discard();
+
+		ITypeReference type = null;
+		IName name = parseName();
+
+		if (!expected(TokenType.TOK_LEFT_PAR)) return null;
+		List<IFormalParameter> params = parseFormalParameters();
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
@@ -279,58 +359,52 @@ public class Parser implements IParser
 			type = new TypeReference( parseName() );
 		}
 
-		return new FieldDeclaration(annots, modifiers, type, name);
-	}
-
-	void parseMethodDeclaration( IModifiers modifiers, ITypeReference type, ITypeBody body )
-	{
-		IName name = null;
-
-		if (tokens.peekType() == TokenType.TOK_LEFT_PAR)
-		{
-			// assume we have a constructor
-			name = type.getName();
-		}
-		else
-			name = parseName();
-
-		tokens.discard();
-		List<IFormalParameter> params = parseFormatParameters();
-		tokens.discard(TokenType.TOK_RIGHT_PAR);
-
-		IMethodDeclaration method = new MethodDeclaration(modifiers, type, name, params, null);
+		IMethodDeclaration method = new MethodDeclaration(annots, type, name, params, null);
 		method.setParent(body);
-		body.getMethods().add(method);
-		tokens.discard(); // :
-		tokens.discard(); // EOL
+
+		return method;
 	}
 
-	List<IFormalParameter> parseFormatParameters()
+	/**
+	 * Parse a parameter list.
+	 *
+	 *    ParameterList: "(" ")" | "(" Parameter ( "," Parameter )* ")"
+	 *
+	 *    Parameter: ( "var" | "const" )? Name ":" TypeReference
+	 *
+	 * @return
+	 */
+	List<IFormalParameter> parseFormalParameters()
 	{
-		IName typeName = parseName();
-		IName name = parseName();
+		if (tokens.peekType() != TokenType.TOK_LEFT_PAR) return null;
+		tokens.discard();
 
-		if (typeName == null || name == null)
-			return null;
+		List<IFormalParameter> output = new LinkedList<>();
+		IName typeName, name;
 
-		List<IFormalParameter> result = new LinkedList<>();
-		result.add( new FormalParameter(name, new TypeReference(typeName)) );
-
-		while (tokens.peekType() == TokenType.TOK_COMA)
+		while (tokens.peekType() != TokenType.TOK_RIGHT_PAR)
 		{
+			if (tokens.peekType() == TokenType.TOK_COMA)
+			{
+				tokens.discard();
+				continue;
+			}
+
+			name = parseName();
+			if (!expected(TokenType.TOK_COLON)) return null;
 			tokens.discard();
 			typeName = parseName();
-			name = parseName();
-			result.add( new FormalParameter(name, new TypeReference(typeName)) );
+			output.add( new FormalParameter(name, new TypeReference(typeName)) );
 		}
 
-		return result;
+		tokens.discard(); // )
+		return output;
 	}
 
 	/**
 	 * Parse the following grammar:
 	 *
-	 *    Extends = ":" QualifiedName [ "," QualifiedName ]*
+	 *    Extends: ":" TypeReference ( "," TypeReference )*
 	 *
 	 * @return
 	 */
@@ -364,6 +438,13 @@ public class Parser implements IParser
 		return extended;
 	}
 
+	/**
+	 * Parse a annatation.
+	 *
+	 *    Annotation: "@" QualifiedName
+	 *
+	 * @return
+	 */
 	List<IAnnotation> parseAnnotations()
 	{
 		if (tokens.peekType() != TokenType.TOK_AT)
