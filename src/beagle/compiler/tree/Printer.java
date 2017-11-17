@@ -1,42 +1,63 @@
 package beagle.compiler.tree;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
 
-public class Printer
+public class Printer extends PrintStream
 {
 
-	private Printer()
+	public Printer( OutputStream stream )
 	{
-	}
-	
-	public static void indent( PrintStream out, int level )
-	{
-		for (int i = 0; i < level; ++i)
-			out.print("   ");
-	}
-	
-	public static void print( PrintStream out, String key, String value )
-	{
-		out.print(key);
-		out.print("='");
-		out.print(value);
-		out.print("'  ");
+		super(stream);
 	}
 
-	public static void print( PrintStream out, String key, long value )
+	public void indent( int level )
 	{
-		out.print(key);
-		out.print("=");
-		out.print(value);
-		out.print("  ");
+		for (int i = 0; i < level; ++i)
+			append("   ");
+		flush();
 	}
-	
-	public static void print( PrintStream out, String key, boolean value )
+
+	/**
+	 * Print a tag.
+	 *
+	 * @param name
+	 * @param level
+	 */
+	void printTag( String name, int level )
 	{
-		out.print(key);
-		out.print("=");
-		out.print(value);
-		out.print("  ");
+		indent(level);
+		append('[');
+		append(name);
+		append("]  ");
+		flush();
 	}
-	
+
+	public void printAttribute( String key, String value )
+	{
+		append(key);
+		append("='");
+		append(value);
+		append("'  ");
+		flush();
+	}
+
+	public void printAttribute( String key, long value )
+	{
+		append(key);
+		append("=");
+		append(Long.toString(value));
+		append("  ");
+		flush();
+	}
+
+	public void printAttribute( String key, boolean value )
+	{
+		append(key);
+		append("=");
+		append(Boolean.toString(value));
+		append("  ");
+		flush();
+	}
+
 }

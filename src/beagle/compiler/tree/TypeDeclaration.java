@@ -1,9 +1,8 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
 import java.util.List;
 
-public class TypeDeclaration implements ITypeDeclaration
+public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 {
 
 	protected IPackage pack;
@@ -12,13 +11,13 @@ public class TypeDeclaration implements ITypeDeclaration
 
 	protected ICompilationUnit parent;
 
+	protected List<IAnnotation> annots;
+
 	protected IModifiers modifiers;
 
 	protected IName name;
 
 	protected List<ITypeReference> extended;
-
-	protected List<IAnnotation> annots;
 
 	protected ITypeBody body;
 
@@ -118,15 +117,12 @@ public class TypeDeclaration implements ITypeDeclaration
 		return body;
 	}
 
-	@Override
-	public void print(PrintStream out, int level)
+	/*@Override
+	public void print(Printer out, int level)
 	{
-		Printer.indent(out, level);
-		out.print("[");
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-		Printer.print(out, "name", getQualifiedName());
-		Printer.print(out, "isComplete", complete);
+		out.printTag(getClass().getSimpleName(), level);
+		out.printAttribute("name", getQualifiedName());
+		out.printAttribute("isComplete", complete);
 		out.println();
 
 		if (modifiers != null)
@@ -134,19 +130,35 @@ public class TypeDeclaration implements ITypeDeclaration
 
 		if (extended != null)
 		{
-			Printer.indent(out, level + 1);
-			out.println("[Extended]");
+			out.printTag("Extended", level + 1);
+			out.println();
 			for (ITypeReference item : extended)
 				item.print(out, level + 2);
 		}
 
 		body.print(out, level + 1);
-	}
+	}*/
 
 	@Override
 	public List<IAnnotation> getAnnotations()
 	{
 		return annots;
+	}
+
+	@Override
+	public void accept(ITreeVisitor visitor)
+	{
+		if (visitor.visit(this))
+		{
+			for (IAnnotation item : annots)
+				item.accept(visitor);
+			accept(visitor, modifiers);
+			accept(visitor, name);
+			for (ITypeReference item : extended)
+				item.accept(visitor);
+			accept(visitor, body);
+		}
+		visitor.finish(this);
 	}
 
 }

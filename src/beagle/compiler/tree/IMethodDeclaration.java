@@ -6,19 +6,19 @@ public interface IMethodDeclaration extends ITreeElement
 {
 
 	public IModifiers getModifiers();
-	
+
 	public ITypeReference getReturnType();
-	
+
 	public IName getName();
-	
+
 	public List<IFormalParameter> getParameters();
-		
-	public IMethodBody getBody();
-	
+
+	public IBlock getBody();
+
 	public boolean isContructor();
-		
+
 	public ITypeBody getParent();
-	
+
 	public void setParent( ITypeBody parent );
-	
+
 }

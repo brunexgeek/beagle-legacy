@@ -1,20 +1,18 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-
-public class FormalParameter implements IFormalParameter
+public class FormalParameter extends TreeElement implements IFormalParameter
 {
 
 	private ITypeReference type;
-	
+
 	private IName name;
-	
+
 	public FormalParameter( IName name, ITypeReference type )
 	{
 		this.type = type;
 		this.name = name;
 	}
-	
+
 	@Override
 	public IName getName()
 	{
@@ -28,13 +26,23 @@ public class FormalParameter implements IFormalParameter
 	}
 
 	@Override
-	public void print(PrintStream out, int level)
+	public void accept(ITreeVisitor visitor)
 	{
-		Printer.indent(out, level);
-		out.println("[FormatParameter]");
-		
-		type.print(out, level + 1);
-		name.print(out, level + 1);
+		if (visitor.visit(this))
+		{
+			accept(visitor, name);
+			accept(visitor, type);
+		}
+		visitor.finish(this);
 	}
+
+//	@Override
+//	public void print(Printer out, int level)
+//	{
+//		out.printTag("FormatParameter", level);
+//
+//		type.print(out, level + 1);
+//		name.print(out, level + 1);
+//	}
 
 }

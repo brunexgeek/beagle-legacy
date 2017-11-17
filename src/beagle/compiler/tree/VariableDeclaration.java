@@ -1,17 +1,15 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-import java.util.LinkedList;
 import java.util.List;
 
-public class VariableDeclaration implements IVariableDeclaration
+public class VariableDeclaration extends TreeElement implements IVariableDeclaration
 {
 
 	protected IModifiers modifiers;
 
 	protected ITypeReference type;
 
-	protected LinkedList<IFieldVariable> variables;
+	protected IName name;
 
 	protected List<IAnnotation> annotations;
 
@@ -22,20 +20,12 @@ public class VariableDeclaration implements IVariableDeclaration
 		this.annotations = annotations;
 		this.modifiers = null;
 		this.type = type;
-		this.variables = new LinkedList<>();
-		if (name != null)
-			this.variables.add( new FieldVariable(name) );
+		this.name = name;
 	}
 
 	public VariableDeclaration( List<IAnnotation> annotations, ITypeReference type )
 	{
 		this(annotations,  type, null);
-	}
-
-	@Override
-	public void print(PrintStream out, int level)
-	{
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -51,14 +41,9 @@ public class VariableDeclaration implements IVariableDeclaration
 	}
 
 	@Override
-	public List<IFieldVariable> getVariables()
+	public IName getName( IName name )
 	{
-		return variables;
-	}
-
-	public void addVariable( IName name )
-	{
-		variables.add( new FieldVariable(name) );
+		return name;
 	}
 
 	@Override
@@ -77,6 +62,20 @@ public class VariableDeclaration implements IVariableDeclaration
 	public List<IAnnotation> getAnnotations()
 	{
 		return annotations;
+	}
+
+	@Override
+	public void accept(ITreeVisitor visitor)
+	{
+		if (visitor.visit(this))
+		{
+			for (IAnnotation item : annotations)
+				item.accept(visitor);
+			accept(visitor, modifiers);
+			accept(visitor, name);
+			accept(visitor, type);
+		}
+		visitor.finish(this);
 	}
 
 }

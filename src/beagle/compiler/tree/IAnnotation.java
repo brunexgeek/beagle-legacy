@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public interface IAnnotation
+public interface IAnnotation extends ITreeElement
 {
 
 	public ITypeReference getType();

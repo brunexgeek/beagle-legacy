@@ -4,10 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import beagle.compiler.tree.Annotation;
+import beagle.compiler.tree.Block;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.IAnnotation;
+import beagle.compiler.tree.IBlock;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
 import beagle.compiler.tree.IFormalParameter;
@@ -359,7 +361,9 @@ public class Parser implements IParser
 			type = new TypeReference( parseName() );
 		}
 
-		IMethodDeclaration method = new MethodDeclaration(annots, type, name, params, null);
+		IBlock block = parseBlock();
+
+		IMethodDeclaration method = new MethodDeclaration(annots, type, name, params, block);
 		method.setParent(body);
 
 		return method;
@@ -463,6 +467,17 @@ public class Parser implements IParser
 		}
 
 		return output;
+	}
+
+	IBlock parseBlock()
+	{
+		if (!expected(TokenType.TOK_LEFT_BRACE)) return null;
+
+		while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE) tokens.discard();
+		tokens.discard();
+
+		Block block = new Block();
+		return block;
 	}
 
 }

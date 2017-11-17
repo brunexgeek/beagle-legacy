@@ -1,17 +1,16 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TypeBody implements ITypeBody
+public class TypeBody extends TreeElement implements ITypeBody
 {
 
-	List<IMethodDeclaration> methods;
+	List<IConstantDeclaration> constants;
 
 	List<IVariableDeclaration> variables;
 
-	List<IConstantDeclaration> constants;
+	List<IMethodDeclaration> methods;
 
 	ITypeDeclaration parent;
 
@@ -22,20 +21,20 @@ public class TypeBody implements ITypeBody
 
 	public TypeBody( ITypeDeclaration parent )
 	{
-		this.methods = new LinkedList<IMethodDeclaration>();
+		this.methods = new LinkedList<>();
 		this.variables = new LinkedList<>();
 		this.constants = new LinkedList<>();
 		this.parent = parent;
 	}
 
-	@Override
-	public void print(PrintStream out, int level)
-	{
-		Printer.indent(out, level);
-		out.println("[Body]");
-		for (IMethodDeclaration item : methods)
-			item.print(out, level + 1);
-	}
+//	@Override
+//	public void print(Printer out, int level)
+//	{
+//		out.printTag("Body", level);
+//		out.println();
+//		for (IMethodDeclaration item : methods)
+//			item.print(out, level + 1);
+//	}
 
 	@Override
 	public List<IMethodDeclaration> getMethods()
@@ -65,6 +64,21 @@ public class TypeBody implements ITypeBody
 	public List<IConstantDeclaration> getConstants()
 	{
 		return constants;
+	}
+
+	@Override
+	public void accept(ITreeVisitor visitor)
+	{
+		if (visitor.visit(this))
+		{
+			for (IConstantDeclaration item : constants)
+				item.accept(visitor);
+			for (IVariableDeclaration item : variables)
+				item.accept(visitor);
+			for (IMethodDeclaration item : methods)
+				item.accept(visitor);
+		}
+		visitor.finish(this);
 	}
 
 

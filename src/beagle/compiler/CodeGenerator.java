@@ -3,16 +3,13 @@ package beagle.compiler;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModule;
-import beagle.compiler.tree.IPackage;
-import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.IVariableDeclaration;
 import beagle.compiler.tree.TreeVisitor;
 
-public class CodeGenerator extends TreeVisitor<Object>
+public class CodeGenerator extends TreeVisitor
 {
 
 	protected OutputStream output;
@@ -26,13 +23,7 @@ public class CodeGenerator extends TreeVisitor<Object>
 	}
 
 	@Override
-	public void visitCompilationUnit(ICompilationUnit target, Object context)
-	{
-		super.visitCompilationUnit(target, context);
-	}
-
-	@Override
-	public void visitTypeDeclaration(ITypeDeclaration current, Object context)
+	public boolean visit(ITypeDeclaration current)
 	{
 		printer.println("; Type '" + current.getQualifiedName() + "'");
 
@@ -47,41 +38,22 @@ public class CodeGenerator extends TreeVisitor<Object>
 		}
 
 		printer.println(" }");
-
-		super.visitTypeDeclaration(current, context);
+		return true;
 	}
 
 	@Override
-	public void visitImport(IPackage target, Object context)
-	{
-		super.visitImport(target, context);
-	}
-
-	@Override
-	public void visitPackage(IPackage target, Object context)
-	{
-		super.visitPackage(target, context);
-	}
-
-	@Override
-	public void visitModule(IModule target, Object context)
+	public boolean visit(IModule target)
 	{
 		printer.println("; module '" + target.getName().getQualifiedName() + "'");
-		super.visitModule(target, context);
+		return true;
 	}
 
 	@Override
-	public void visitTypeBody(ITypeBody target, Object context)
-	{
-		super.visitTypeBody(target, context);
-	}
-
-	@Override
-	public void visitMethodDeclaration(IMethodDeclaration target, Object context)
+	public boolean visit(IMethodDeclaration target)
 	{
 		printer.println("; method of '" + target.getParent().getParent().getName().getQualifiedName() + "'");
 		printer.println("define void @" + target.getName().getQualifiedName() + "() {}");
-		super.visitMethodDeclaration(target, context);
+		return true;
 	}
 
 }

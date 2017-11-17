@@ -11,10 +11,10 @@ public interface IConstantDeclaration extends ITreeElement
 
 	ITypeReference getType();
 
-	List<IFieldVariable> getVariables();
-
 	ITypeBody getParent();
 
 	void setParent( ITypeBody parent );
+
+	IName getName();
 
 }

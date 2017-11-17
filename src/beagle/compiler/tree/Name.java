@@ -1,15 +1,14 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 
-public class Name implements IName
+public class Name extends TreeElement implements IName
 {
 
 	private ArrayList<String> names;
-	
+
 	private String qualifiedName;
-	
+
 	public Name( String value )
 	{
 		if (value == null)
@@ -18,18 +17,18 @@ public class Name implements IName
 		names.add(value);
 		qualifiedName = value;
 	}
-	
+
 	public Name append( String value )
 	{
 		if (value == null || value.isEmpty())
 			return this;
-		
+
 		names.add(value);
 		qualifiedName += '.' + value;
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public String getQualifiedName()
 	{
@@ -53,7 +52,7 @@ public class Name implements IName
 	@Override
 	public boolean equals( Object name)
 	{
-		if (!(name instanceof IName)) 
+		if (!(name instanceof IName))
 			return false;
 		IName object = (Name) name;
 		return compareTo(object) == 0;
@@ -77,22 +76,23 @@ public class Name implements IName
 		return qualifiedName;
 	}
 
+	@Override
 	public IName slice(int start)
 	{
 		return slice(start, getCount() - start);
 	}
-	
+
 	@Override
 	public IName slice(int start, int length)
 	{
 		if (start < 0 || start >= names.size() || length <= 0)
 			return null;
-		
+
 		Name output = null;
 		int end = start + length;
 		if (end > names.size())
 			end = names.size();
-		
+
 		for (int i = start; i < end; ++i)
 		{
 			if (output == null)
@@ -100,18 +100,18 @@ public class Name implements IName
 			else
 				output.append( names.get(i) );
 		}
-		
+
 		/*int n = names.size() - index;
 		for (int i = 0; i < n; ++i)
 			names.remove( names.size() - 1);
-		
+
 		qualifiedName = names.get(0);
 		for (int i = 1; i < names.size(); ++i)
 		{
 			qualifiedName += '.';
 			qualifiedName += names.get(i);
 		}*/
-		
+
 		return output;
 	}
 
@@ -122,14 +122,18 @@ public class Name implements IName
 	}
 
 	@Override
-	public void print(PrintStream out, int level)
+	public void accept(ITreeVisitor visitor)
 	{
-		Printer.indent(out, level);
-		out.print("[");
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-		Printer.print(out, "value", getQualifiedName());
-		out.println();
+		// TODO Auto-generated method stub
+
 	}
+
+//	@Override
+//	public void print(Printer out, int level)
+//	{
+//		out.printTag(getClass().getSimpleName(), level);
+//		out.printAttribute("value", getQualifiedName());
+//		out.println();
+//	}
 
 }

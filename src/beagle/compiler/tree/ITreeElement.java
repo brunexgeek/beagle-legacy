@@ -1,10 +1,12 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-
 public interface ITreeElement
 {
 
-	public void print( PrintStream out, int level );
-	
+	public void accept( ITreeVisitor visitor );
+
+	public void accept( ITreeVisitor visitor, ITreeElement child );
+
+	//public void accept( ITreeVisitor visitor, List<ITreeElement> child );
+
 }

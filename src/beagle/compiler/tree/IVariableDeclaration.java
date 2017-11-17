@@ -11,7 +11,7 @@ public interface IVariableDeclaration extends ITreeElement
 
 	ITypeReference getType();
 
-	List<IFieldVariable> getVariables();
+	IName getName( IName name );
 
 	ITypeBody getParent();
 

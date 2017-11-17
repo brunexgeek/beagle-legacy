@@ -1,32 +1,31 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
 import java.util.List;
 
-public class MethodDeclaration implements IMethodDeclaration
+public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 {
-
-	ITypeReference type;
-
-	List<IFormalParameter> parameters;
-
-	IMethodBody body;
-
-	IName name;
-
-	IModifiers modifiers;
-
-	ITypeBody parent;
 
 	List<IAnnotation> annotations;
 
-	public MethodDeclaration(List<IAnnotation> annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IMethodBody body)
+	IModifiers modifiers;
+
+	IName name;
+
+	List<IFormalParameter> parameters;
+
+	ITypeReference type;
+
+	IBlock body;
+
+	ITypeBody parent;
+
+	public MethodDeclaration(List<IAnnotation> annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IBlock body)
 	{
 		this.type = type;
 		this.name = name;
 		this.parameters = parameters;
 		this.body = body;
-		this.modifiers = modifiers;
+		this.modifiers = null;
 	}
 
 	@Override
@@ -48,31 +47,27 @@ public class MethodDeclaration implements IMethodDeclaration
 	}
 
 	@Override
-	public IMethodBody getBody()
+	public IBlock getBody()
 	{
 		return body;
 	}
 
-	@Override
-	public void print(PrintStream out, int level)
-	{
-		Printer.indent(out, level);
-		out.print('[');
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-		Printer.print(out, "isContructor", isContructor());
-		out.println();
-
-		if (modifiers != null)
-			modifiers.print(out, level + 1);
-		type.print(out, level + 1);
-		name.print(out, level + 1);
-
-		Printer.indent(out, level + 1);
-		out.println("[FormalParameterList]");
-		for (IFormalParameter param : parameters)
-			param.print(out, level + 2);
-	}
+//	@Override
+//	public void print(Printer out, int level)
+//	{
+//		out.printTag(getClass().getSimpleName(), level);
+//		out.printAttribute("isContructor", isContructor());
+//		out.println();
+//
+//		if (modifiers != null)
+//			modifiers.print(out, level + 1);
+//		type.print(out, level + 1);
+//		name.print(out, level + 1);
+//
+//		out.printTag("[FormalParameterList]", level + 1);
+//		for (IFormalParameter param : parameters)
+//			param.print(out, level + 2);
+//	}
 
 	@Override
 	public boolean isContructor()
@@ -96,6 +91,24 @@ public class MethodDeclaration implements IMethodDeclaration
 	public void setParent(ITypeBody parent)
 	{
 		this.parent = parent;
+	}
+
+	@Override
+	public void accept(ITreeVisitor visitor)
+	{
+		if (visitor.visit(this))
+		{
+			for (IAnnotation item : annotations)
+				item.accept(visitor);
+			accept(visitor, modifiers);
+			accept(visitor, name);
+			accept(visitor, modifiers);
+			for (IFormalParameter item : parameters)
+				item.accept(visitor);
+			accept(visitor, type);
+			accept(visitor, body);
+		}
+		visitor.finish(this);
 	}
 
 }

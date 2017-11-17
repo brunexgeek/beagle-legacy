@@ -1,19 +1,17 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-import java.util.LinkedList;
 import java.util.List;
 
-public class ConstantDeclaration implements IConstantDeclaration
+public class ConstantDeclaration extends TreeElement implements IConstantDeclaration
 {
+
+	protected List<IAnnotation> annotations;
 
 	protected IModifiers modifiers;
 
+	protected IName name;
+
 	protected ITypeReference type;
-
-	protected LinkedList<IFieldVariable> variables;
-
-	protected List<IAnnotation> annotations;
 
 	protected ITypeBody parent;
 
@@ -22,9 +20,7 @@ public class ConstantDeclaration implements IConstantDeclaration
 		this.annotations = annotations;
 		this.modifiers = null;
 		this.type = type;
-		this.variables = new LinkedList<>();
-		if (name != null)
-			this.variables.add( new FieldVariable(name) );
+		this.name = name;
 	}
 
 	public ConstantDeclaration( List<IAnnotation> annotations, ITypeReference type )
@@ -32,11 +28,6 @@ public class ConstantDeclaration implements IConstantDeclaration
 		this(annotations, type, null);
 	}
 
-	@Override
-	public void print(PrintStream out, int level)
-	{
-		// TODO Auto-generated method stub
-	}
 
 	@Override
 	public IModifiers getModifiers()
@@ -51,14 +42,9 @@ public class ConstantDeclaration implements IConstantDeclaration
 	}
 
 	@Override
-	public List<IFieldVariable> getVariables()
+	public IName getName()
 	{
-		return variables;
-	}
-
-	public void addVariable( IName name )
-	{
-		variables.add( new FieldVariable(name) );
+		return name;
 	}
 
 	@Override
@@ -77,6 +63,20 @@ public class ConstantDeclaration implements IConstantDeclaration
 	public List<IAnnotation> getAnnotations()
 	{
 		return annotations;
+	}
+
+	@Override
+	public void accept(ITreeVisitor visitor)
+	{
+		if (visitor.visit(this))
+		{
+			for (IAnnotation item : annotations)
+				item.accept(visitor);
+			accept(visitor, modifiers);
+			accept(visitor, name);
+			accept(visitor, type);
+		}
+		visitor.finish(this);
 	}
 
 }

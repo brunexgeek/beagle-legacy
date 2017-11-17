@@ -1,8 +1,6 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-
-public class Modifiers implements IModifiers
+public class Modifiers extends TreeElement implements IModifiers
 {
 
 	private int modifiers;
@@ -25,27 +23,31 @@ public class Modifiers implements IModifiers
 	}
 
 	@Override
-	public void print(PrintStream out, int level)
+	public void accept(ITreeVisitor visitor)
 	{
-		Printer.indent(out, level);
-		out.print("[");
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-
-		if ((modifiers & PUBLIC) != 0)
-			out.print("public  ");
-		if ((modifiers & PROTECTED) != 0)
-			out.print("protected  ");
-		if ((modifiers & PRIVATE) != 0)
-			out.print("private  ");
-		if ((modifiers & INTERNAL) != 0)
-			out.print("const  ");
-		if ((modifiers & PACKAGE) != 0)
-			out.print("package  ");
-		if ((modifiers & STATIC) != 0)
-			out.print("static  ");
-
-		out.println();
+		visitor.visit(this);
+		visitor.finish(this);
 	}
+
+//	@Override
+//	public void print(Printer out, int level)
+//	{
+//		out.printTag(getClass().getSimpleName(), level);
+//
+//		if ((modifiers & PUBLIC) != 0)
+//			out.print("public  ");
+//		if ((modifiers & PROTECTED) != 0)
+//			out.print("protected  ");
+//		if ((modifiers & PRIVATE) != 0)
+//			out.print("private  ");
+//		if ((modifiers & INTERNAL) != 0)
+//			out.print("const  ");
+//		if ((modifiers & PACKAGE) != 0)
+//			out.print("package  ");
+//		if ((modifiers & STATIC) != 0)
+//			out.print("static  ");
+//
+//		out.println();
+//	}
 
 }

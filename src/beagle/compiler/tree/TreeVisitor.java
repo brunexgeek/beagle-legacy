@@ -1,87 +1,174 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
-public class TreeVisitor<T>
+public class TreeVisitor implements ITreeVisitor
 {
 
-	public void visitModule( IModule target, T context )
+	@Override
+	public void finish(IAnnotation annotation)
 	{
-		for (ICompilationUnit current : target.getCompilationUnits().values())
-			visitCompilationUnit(current, context);
-	}
-	
-	public void visitCompilationUnit( ICompilationUnit target, T context )
-	{
-		if (target.getPackage() != null)
-			visitPackage(target.getPackage(), context);
-		
-		for (IPackage current : target.getImportedPackages().values())
-			visitImport(current, context);
-		
-		for (ITypeDeclaration current : target.getTypes().values())
-			visitTypeDeclaration(current, context);
+
 	}
 
-	public void visitTypeDeclaration(ITypeDeclaration target, T context)
+	@Override
+	public void finish(IBlock block)
 	{
-		visitTypeBody(target.getBody(), context);
+
 	}
 
-	public void visitTypeBody(ITypeBody target, T context)
+	@Override
+	public void finish(ICompilationUnit compilationUnit)
 	{
-		for (IMethodDeclaration current : target.getMethods())
-			visitMethodDeclaration(current, context);
+
 	}
 
-	public void visitMethodDeclaration(IMethodDeclaration target, T context)
+	@Override
+	public void finish(IConstantDeclaration constantDeclaration)
 	{
-		if (target.getModifiers() != null) 
-			visitModifiers(target.getModifiers(), context);
-		visitReturnType(target.getReturnType(), context);
-		visitName(target.getName(), context);
-		visitParameters(target.getParameters(), context);
-		visitMethodBody(target.getBody(), context);
+
 	}
 
-	public void visitMethodBody(IMethodBody body, T context)
+	@Override
+	public void finish(IFormalParameter formalParameter)
+	{
+
+	}
+
+	@Override
+	public void finish(IMethodDeclaration methodDeclaration)
+	{
+
+	}
+
+	@Override
+	public void finish(IModifiers modifiers)
 	{
 	}
 
-	public void visitReturnType(ITypeReference returnType, T context)
+	@Override
+	public void finish(IModule module)
+	{
+
+	}
+
+	@Override
+	public void finish(IPackage package1)
+	{
+
+	}
+
+	@Override
+	public void finish(ITypeBody body)
+	{
+
+	}
+
+	@Override
+	public void finish(ITypeDeclaration typeDeclaration)
+	{
+
+	}
+
+	@Override
+	public void finish(ITypeImport typeImport)
+	{
+
+	}
+
+	@Override
+	public void finish(IVariableDeclaration variableDeclaration)
+	{
+
+	}
+
+	@Override
+	public void finish(TypeReference typeReference)
 	{
 	}
 
-	public void visitName(IName name, T context)
+	@Override
+	public boolean visit(IAnnotation annotation)
 	{
+		return true;
 	}
 
-	public void visitParameters(List<IFormalParameter> parameters, T context)
+	@Override
+	public boolean visit(IBlock block)
 	{
-		for (IFormalParameter param : parameters)
-			visitParameter(param, context);
+		return true;
 	}
 
-	public void visitParameter(IFormalParameter param, T context)
+	@Override
+	public boolean visit(ICompilationUnit compilationUnit)
 	{
-		visitType(param.getType(), context);
-		visitName(param.getName(), context);
+		return true;
 	}
 
-	public void visitType(ITypeReference type, T context)
+	@Override
+	public boolean visit(IConstantDeclaration constantDeclaration)
 	{
+		return true;
 	}
 
-	public void visitModifiers(IModifiers target, T context)
+	@Override
+	public boolean visit(IFormalParameter formalParameter)
 	{
+		return true;
 	}
 
-	public void visitImport(IPackage target, T context)
+	@Override
+	public boolean visit(IMethodDeclaration methodDeclaration)
 	{
+		return true;
 	}
 
-	public void visitPackage(IPackage target, T context)
+	@Override
+	public boolean visit(IModifiers modifiers)
 	{
+		return true;
 	}
-	
+
+	@Override
+	public boolean visit(IModule module)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean visit(IPackage package1)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean visit(ITypeBody body)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean visit(ITypeDeclaration typeDeclaration)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean visit(ITypeImport typeImport)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean visit(ITypeReference typeReference)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean visit(IVariableDeclaration variableDeclaration)
+	{
+		return true;
+	}
+
+
+
 }

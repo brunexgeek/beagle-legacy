@@ -1,10 +1,9 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Set;
 
-public class Package implements IPackage
+public class Package extends TreeElement implements IPackage
 {
 
 	private IName name;
@@ -51,16 +50,13 @@ public class Package implements IPackage
 		return "[" + getClass().getSimpleName() + "]";
 	}
 
-	@Override
-	public void print( PrintStream out, int level )
-	{
-		Printer.indent(out, level);
-		out.print("[");
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-		Printer.print(out, "name", name.getQualifiedName());
-		out.println();
-	}
+//	@Override
+//	public void print( Printer out, int level )
+//	{
+//		out.printTag(getClass().getSimpleName(), level);
+//		out.printAttribute("name", name.getQualifiedName());
+//		out.println();
+//	}
 
 	@Override
 	public IName getName()
@@ -72,6 +68,12 @@ public class Package implements IPackage
 	public ITypeDeclaration getType(IName name)
 	{
 		return getType(name.getQualifiedName());
+	}
+
+	@Override
+	public void accept(ITreeVisitor visitor)
+	{
+		visitor.visit(this);
 	}
 
 }

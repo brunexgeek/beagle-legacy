@@ -67,7 +67,6 @@ public class ScanString
 	 */
 	private static char[] preprocess(char[] content)
 	{
-		int lines = 0;
 		int total = content.length;
 
 		// discard every EOL at the end of the input
@@ -82,11 +81,6 @@ public class ScanString
 			buffer[1] = EOI;
 			return buffer;
 		}
-
-		// computes the amount of lines
-		for (int i = 0; i < total; ++i)
-			if (content[i] == '\n') ++lines;
-		lines++;
 
 		// ensure space for ending EOL+EOI markers
 		char[] buffer = new char[total + 2];

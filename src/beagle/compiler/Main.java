@@ -1,18 +1,18 @@
 package beagle.compiler;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import beagle.compiler.tree.ICompilationUnit;
-import beagle.compiler.tree.IModule;
-import beagle.compiler.tree.Module;
-import beagle.compiler.tree.Name;
+import beagle.compiler.tree.ITreeVisitor;
 
 public class Main
 {
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException
 	{
 		CompilationContext context = new CompilationContext(new Listener());
@@ -36,11 +36,13 @@ public class Main
 				IParser parser = new Parser(context, scanner);
 				ICompilationUnit unit = parser.parse();
 				if (unit == null) return;
-				//unit.print(System.out, 0);
-				IModule module = new Module( new Name("beagle"));
+				ITreeVisitor visitor = new HtmlVisitor(new PrintStream(System.out));
+				unit.accept(visitor);
+				//unit.print(new Printer(System.out), 0);
+				/*IModule module = new Module( new Name("beagle"));
 				module.addCompilationUnit(unit);
 				CodeGenerator codegen = new CodeGenerator(System.out);
-				codegen.visitModule(module, null);
+				codegen.visitModule(module, null);*/
 			}
 		}
 	}

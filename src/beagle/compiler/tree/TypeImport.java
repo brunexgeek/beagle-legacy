@@ -1,19 +1,17 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-
 import beagle.compiler.CompilationContext;
 
-public class TypeImport implements ITypeImport
+public class TypeImport extends TreeElement implements ITypeImport
 {
 
 	IPackage pack;
-	
+
 	ITypeDeclaration type;
-	
+
 	/**
 	 * Creates an package import.
-	 * 
+	 *
 	 * @param context
 	 * @param packageName Qualified name of the package.
 	 */
@@ -21,12 +19,12 @@ public class TypeImport implements ITypeImport
 	{
 		this(context, packageName, null);
 	}
-	
+
 	/**
 	 * Creates an type import.
-	 * 
+	 *
 	 * If the imported type is unknown, an incomplete type will be created.
-	 * 
+	 *
 	 * @param context
 	 * @param packageName Qualified name of the package.
 	 * @param typeName Simple name of the type.
@@ -37,7 +35,7 @@ public class TypeImport implements ITypeImport
 		/*if (typeName != null)
 			type = context.createType(typeName, pack);*/
 	}
-	
+
 	@Override
 	public IPackage getPackage()
 	{
@@ -69,18 +67,23 @@ public class TypeImport implements ITypeImport
 	}
 
 	@Override
-	public void print(PrintStream out, int level)
+	public void accept(ITreeVisitor visitor)
 	{
-		Printer.indent(out, level);
-		out.print("[");
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-		
-		if (type != null)
-			Printer.print(out, "type", type.getQualifiedName());
-		else
-			Printer.print(out, "package", pack.getQualifiedName());
-		out.println();
+		if (visitor.visit(this))
+			accept(visitor, type);
+		visitor.finish(this);
 	}
+
+	/*@Override
+	public void print(Printer out, int level)
+	{
+		out.printTag(getClass().getSimpleName(), level);
+
+		if (type != null)
+			out.printAttribute("type", type.getQualifiedName());
+		else
+			out.printAttribute("package", pack.getQualifiedName());
+		out.println();
+	}*/
 
 }

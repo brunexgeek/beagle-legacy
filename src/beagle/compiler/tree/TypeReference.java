@@ -1,18 +1,16 @@
 package beagle.compiler.tree;
 
-import java.io.PrintStream;
-
-public class TypeReference implements ITypeReference
+public class TypeReference extends TreeElement implements ITypeReference
 {
 
 	private IPackage pack;
-	
+
 	private ITypeDeclaration type;
-	
+
 	private IName typeName;
-	
+
 	private IName packageName;
-	
+
 	public TypeReference( IName qualifiedName )
 	{
 		if (qualifiedName.isQualified())
@@ -23,19 +21,19 @@ public class TypeReference implements ITypeReference
 		else
 			typeName = qualifiedName;
 	}
-	
+
 	public TypeReference( IName typeName, IPackage pack )
 	{
 		this(typeName, pack.getName());
 		this.pack = pack;
 	}
-	
+
 	public TypeReference( IName typeName, IName packageName )
 	{
 		this.typeName = typeName;
 		this.packageName = packageName;
 	}
-	
+
 	@Override
 	public IName getName()
 	{
@@ -79,14 +77,18 @@ public class TypeReference implements ITypeReference
 	}
 
 	@Override
-	public void print(PrintStream out, int level)
+	public void accept(ITreeVisitor visitor)
 	{
-		Printer.indent(out, level);
-		out.print("[");
-		out.print(getClass().getSimpleName());
-		out.print("]  ");
-		Printer.print(out, "type", getQualifiedName());
-		out.println();
+		visitor.visit(this);
+		visitor.finish(this);
 	}
+
+//	@Override
+//	public void print(Printer out, int level)
+//	{
+//		out.printTag(getClass().getSimpleName(), level);
+//		out.printAttribute("type", getQualifiedName());
+//		out.println();
+//	}
 
 }
