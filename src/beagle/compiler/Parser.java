@@ -4,11 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import beagle.compiler.tree.Annotation;
+import beagle.compiler.tree.AnnotationList;
 import beagle.compiler.tree.Block;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.FormalParameter;
-import beagle.compiler.tree.IAnnotation;
+import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
@@ -21,6 +22,7 @@ import beagle.compiler.tree.ITreeElement;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
 import beagle.compiler.tree.ITypeReference;
+import beagle.compiler.tree.ITypeReferenceList;
 import beagle.compiler.tree.IVariableDeclaration;
 import beagle.compiler.tree.MethodDeclaration;
 import beagle.compiler.tree.Name;
@@ -29,6 +31,7 @@ import beagle.compiler.tree.TypeBody;
 import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeReference;
+import beagle.compiler.tree.TypeReferenceList;
 import beagle.compiler.tree.VariableDeclaration;
 
 public class Parser implements IParser
@@ -202,7 +205,7 @@ public class Parser implements IParser
 	 */
 	ITypeDeclaration parseType( ICompilationUnit unit )
 	{
-		List<IAnnotation> annots = parseAnnotations();
+		IAnnotationList annots = parseAnnotations();
 		//IModifiers modifiers = parseModifiers(false);
 
 		if (tokens.peekType() == TokenType.TOK_CLASS)
@@ -222,13 +225,13 @@ public class Parser implements IParser
 	 * @param modifiers
 	 * @return
 	 */
-	ITypeDeclaration parseClass( ICompilationUnit unit, List<IAnnotation> annots, IModifiers modifiers )
+	ITypeDeclaration parseClass( ICompilationUnit unit, IAnnotationList annots, IModifiers modifiers )
 	{
 		if (!expected(TokenType.TOK_CLASS))
 			return null;
 		tokens.discard();
 
-		List<ITypeReference> extended = null;
+		ITypeReferenceList extended = null;
 
 		IName name = parseName();
 
@@ -262,7 +265,7 @@ public class Parser implements IParser
 			// parse every class member
 			while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
 			{
-				List<IAnnotation> annots = parseAnnotations();
+				IAnnotationList annots = parseAnnotations();
 				//IModifiers modifiers = parseModifiers();
 
 				// variable or constant
@@ -299,7 +302,7 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	ITreeElement parseVariableOrConstant( List<IAnnotation> annots )
+	ITreeElement parseVariableOrConstant( IAnnotationList annots )
 	{
 		// get 'var' or 'const' keyword
 		TokenType kind = tokens.peekType();
@@ -344,7 +347,7 @@ public class Parser implements IParser
 	 * @param type
 	 * @param body
 	 */
-	IMethodDeclaration parseMethod( List<IAnnotation> annots, TypeBody body )
+	IMethodDeclaration parseMethod( IAnnotationList annots, TypeBody body )
 	{
 		if (!expected(TokenType.TOK_DEF)) return null;
 		tokens.discard();
@@ -412,9 +415,9 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	List<ITypeReference> parseExtends()
+	ITypeReferenceList parseExtends()
 	{
-		List<ITypeReference> extended = null;
+		ITypeReferenceList extended = null;
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
@@ -426,7 +429,7 @@ public class Parser implements IParser
 				return null;
 			}
 
-			extended = new LinkedList<ITypeReference>();
+			extended = new TypeReferenceList();
 			extended.add( new TypeReference( parseName() ) );
 
 			while (true)
@@ -449,14 +452,14 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	List<IAnnotation> parseAnnotations()
+	IAnnotationList parseAnnotations()
 	{
 		if (tokens.peekType() != TokenType.TOK_AT)
 		{
-			return new LinkedList<IAnnotation>();
+			return new AnnotationList();
 		}
 
-		LinkedList<IAnnotation> output = new LinkedList<>();
+		AnnotationList output = new AnnotationList();
 
 		while (tokens.peekType() == TokenType.TOK_AT)
 		{

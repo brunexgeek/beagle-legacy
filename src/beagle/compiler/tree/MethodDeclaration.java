@@ -1,12 +1,11 @@
 package beagle.compiler.tree;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 {
 
-	List<IAnnotation> annotations;
+	IAnnotationList annotations;
 
 	IModifiers modifiers;
 
@@ -20,9 +19,9 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 
 	ITypeBody parent;
 
-	public MethodDeclaration(List<IAnnotation> annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IBlock body)
+	public MethodDeclaration(IAnnotationList annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IBlock body)
 	{
-		this.annotations = new LinkedList<>();
+		this.annotations = annots;
 		this.type = type;
 		this.name = name;
 		this.parameters = parameters;
@@ -96,7 +95,7 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 	}
 
 	@Override
-	public List<IAnnotation> getAnnotations()
+	public IAnnotationList getAnnotations()
 	{
 		return annotations;
 	}
@@ -106,8 +105,7 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 	{
 		if (visitor.visit(this))
 		{
-			for (IAnnotation item : annotations)
-				item.accept(visitor);
+			accept(visitor, annotations);
 			accept(visitor, modifiers);
 			accept(visitor, name);
 			accept(visitor, modifiers);

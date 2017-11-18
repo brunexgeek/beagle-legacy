@@ -1,11 +1,9 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public interface IVariableDeclaration extends ITreeElement
 {
 
-	List<IAnnotation> getAnnotations();
+	IAnnotationList getAnnotations();
 
 	IModifiers getModifiers();
 

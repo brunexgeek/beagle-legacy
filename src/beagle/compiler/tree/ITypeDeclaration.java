@@ -1,12 +1,10 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public interface ITypeDeclaration extends ITreeElement
 {
 
 	/**
-	 * Indicates if the type is complete.
+	 * Indicates whether the type is complete.
 	 *
 	 * A type is complete if its definition is already known. This happens if
 	 * its compilation unit is part of the current compilation process or if its
@@ -19,7 +17,7 @@ public interface ITypeDeclaration extends ITreeElement
 	 */
 	public boolean isComplete();
 
-	public List<IAnnotation> getAnnotations();
+	public IAnnotationList getAnnotations();
 
 	public IPackage getPackage();
 

@@ -1,11 +1,9 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public class ConstantDeclaration extends TreeElement implements IConstantDeclaration
 {
 
-	protected List<IAnnotation> annotations;
+	protected IAnnotationList annotations;
 
 	protected IModifiers modifiers;
 
@@ -15,7 +13,7 @@ public class ConstantDeclaration extends TreeElement implements IConstantDeclara
 
 	protected ITypeBody parent;
 
-	public ConstantDeclaration( List<IAnnotation> annotations, ITypeReference type, IName name )
+	public ConstantDeclaration( IAnnotationList annotations, ITypeReference type, IName name )
 	{
 		this.annotations = annotations;
 		this.modifiers = null;
@@ -23,7 +21,7 @@ public class ConstantDeclaration extends TreeElement implements IConstantDeclara
 		this.name = name;
 	}
 
-	public ConstantDeclaration( List<IAnnotation> annotations, ITypeReference type )
+	public ConstantDeclaration( IAnnotationList annotations, ITypeReference type )
 	{
 		this(annotations, type, null);
 	}
@@ -60,7 +58,7 @@ public class ConstantDeclaration extends TreeElement implements IConstantDeclara
 	}
 
 	@Override
-	public List<IAnnotation> getAnnotations()
+	public IAnnotationList getAnnotations()
 	{
 		return annotations;
 	}
@@ -70,8 +68,7 @@ public class ConstantDeclaration extends TreeElement implements IConstantDeclara
 	{
 		if (visitor.visit(this))
 		{
-			for (IAnnotation item : annotations)
-				item.accept(visitor);
+			accept(visitor, annotations);
 			accept(visitor, modifiers);
 			accept(visitor, name);
 			accept(visitor, type);

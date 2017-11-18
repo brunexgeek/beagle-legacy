@@ -1,7 +1,5 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 {
 
@@ -11,13 +9,13 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 
 	protected ICompilationUnit parent;
 
-	protected List<IAnnotation> annots;
+	protected IAnnotationList annotations;
 
 	protected IModifiers modifiers;
 
 	protected IName name;
 
-	protected List<ITypeReference> extended;
+	protected ITypeReferenceList extended;
 
 	protected ITypeBody body;
 
@@ -32,8 +30,8 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	 * @param implemented
 	 * @param body
 	 */
-	public TypeDeclaration(ICompilationUnit parent, List<IAnnotation> annots, IModifiers modifiers, IName name,
-			List<ITypeReference> extended, ITypeBody body)
+	public TypeDeclaration(ICompilationUnit parent, IAnnotationList annots, IModifiers modifiers, IName name,
+			ITypeReferenceList extended, ITypeBody body)
 	{
 		if (name.getCount() > 1)
 			throw new IllegalArgumentException("Invalid simple name");
@@ -41,7 +39,7 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 			throw new IllegalArgumentException("Compilation unit can not be null");
 
 		this.parent = parent;
-		this.annots = annots;
+		this.annotations = annots;
 		this.name = name;
 		this.pack = parent.getPackage();
 		this.complete = true;
@@ -140,9 +138,9 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	}*/
 
 	@Override
-	public List<IAnnotation> getAnnotations()
+	public IAnnotationList getAnnotations()
 	{
-		return annots;
+		return annotations;
 	}
 
 	@Override
@@ -150,12 +148,10 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	{
 		if (visitor.visit(this))
 		{
-			for (IAnnotation item : annots)
-				item.accept(visitor);
+			accept(visitor, annotations);
 			accept(visitor, modifiers);
 			accept(visitor, name);
-			for (ITypeReference item : extended)
-				item.accept(visitor);
+			accept(visitor, extended);
 			accept(visitor, body);
 		}
 		visitor.finish(this);

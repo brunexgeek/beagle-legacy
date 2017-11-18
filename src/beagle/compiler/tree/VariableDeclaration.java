@@ -1,7 +1,5 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public class VariableDeclaration extends TreeElement implements IVariableDeclaration
 {
 
@@ -11,11 +9,11 @@ public class VariableDeclaration extends TreeElement implements IVariableDeclara
 
 	protected IName name;
 
-	protected List<IAnnotation> annotations;
+	protected IAnnotationList annotations;
 
 	protected ITypeBody parent;
 
-	public VariableDeclaration( List<IAnnotation> annotations, ITypeReference type, IName name )
+	public VariableDeclaration( IAnnotationList annotations, ITypeReference type, IName name )
 	{
 		this.annotations = annotations;
 		this.modifiers = null;
@@ -23,7 +21,7 @@ public class VariableDeclaration extends TreeElement implements IVariableDeclara
 		this.name = name;
 	}
 
-	public VariableDeclaration( List<IAnnotation> annotations, ITypeReference type )
+	public VariableDeclaration( IAnnotationList annotations, ITypeReference type )
 	{
 		this(annotations,  type, null);
 	}
@@ -59,7 +57,7 @@ public class VariableDeclaration extends TreeElement implements IVariableDeclara
 	}
 
 	@Override
-	public List<IAnnotation> getAnnotations()
+	public IAnnotationList getAnnotations()
 	{
 		return annotations;
 	}
@@ -69,8 +67,7 @@ public class VariableDeclaration extends TreeElement implements IVariableDeclara
 	{
 		if (visitor.visit(this))
 		{
-			for (IAnnotation item : annotations)
-				item.accept(visitor);
+			accept(visitor, annotations);
 			accept(visitor, modifiers);
 			accept(visitor, name);
 			accept(visitor, type);

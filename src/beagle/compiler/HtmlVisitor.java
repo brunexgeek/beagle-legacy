@@ -1,14 +1,17 @@
 package beagle.compiler;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import beagle.compiler.tree.IAnnotation;
+import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
+import beagle.compiler.tree.ITypeDeclarationList;
+import beagle.compiler.tree.ITypeImport;
+import beagle.compiler.tree.ITypeImportList;
 import beagle.compiler.tree.IVariableDeclaration;
 import beagle.compiler.tree.TreeVisitor;
 
@@ -108,6 +111,29 @@ public class HtmlVisitor extends TreeVisitor
 	}
 
 	@Override
+	public boolean visit(ITypeImportList target)
+	{
+		if (target.size() == 0)
+		{
+			level++;
+			return false;
+		}
+		title("Imports");
+		level++;
+		for (ITypeImport item : target)
+			attribute(item.getQualifiedIdentifier());
+		return false;
+	}
+
+	@Override
+	public boolean visit(ITypeDeclarationList target)
+	{
+		title("TypeDeclarationList");
+		level++;
+		return true;
+	}
+
+	@Override
 	public boolean visit()
 	{
 		level++;
@@ -119,7 +145,7 @@ public class HtmlVisitor extends TreeVisitor
 	{
 		level--;
 	}
-
+/*
 	void writeAnnotations( List<IAnnotation> target )
 	{
 		if (target.size() == 0) return;
@@ -128,7 +154,7 @@ public class HtmlVisitor extends TreeVisitor
 		for (IAnnotation item : target)
 			attribute(item.getType().getQualifiedName());
 		level--;
-	}
+	}*/
 
 	@Override
 	public boolean visit(ITypeDeclaration target)
@@ -137,7 +163,7 @@ public class HtmlVisitor extends TreeVisitor
 		level++;
 
 		attribute("name", target.getQualifiedName());
-		writeAnnotations(target.getAnnotations());
+		//writeAnnotations(target.getAnnotations());
 
 		return true;
 	}
@@ -160,8 +186,8 @@ public class HtmlVisitor extends TreeVisitor
 		if (target.getType() != null)
 			attribute("type", target.getType().getQualifiedName());
 
-		writeAnnotations(target.getAnnotations());
-		return false;
+		//writeAnnotations(target.getAnnotations());
+		return true;
 	}
 
 	@Override
@@ -173,9 +199,24 @@ public class HtmlVisitor extends TreeVisitor
 		attribute("name", target.getName().toString());
 		if (target.getReturnType() != null)
 			attribute("returnType", target.getReturnType().getQualifiedName());
-		writeAnnotations(target.getAnnotations());
+		//writeAnnotations(target.getAnnotations());
 
 		return true;
+	}
+
+	@Override
+	public boolean visit(IAnnotationList target)
+	{
+		if (target.size() == 0)
+		{
+			level++;
+			return false;
+		}
+		title("Annotations");
+		level++;
+		for (IAnnotation item : target)
+			attribute(item.getType().getQualifiedName());
+		return false;
 	}
 
 	@Override
@@ -187,8 +228,8 @@ public class HtmlVisitor extends TreeVisitor
 		attribute("name", target.getName().toString());
 		attribute("type", target.getType().getQualifiedName());
 
-		writeAnnotations(target.getAnnotations());
-		return false;
+		//writeAnnotations(target.getAnnotations());
+		return true;
 	}
 
 	@Override

@@ -15,6 +15,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(IAnnotationList target)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(IBlock target)
 	{
 		finish();
@@ -57,6 +63,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(IName name)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(IPackage target1)
 	{
 		finish();
@@ -75,13 +87,19 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(ITypeDeclarationList target)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(ITypeImport target)
 	{
 		finish();
 	}
 
 	@Override
-	public void finish(IVariableDeclaration target)
+	public void finish(ITypeImportList typeImportList)
 	{
 		finish();
 	}
@@ -93,7 +111,31 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(ITypeReferenceList target)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(IVariableDeclaration target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean visit(IAnnotation target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IAnnotationList target)
 	{
 		return visit();
 	}
@@ -141,6 +183,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public boolean visit(IName name)
+	{
+		return visit();
+	}
+
+	@Override
 	public boolean visit(IPackage target1)
 	{
 		return visit();
@@ -159,7 +207,19 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public boolean visit(ITypeDeclarationList target)
+	{
+		return visit();
+	}
+
+	@Override
 	public boolean visit(ITypeImport target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(ITypeImportList typeImportList)
 	{
 		return visit();
 	}
@@ -171,29 +231,15 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public boolean visit(ITypeReferenceList target)
+	{
+		return visit();
+	}
+
+	@Override
 	public boolean visit(IVariableDeclaration target)
 	{
 		return visit();
 	}
-
-	@Override
-	public boolean visit()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(Name name)
-	{
-		return visit();
-	}
-
-	@Override
-	public void finish(Name name)
-	{
-		finish();
-	}
-
-
 
 }

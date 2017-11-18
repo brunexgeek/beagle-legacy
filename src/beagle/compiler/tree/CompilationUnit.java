@@ -1,18 +1,15 @@
 package beagle.compiler.tree;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class CompilationUnit extends TreeElement implements ICompilationUnit
 {
 
 	private IPackage pack;
 
-	private List<ITypeImport> importList;
+	private ITypeImportList importList;
 
-	private Map<String, ITypeDeclaration> types;
+	private ITypeDeclarationList typeList;
 
 	private String fileName;
 
@@ -20,8 +17,8 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 	{
 		this.fileName = fileName;
 		this.pack = pack;
-		importList = new LinkedList<>();
-		types = new HashMap<String, ITypeDeclaration>();
+		importList = new TypeImportList();
+		typeList = new TypeDeclarationList();
 	}
 
 	@Override
@@ -37,9 +34,9 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 	}
 
 	@Override
-	public Map<String, ITypeDeclaration> getTypes()
+	public ITypeDeclarationList getTypes()
 	{
-		return types;
+		return typeList;
 	}
 
 	@Override
@@ -54,25 +51,6 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/*@Override
-	public void print( Printer out, int level )
-	{
-		out.printTag(getClass().getSimpleName(), level);
-		pack.print(out, level + 1);
-
-		out.printTag("Imports", level + 1);
-		out.println();
-
-		for (ITypeDeclaration current : importedTypes.values())
-			current.print(out, level + 2);
-
-		for (IPackage current : importedPackages.values())
-			current.print(out, level + 2);
-
-		for (ITypeDeclaration current : types.values())
-			current.print(out, level + 1);
-	}*/
 
 	@Override
 	public void addImport(ITypeImport typeImport)
@@ -96,7 +74,7 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 	{
 		if (type == null) return;
 
-		types.put(type.getQualifiedName(), type);
+		typeList.add(type);
 	}
 
 	@Override
@@ -105,10 +83,8 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 		if (visitor.visit(this))
 		{
 			accept(visitor, pack);
-			for (ITypeImport item : importList)
-				item.accept(visitor);
-			for (ITypeDeclaration item : types.values())
-				item.accept(visitor);
+			accept(visitor, importList);
+			accept(visitor, typeList);
 		}
 		visitor.finish(this);
 	}

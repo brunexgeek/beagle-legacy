@@ -1,14 +1,13 @@
 package beagle.compiler.tree;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ICompilationUnit extends ITreeElement
 {
 
 	public IPackage getPackage();
 
-	public Map<String, ITypeDeclaration> getTypes();
+	public ITypeDeclarationList getTypes();
 
 	public String getFileName();
 
