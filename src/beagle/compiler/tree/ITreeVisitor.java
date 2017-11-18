@@ -3,59 +3,67 @@ package beagle.compiler.tree;
 public interface ITreeVisitor
 {
 
-	void finish(IAnnotation annotation);
+	void finish();
 
-	void finish(IBlock block);
+	void finish(IAnnotation target);
 
-	void finish(ICompilationUnit compilationUnit);
+	void finish(IBlock target);
 
-	void finish(IConstantDeclaration constantDeclaration);
+	void finish(ICompilationUnit target);
 
-	void finish(IFormalParameter formalParameter);
+	void finish(IConstantDeclaration target);
 
-	void finish(IMethodDeclaration methodDeclaration);
+	void finish(IFormalParameter target);
 
-	void finish(IModifiers modifiers);
+	void finish(IMethodDeclaration target);
 
-	void finish(IModule module);
+	void finish(IModifiers target);
 
-	void finish(IPackage package1);
+	void finish(IModule target);
 
-	void finish(ITypeBody body);
+	void finish(IPackage target1);
 
-	void finish(ITypeDeclaration typeDeclaration);
+	void finish(ITypeBody target);
 
-	void finish(ITypeImport typeImport);
+	void finish(ITypeDeclaration target);
 
-	void finish(IVariableDeclaration variableDeclaration);
+	void finish(ITypeImport target);
 
-	void finish(TypeReference typeReference);
+	void finish(IVariableDeclaration target);
 
-	boolean visit(IAnnotation annotation);
+	void finish(ITypeReference target);
 
-	boolean visit(IBlock block);
+	boolean visit();
 
-	boolean visit(ICompilationUnit compilationUnit);
+	boolean visit(IAnnotation target);
 
-	boolean visit(IConstantDeclaration constantDeclaration);
+	boolean visit(IBlock target);
 
-	boolean visit(IFormalParameter formalParameter);
+	boolean visit(ICompilationUnit target);
 
-	boolean visit(IMethodDeclaration methodDeclaration);
+	boolean visit(IConstantDeclaration target);
 
-	boolean visit(IModifiers modifiers);
+	boolean visit(IFormalParameter target);
 
-	boolean visit(IModule module);
+	boolean visit(IMethodDeclaration target);
 
-	boolean visit(IPackage package1);
+	boolean visit(IModifiers target);
 
-	boolean visit(ITypeBody body);
+	boolean visit(IModule target);
 
-	boolean visit(ITypeDeclaration typeDeclaration);
+	boolean visit(IPackage target1);
 
-	boolean visit(ITypeImport typeImport);
+	boolean visit(ITypeBody target);
 
-	boolean visit(ITypeReference typeReference);
+	boolean visit(ITypeDeclaration target);
 
-	boolean visit(IVariableDeclaration variableDeclaration);
+	boolean visit(ITypeImport target);
+
+	boolean visit(ITypeReference target);
+
+	boolean visit(IVariableDeclaration target);
+
+	boolean visit(Name name);
+
+	void finish(Name name);
 }

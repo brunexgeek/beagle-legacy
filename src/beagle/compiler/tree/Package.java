@@ -74,6 +74,7 @@ public class Package extends TreeElement implements IPackage
 	public void accept(ITreeVisitor visitor)
 	{
 		visitor.visit(this);
+		visitor.finish(this);
 	}
 
 }

@@ -21,7 +21,7 @@ public class Main
 		{
 			String content = new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8);
 
-			System.out.println("Compiling '" + fileName + "'");
+			//System.out.println("Compiling '" + fileName + "'");
 			IScanner scanner = new Scanner(context, new ScanString(fileName, content));
 			if (false)
 			{

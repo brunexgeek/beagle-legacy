@@ -21,4 +21,6 @@ public interface IMethodDeclaration extends ITreeElement
 
 	public void setParent( ITypeBody parent );
 
+	List<IAnnotation> getAnnotations();
+
 }

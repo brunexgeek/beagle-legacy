@@ -41,7 +41,7 @@ public class VariableDeclaration extends TreeElement implements IVariableDeclara
 	}
 
 	@Override
-	public IName getName( IName name )
+	public IName getName()
 	{
 		return name;
 	}

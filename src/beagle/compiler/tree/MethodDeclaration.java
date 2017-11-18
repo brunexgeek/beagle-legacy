@@ -1,5 +1,6 @@
 package beagle.compiler.tree;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MethodDeclaration extends TreeElement implements IMethodDeclaration
@@ -21,6 +22,7 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 
 	public MethodDeclaration(List<IAnnotation> annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IBlock body)
 	{
+		this.annotations = new LinkedList<>();
 		this.type = type;
 		this.name = name;
 		this.parameters = parameters;
@@ -91,6 +93,12 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 	public void setParent(ITypeBody parent)
 	{
 		this.parent = parent;
+	}
+
+	@Override
+	public List<IAnnotation> getAnnotations()
+	{
+		return annotations;
 	}
 
 	@Override

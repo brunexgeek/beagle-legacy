@@ -4,169 +4,194 @@ public class TreeVisitor implements ITreeVisitor
 {
 
 	@Override
-	public void finish(IAnnotation annotation)
-	{
-
-	}
-
-	@Override
-	public void finish(IBlock block)
-	{
-
-	}
-
-	@Override
-	public void finish(ICompilationUnit compilationUnit)
-	{
-
-	}
-
-	@Override
-	public void finish(IConstantDeclaration constantDeclaration)
-	{
-
-	}
-
-	@Override
-	public void finish(IFormalParameter formalParameter)
-	{
-
-	}
-
-	@Override
-	public void finish(IMethodDeclaration methodDeclaration)
-	{
-
-	}
-
-	@Override
-	public void finish(IModifiers modifiers)
+	public void finish()
 	{
 	}
 
 	@Override
-	public void finish(IModule module)
+	public void finish(IAnnotation target)
 	{
-
+		finish();
 	}
 
 	@Override
-	public void finish(IPackage package1)
+	public void finish(IBlock target)
 	{
-
+		finish();
 	}
 
 	@Override
-	public void finish(ITypeBody body)
+	public void finish(ICompilationUnit target)
 	{
-
+		finish();
 	}
 
 	@Override
-	public void finish(ITypeDeclaration typeDeclaration)
+	public void finish(IConstantDeclaration target)
 	{
-
+		finish();
 	}
 
 	@Override
-	public void finish(ITypeImport typeImport)
+	public void finish(IFormalParameter target)
 	{
-
+		finish();
 	}
 
 	@Override
-	public void finish(IVariableDeclaration variableDeclaration)
+	public void finish(IMethodDeclaration target)
 	{
-
+		finish();
 	}
 
 	@Override
-	public void finish(TypeReference typeReference)
+	public void finish(IModifiers target)
 	{
+		finish();
 	}
 
 	@Override
-	public boolean visit(IAnnotation annotation)
+	public void finish(IModule target)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(IPackage target1)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(ITypeBody target)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(ITypeDeclaration target)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(ITypeImport target)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(IVariableDeclaration target)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(ITypeReference target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(IAnnotation target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IBlock target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(ICompilationUnit target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IConstantDeclaration target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IFormalParameter target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IMethodDeclaration target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IModifiers target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IModule target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IPackage target1)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(ITypeBody target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(ITypeDeclaration target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(ITypeImport target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(ITypeReference target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IVariableDeclaration target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit()
 	{
 		return true;
 	}
 
 	@Override
-	public boolean visit(IBlock block)
+	public boolean visit(Name name)
 	{
-		return true;
+		return visit();
 	}
 
 	@Override
-	public boolean visit(ICompilationUnit compilationUnit)
+	public void finish(Name name)
 	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IConstantDeclaration constantDeclaration)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IFormalParameter formalParameter)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IMethodDeclaration methodDeclaration)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IModifiers modifiers)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IModule module)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IPackage package1)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(ITypeBody body)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(ITypeDeclaration typeDeclaration)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(ITypeImport typeImport)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(ITypeReference typeReference)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean visit(IVariableDeclaration variableDeclaration)
-	{
-		return true;
+		finish();
 	}
 
 

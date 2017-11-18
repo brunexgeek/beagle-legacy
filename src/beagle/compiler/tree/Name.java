@@ -124,8 +124,8 @@ public class Name extends TreeElement implements IName
 	@Override
 	public void accept(ITreeVisitor visitor)
 	{
-		// TODO Auto-generated method stub
-
+		visitor.visit(this);
+		visitor.finish(this);
 	}
 
 //	@Override
