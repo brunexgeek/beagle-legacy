@@ -14,7 +14,7 @@ public class Block extends TreeElement implements IBlock
 	}
 
 	@Override
-	public List<IStatement> getStatements()
+	public List<IStatement> statements()
 	{
 		return statements;
 	}

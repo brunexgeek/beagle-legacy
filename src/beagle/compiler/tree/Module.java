@@ -39,7 +39,7 @@ public class Module extends TreeElement implements IModule
 	@Override
 	public void addCompilationUnit(ICompilationUnit unit)
 	{
-		units.put(unit.getFileName(), unit);
+		units.put(unit.fileName(), unit);
 	}
 
 	@Override

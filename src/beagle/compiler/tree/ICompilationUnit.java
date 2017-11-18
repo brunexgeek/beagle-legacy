@@ -5,24 +5,15 @@ import java.util.List;
 public interface ICompilationUnit extends ITreeElement
 {
 
-	public IPackage getPackage();
+	IPackage namespace();
 
-	public ITypeDeclarationList getTypes();
+	void namespace( IPackage value );
 
-	public String getFileName();
+	ITypeDeclarationList types();
 
-	/**
-	 * Returns the {@link ITypeDeclaration} object representing the type identified by the given
-	 * name (qualified or not).
-	 *
-	 * @param name
-	 * @return
-	 */
-	public ITypeDeclaration findImportedType(String name);
+	String fileName();
 
-	public void addImport(ITypeImport typeImport);
+	void filename( String value );
 
-	public void addType( ITypeDeclaration type );
-
-	public List<ITypeImport> getImports();
+	List<ITypeImport> imports();
 }

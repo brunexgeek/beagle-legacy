@@ -1,8 +1,6 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
-public interface IAnnotationList extends ITreeElement, List<IAnnotation>
+public interface IAnnotationList extends ITreeElement, ITreeElementList<IAnnotation>
 {
 
 

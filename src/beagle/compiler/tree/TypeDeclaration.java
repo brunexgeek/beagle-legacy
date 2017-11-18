@@ -41,7 +41,7 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 		this.parent = parent;
 		this.annotations = annots;
 		this.name = name;
-		this.pack = parent.getPackage();
+		this.pack = parent.namespace();
 		this.complete = true;
 		this.modifiers = modifiers;
 		this.extended = extended;

@@ -11,7 +11,7 @@ public class Annotation extends TreeElement implements IAnnotation
 	}
 
 	@Override
-	public ITypeReference getType()
+	public ITypeReference type()
 	{
 		return type;
 	}

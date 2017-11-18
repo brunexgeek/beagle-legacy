@@ -1,8 +1,6 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
-public interface ITypeDeclarationList extends List<ITypeDeclaration>, ITreeElement
+public interface ITypeDeclarationList extends ITreeElementList<ITypeDeclaration>, ITreeElement
 {
 
 }

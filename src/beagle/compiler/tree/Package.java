@@ -73,7 +73,8 @@ public class Package extends TreeElement implements IPackage
 	@Override
 	public void accept(ITreeVisitor visitor)
 	{
-		visitor.visit(this);
+		if (visitor.visit(this))
+			accept(visitor, name);
 		visitor.finish(this);
 	}
 

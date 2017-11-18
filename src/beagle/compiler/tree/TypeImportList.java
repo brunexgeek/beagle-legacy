@@ -1,8 +1,6 @@
 package beagle.compiler.tree;
 
-import java.util.LinkedList;
-
-public class TypeImportList extends LinkedList<ITypeImport> implements ITypeImportList
+public class TypeImportList extends TreeElementList<ITypeImport> implements ITypeImportList
 {
 
 	private static final long serialVersionUID = -753519263293915297L;
@@ -14,12 +12,6 @@ public class TypeImportList extends LinkedList<ITypeImport> implements ITypeImpo
 			for (ITypeImport item : this)
 				item.accept(visitor);
 		visitor.finish(this);
-	}
-
-	@Override
-	public void accept(ITreeVisitor visitor, ITreeElement child)
-	{
-		if (child != null) child.accept(visitor);
 	}
 
 }

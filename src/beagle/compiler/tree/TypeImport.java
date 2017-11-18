@@ -7,7 +7,7 @@ public class TypeImport extends TreeElement implements ITypeImport
 
 	IPackage pack;
 
-	ITypeDeclaration type;
+	IName name;
 
 	/**
 	 * Creates an package import.
@@ -31,59 +31,52 @@ public class TypeImport extends TreeElement implements ITypeImport
 	 */
 	public TypeImport( CompilationContext context, IName packageName, IName typeName)
 	{
-		pack = context.createPackage(packageName);
-		/*if (typeName != null)
-			type = context.createType(typeName, pack);*/
+		this.pack = context.createPackage(packageName);
+		this.name = typeName;
 	}
 
 	@Override
-	public IPackage getPackage()
+	public IPackage namespace()
 	{
 		return pack;
 	}
 
 	@Override
-	public String getQualifiedIdentifier()
+	public void namespace(IPackage value)
 	{
-		if (type != null)
-			return pack.getQualifiedName() + "." + type.getName();
+		this.pack = value;
+	}
+
+	@Override
+	public String qualifiedName()
+	{
+		if (name != null)
+			return pack.getQualifiedName() + "." + name;
 		else
 			return pack.getQualifiedName() + ".*";
 	}
 
 	@Override
-	public ITypeDeclaration getType()
+	public IName name()
 	{
-		return type;
+		return name;
 	}
 
 	@Override
-	public IName getName()
+	public void name(IName value)
 	{
-		if (type != null)
-			return type.getName();
-		else
-			return pack.getName();
+		this.name = value;
 	}
 
 	@Override
 	public void accept(ITreeVisitor visitor)
 	{
 		if (visitor.visit(this))
-			accept(visitor, type);
+		{
+			accept(visitor, namespace());
+			accept(visitor, name());
+		}
 		visitor.finish(this);
 	}
-
-	/*@Override
-	public void print(Printer out, int level)
-	{
-		out.printTag(getClass().getSimpleName(), level);
-
-		if (type != null)
-			out.printAttribute("type", type.getQualifiedName());
-		else
-			out.printAttribute("package", pack.getQualifiedName());
-		out.println();
-	}*/
 
 }

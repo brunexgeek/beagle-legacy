@@ -1,66 +1,11 @@
 package beagle.compiler.tree;
 
-public class ConstantDeclaration extends TreeElement implements IConstantDeclaration
+public class ConstantDeclaration extends StorageDeclaration implements IConstantDeclaration
 {
 
-	protected IAnnotationList annotations;
-
-	protected IModifiers modifiers;
-
-	protected IName name;
-
-	protected ITypeReference type;
-
-	protected ITypeBody parent;
-
-	public ConstantDeclaration( IAnnotationList annotations, ITypeReference type, IName name )
+	public ConstantDeclaration( IAnnotationList annotations, IName name, ITypeReference type )
 	{
-		this.annotations = annotations;
-		this.modifiers = null;
-		this.type = type;
-		this.name = name;
-	}
-
-	public ConstantDeclaration( IAnnotationList annotations, ITypeReference type )
-	{
-		this(annotations, type, null);
-	}
-
-
-	@Override
-	public IModifiers getModifiers()
-	{
-		return modifiers;
-	}
-
-	@Override
-	public ITypeReference getType()
-	{
-		return type;
-	}
-
-	@Override
-	public IName getName()
-	{
-		return name;
-	}
-
-	@Override
-	public ITypeBody getParent()
-	{
-		return parent;
-	}
-
-	@Override
-	public void setParent(ITypeBody parent)
-	{
-		this.parent = parent;
-	}
-
-	@Override
-	public IAnnotationList getAnnotations()
-	{
-		return annotations;
+		super(annotations, name, type, null);
 	}
 
 	@Override
@@ -72,6 +17,7 @@ public class ConstantDeclaration extends TreeElement implements IConstantDeclara
 			accept(visitor, modifiers);
 			accept(visitor, name);
 			accept(visitor, type);
+			//accept(visitor, initializer);
 		}
 		visitor.finish(this);
 	}

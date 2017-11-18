@@ -5,13 +5,13 @@ import java.util.List;
 public class CompilationUnit extends TreeElement implements ICompilationUnit
 {
 
-	private IPackage pack;
+	private String fileName;
 
 	private ITypeImportList importList;
 
-	private ITypeDeclarationList typeList;
+	private IPackage pack;
 
-	private String fileName;
+	private ITypeDeclarationList typeList;
 
 	public CompilationUnit( String fileName, IPackage pack )
 	{
@@ -19,62 +19,6 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 		this.pack = pack;
 		importList = new TypeImportList();
 		typeList = new TypeDeclarationList();
-	}
-
-	@Override
-	public IPackage getPackage()
-	{
-		return pack;
-	}
-
-	@Override
-	public List<ITypeImport> getImports()
-	{
-		return importList;
-	}
-
-	@Override
-	public ITypeDeclarationList getTypes()
-	{
-		return typeList;
-	}
-
-	@Override
-	public String getFileName()
-	{
-		return fileName;
-	}
-
-	@Override
-	public ITypeDeclaration findImportedType(String name)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addImport(ITypeImport typeImport)
-	{
-		if (typeImport == null) return;
-
-		importList.add(typeImport);
-
-		/*ITypeDeclaration type = typeImport.getType();
-		if (type != null)
-			importedTypes.put(type.getQualifiedName(), type);
-		else
-		{
-			IPackage pack = typeImport.getPackage();
-			importedPackages.put(pack.getQualifiedName(), pack);
-		}*/
-	}
-
-	@Override
-	public void addType(ITypeDeclaration type)
-	{
-		if (type == null) return;
-
-		typeList.add(type);
 	}
 
 	@Override
@@ -87,6 +31,42 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 			accept(visitor, typeList);
 		}
 		visitor.finish(this);
+	}
+
+	@Override
+	public void filename(String value)
+	{
+		this.fileName = value;
+	}
+
+	@Override
+	public String fileName()
+	{
+		return fileName;
+	}
+
+	@Override
+	public List<ITypeImport> imports()
+	{
+		return importList;
+	}
+
+	@Override
+	public IPackage namespace()
+	{
+		return pack;
+	}
+
+	@Override
+	public void namespace(IPackage value)
+	{
+		this.pack = value;
+	}
+
+	@Override
+	public ITypeDeclarationList types()
+	{
+		return typeList;
 	}
 
 }

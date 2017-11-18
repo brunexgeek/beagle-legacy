@@ -1,18 +1,7 @@
 package beagle.compiler.tree;
 
-public interface IConstantDeclaration extends ITreeElement
+public interface IConstantDeclaration extends IStorageDeclaration
 {
 
-	IAnnotationList getAnnotations();
-
-	IModifiers getModifiers();
-
-	ITypeReference getType();
-
-	ITypeBody getParent();
-
-	void setParent( ITypeBody parent );
-
-	IName getName();
 
 }

@@ -19,6 +19,8 @@ class Alice : Bob, Eve
 	@Private
 	var variable : Foobar
 
+	@Protected
+	@beagle.compiler.Optimize
 	const constant = "My constant"
 
 	@Public	

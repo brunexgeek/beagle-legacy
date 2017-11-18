@@ -1,7 +1,5 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 {
 
@@ -11,7 +9,7 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 
 	IName name;
 
-	List<IFormalParameter> parameters;
+	IFormalParameterList parameters;
 
 	ITypeReference type;
 
@@ -19,7 +17,7 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 
 	ITypeBody parent;
 
-	public MethodDeclaration(IAnnotationList annots, ITypeReference type, IName name, List<IFormalParameter> parameters, IBlock body)
+	public MethodDeclaration(IAnnotationList annots, ITypeReference type, IName name, IFormalParameterList parameters, IBlock body)
 	{
 		this.annotations = annots;
 		this.type = type;
@@ -30,27 +28,45 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 	}
 
 	@Override
-	public ITypeReference getReturnType()
+	public ITypeReference returnType()
 	{
 		return type;
 	}
 
 	@Override
-	public List<IFormalParameter> getParameters()
+	public void returnType(ITypeReference value)
+	{
+		this.type = value;
+	}
+
+	@Override
+	public IFormalParameterList parameters()
 	{
 		return parameters;
 	}
 
 	@Override
-	public IName getName()
+	public IName name()
 	{
 		return name;
 	}
 
 	@Override
-	public IBlock getBody()
+	public void name(IName value)
+	{
+		this.name = value;
+	}
+
+	@Override
+	public IBlock body()
 	{
 		return body;
+	}
+
+	@Override
+	public void body(IBlock value)
+	{
+		this.body = value;
 	}
 
 //	@Override
@@ -77,25 +93,31 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 	}
 
 	@Override
-	public IModifiers getModifiers()
+	public IModifiers modifiers()
 	{
 		return modifiers;
 	}
 
 	@Override
-	public ITypeBody getParent()
+	public void modifiers(IModifiers value)
+	{
+		this.modifiers = value;
+	}
+
+	@Override
+	public ITypeBody parent()
 	{
 		return parent;
 	}
 
 	@Override
-	public void setParent(ITypeBody parent)
+	public void parent(ITypeBody parent)
 	{
 		this.parent = parent;
 	}
 
 	@Override
-	public IAnnotationList getAnnotations()
+	public IAnnotationList annotations()
 	{
 		return annotations;
 	}
@@ -109,8 +131,7 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 			accept(visitor, modifiers);
 			accept(visitor, name);
 			accept(visitor, modifiers);
-			for (IFormalParameter item : parameters)
-				item.accept(visitor);
+			accept(visitor, parameters);
 			accept(visitor, type);
 			accept(visitor, body);
 		}

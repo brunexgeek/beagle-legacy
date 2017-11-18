@@ -128,12 +128,4 @@ public class Name extends TreeElement implements IName
 		visitor.finish(this);
 	}
 
-//	@Override
-//	public void print(Printer out, int level)
-//	{
-//		out.printTag(getClass().getSimpleName(), level);
-//		out.printAttribute("value", getQualifiedName());
-//		out.println();
-//	}
-
 }

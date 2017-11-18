@@ -17,15 +17,17 @@ public interface ITreeVisitor
 
 	void finish(IFormalParameter target);
 
+	void finish(IFormalParameterList target);
+
 	void finish(IMethodDeclaration target);
 
 	void finish(IModifiers target);
 
 	void finish(IModule target);
 
-	void finish(IName name);
+	void finish(IName target);
 
-	void finish(IPackage target1);
+	void finish(IPackage target);
 
 	void finish(ITypeBody target);
 
@@ -57,13 +59,15 @@ public interface ITreeVisitor
 
 	boolean visit(IFormalParameter target);
 
+	boolean visit(IFormalParameterList target);
+
 	boolean visit(IMethodDeclaration target);
 
 	boolean visit(IModifiers target);
 
 	boolean visit(IModule target);
 
-	boolean visit(IName name);
+	boolean visit(IName target);
 
 	boolean visit(IPackage target);
 

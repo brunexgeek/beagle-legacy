@@ -5,6 +5,6 @@ import java.util.List;
 public interface IBlock extends ITreeElement
 {
 
-	List<IStatement> getStatements();
+	List<IStatement> statements();
 
 }

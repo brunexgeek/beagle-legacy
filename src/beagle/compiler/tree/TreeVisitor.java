@@ -45,6 +45,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(IFormalParameterList target)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(IMethodDeclaration target)
 	{
 		finish();
@@ -99,7 +105,7 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
-	public void finish(ITypeImportList typeImportList)
+	public void finish(ITypeImportList target)
 	{
 		finish();
 	}
@@ -165,6 +171,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public boolean visit(IFormalParameterList target)
+	{
+		return visit();
+	}
+
+	@Override
 	public boolean visit(IMethodDeclaration target)
 	{
 		return visit();
@@ -183,13 +195,13 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
-	public boolean visit(IName name)
+	public boolean visit(IName target)
 	{
 		return visit();
 	}
 
 	@Override
-	public boolean visit(IPackage target1)
+	public boolean visit(IPackage target)
 	{
 		return visit();
 	}
@@ -219,7 +231,7 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
-	public boolean visit(ITypeImportList typeImportList)
+	public boolean visit(ITypeImportList target)
 	{
 		return visit();
 	}

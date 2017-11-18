@@ -34,7 +34,7 @@ public class CodeGenerator extends TreeVisitor
 		for (IVariableDeclaration field : current.getBody().getVariables())
 		{
 			printer.print(", %.dyn.");
-			printer.print(field.getType().getQualifiedName());
+			printer.print(field.type().getQualifiedName());
 		}
 
 		printer.println(" }");
@@ -51,8 +51,8 @@ public class CodeGenerator extends TreeVisitor
 	@Override
 	public boolean visit(IMethodDeclaration target)
 	{
-		printer.println("; method of '" + target.getParent().getParent().getName().getQualifiedName() + "'");
-		printer.println("define void @" + target.getName().getQualifiedName() + "() {}");
+		printer.println("; method of '" + target.parent().getParent().getName().getQualifiedName() + "'");
+		printer.println("define void @" + target.name().getQualifiedName() + "() {}");
 		return true;
 	}
 

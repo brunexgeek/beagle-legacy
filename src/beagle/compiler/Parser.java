@@ -1,19 +1,17 @@
 package beagle.compiler;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
 import beagle.compiler.tree.Block;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.FormalParameter;
+import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
-import beagle.compiler.tree.IFormalParameter;
+import beagle.compiler.tree.IFormalParameterList;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IName;
@@ -94,7 +92,7 @@ public class Parser implements IParser
 		while (current != null && current.type == TokenType.TOK_IMPORT)
 		{
 			ITypeImport imp = parseImport();
-			unit.addImport(imp);
+			unit.imports().add(imp);
 			if (imp == null) break;
 			current = tokens.peek();
 		}
@@ -103,7 +101,7 @@ public class Parser implements IParser
 		{
 			ITypeDeclaration type = parseType(unit);
 			if (type == null) return null;
-			unit.addType(type);
+			unit.types().add(type);
 		}
 		return unit;
 	}
@@ -332,9 +330,9 @@ public class Parser implements IParser
 		}
 
 		if (kind == TokenType.TOK_CONST)
-			return new ConstantDeclaration(annots, type, name);
+			return new ConstantDeclaration(annots, name, type);
 		else
-			return new VariableDeclaration(annots, type, name);
+			return new VariableDeclaration(annots, name, type);
 	}
 
 
@@ -356,7 +354,7 @@ public class Parser implements IParser
 		IName name = parseName();
 
 		if (!expected(TokenType.TOK_LEFT_PAR)) return null;
-		List<IFormalParameter> params = parseFormalParameters();
+		IFormalParameterList params = parseFormalParameters();
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
@@ -367,7 +365,7 @@ public class Parser implements IParser
 		IBlock block = parseBlock();
 
 		IMethodDeclaration method = new MethodDeclaration(annots, type, name, params, block);
-		method.setParent(body);
+		method.parent(body);
 
 		return method;
 	}
@@ -381,12 +379,12 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	List<IFormalParameter> parseFormalParameters()
+	IFormalParameterList parseFormalParameters()
 	{
 		if (tokens.peekType() != TokenType.TOK_LEFT_PAR) return null;
 		tokens.discard();
 
-		List<IFormalParameter> output = new LinkedList<>();
+		IFormalParameterList output = new FormalParameterList();
 		IName typeName, name;
 
 		while (tokens.peekType() != TokenType.TOK_RIGHT_PAR)

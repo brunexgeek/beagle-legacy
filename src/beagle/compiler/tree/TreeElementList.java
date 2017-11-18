@@ -1,8 +1,11 @@
 package beagle.compiler.tree;
 
+import java.util.LinkedList;
 
-public abstract class TreeElement implements ITreeElement
+public abstract class TreeElementList<T extends ITreeElement> extends LinkedList<T> implements ITreeElementList<T>
 {
+
+	private static final long serialVersionUID = -7963184275285204232L;
 
 	protected ITreeElement parent;
 
@@ -24,13 +27,14 @@ public abstract class TreeElement implements ITreeElement
 		this.parent = parent;
 	}
 
-	/*@Override
-	public <T extends ITreeElement> void accept(ITreeVisitor visitor, List<T> child)
+	@Override
+	public boolean add(T value)
 	{
-		if (child == null) return;
-
-		for (T item : child)
-			item.accept(visitor);
-	}*/
-
+		if (super.add(value))
+		{
+			value.parent(this);
+			return true;
+		}
+		return false;
+	}
 }

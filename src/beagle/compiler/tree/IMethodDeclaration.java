@@ -1,26 +1,32 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public interface IMethodDeclaration extends ITreeElement
 {
 
-	public IModifiers getModifiers();
+	IModifiers modifiers();
 
-	public ITypeReference getReturnType();
+	ITypeReference returnType();
 
-	public IName getName();
+	IName name();
 
-	public List<IFormalParameter> getParameters();
+	IFormalParameterList parameters();
 
-	public IBlock getBody();
+	IBlock body();
 
-	public boolean isContructor();
+	boolean isContructor();
 
-	public ITypeBody getParent();
+	ITypeBody parent();
 
-	public void setParent( ITypeBody parent );
+	void parent( ITypeBody parent );
 
-	IAnnotationList getAnnotations();
+	IAnnotationList annotations();
+
+	void returnType(ITypeReference value);
+
+	void name(IName value);
+
+	void body(IBlock value);
+
+	void modifiers(IModifiers value);
 
 }

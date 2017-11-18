@@ -79,7 +79,11 @@ public class TypeReference extends TreeElement implements ITypeReference
 	@Override
 	public void accept(ITreeVisitor visitor)
 	{
-		visitor.visit(this);
+		if (visitor.visit(this))
+		{
+			accept(visitor, pack);
+			accept(visitor, typeName);
+		}
 		visitor.finish(this);
 	}
 

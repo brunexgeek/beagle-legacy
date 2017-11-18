@@ -14,15 +14,27 @@ public class FormalParameter extends TreeElement implements IFormalParameter
 	}
 
 	@Override
-	public IName getName()
+	public IName name()
 	{
 		return name;
 	}
 
 	@Override
-	public ITypeReference getType()
+	public void name(IName value)
+	{
+		this.name = value;
+	}
+
+	@Override
+	public ITypeReference type()
 	{
 		return type;
+	}
+
+	@Override
+	public void type(ITypeReference value)
+	{
+		this.type = value;
 	}
 
 	@Override
