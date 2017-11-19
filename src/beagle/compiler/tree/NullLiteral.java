@@ -1,12 +1,7 @@
 package beagle.compiler.tree;
 
-public class StringLiteral extends Literal<String>
+public class NullLiteral extends TreeElement implements IExpression
 {
-
-	public StringLiteral(String value)
-	{
-		super(value);
-	}
 
 	@Override
 	public void accept(ITreeVisitor visitor)
@@ -14,5 +9,6 @@ public class StringLiteral extends Literal<String>
 		visitor.visit(this);
 		visitor.finish(this);
 	}
+
 
 }

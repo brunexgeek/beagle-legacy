@@ -2,10 +2,11 @@ package beagle.compiler;
 
 import java.io.PrintStream;
 
+import beagle.compiler.tree.AtomicExpression;
+import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.IAnnotation;
 import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
-import beagle.compiler.tree.IBooleanLiteral;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
 import beagle.compiler.tree.IFormalParameter;
@@ -15,7 +16,6 @@ import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IModule;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
-import beagle.compiler.tree.IStringLiteral;
 import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeDeclarationList;
@@ -24,7 +24,12 @@ import beagle.compiler.tree.ITypeImportList;
 import beagle.compiler.tree.ITypeReference;
 import beagle.compiler.tree.ITypeReferenceList;
 import beagle.compiler.tree.IVariableDeclaration;
+import beagle.compiler.tree.IntegerLiteral;
+import beagle.compiler.tree.NameLiteral;
+import beagle.compiler.tree.NullLiteral;
+import beagle.compiler.tree.StringLiteral;
 import beagle.compiler.tree.TreeVisitor;
+import beagle.compiler.tree.UnaryExpression;
 
 public class HtmlVisitor extends TreeVisitor
 {
@@ -52,6 +57,16 @@ public class HtmlVisitor extends TreeVisitor
 		out.append("</span> &rarr; (<span class='value'>");
 		out.append(value);
 		out.append("</span>)</div></div>");
+		out.flush();
+	}
+
+	protected void attribute( String name, Class<?> clazz )
+	{
+		out.append("<div class='container'><div class='attribute'><span class='name'>");
+		out.append(name);
+		out.append("</span> &rarr; <span class='title'>");
+		out.append(clazz.getSimpleName());
+		out.append("</span></div></div>");
 		out.flush();
 	}
 
@@ -147,19 +162,6 @@ public class HtmlVisitor extends TreeVisitor
 	{
 		close();
 	}
-
-
-	@Override
-	public void finish(IName target)
-	{
-	}
-
-
-	@Override
-	public void finish(IPackage target)
-	{
-	}
-
 
 	@Override
 	public void finish(ITypeBody target)
@@ -400,7 +402,7 @@ public class HtmlVisitor extends TreeVisitor
 	@Override
 	public boolean visit(ITypeReferenceList target)
 	{
-		return open(target.getClass().getSimpleName(), "inheritance");
+		return open(target.getClass().getSimpleName(), "inherit");
 	}
 
 	@Override
@@ -412,34 +414,41 @@ public class HtmlVisitor extends TreeVisitor
 
 	public void writeCSS()
 	{
-		out.append("<style>\n");
-		out.append("html * {font-family: monospace; font-size: 14px; line-height: 20px}");
-		out.append(".container {/*border: 1px solid red; margin-right: -1px; margin-bottom: -1px;*/ border-left: 1px dashed #ddd; padding-left: 1.5em; background-color: #fff}");
-		out.append(".title {font-weight: 600;}");
-		//out.append(".container div:first-of-type, .container .dedent {margin-left: -1.5em}");
-		out.append(".attribute .name {color: blue}");
-		out.append(".container .description {color: blue}");
-		out.append(".attribute .value {font-style: italic; color: green}");
-		out.append("</style>");
+		out.append("<style>"
+			+ "html * {font-family: monospace; font-size: 14px; line-height: 20px}"
+			+ ".container {/*border: 1px solid red; margin-right: -1px; margin-bottom: -1px;*/ border-left: 1px dashed #ddd; padding-left: 1.5em; background-color: #fff}"
+			+ ".title {font-weight: 600;}"
+			+ ".attribute .name {color: blue}"
+			+ ".container .description {color: blue}"
+			+ ".attribute .value {font-style: italic; color: green}"
+			+ "</style>");
 	}
 
 
 	@Override
-	public boolean visit(IBooleanLiteral target)
+	public boolean visit(BooleanLiteral target)
 	{
 		attribute("expression", target.getClass(), Boolean.toString(target.value()));
 		return false;
 	}
 
-
 	@Override
-	public void finish(IBooleanLiteral target)
+	public boolean visit(AtomicExpression target)
 	{
+		open(target.getClass().getSimpleName(), "expression");
+		return true;
 	}
 
 
 	@Override
-	public boolean visit(IStringLiteral target)
+	public void finish(AtomicExpression target)
+	{
+		close();
+	}
+
+
+	@Override
+	public boolean visit(StringLiteral target)
 	{
 		attribute("expression", target.getClass(), target.value());
 		return false;
@@ -447,8 +456,43 @@ public class HtmlVisitor extends TreeVisitor
 
 
 	@Override
-	public void finish(IStringLiteral stringLiteral)
+	public boolean visit(IntegerLiteral target)
 	{
+		attribute("expression", target.getClass(), String.valueOf(target.value()));
+		return false;
+	}
+
+
+	@Override
+	public boolean visit(NullLiteral target)
+	{
+		attribute("expression", target.getClass());
+		return false;
+	}
+
+
+	@Override
+	public boolean visit(NameLiteral target)
+	{
+		attribute("expression", target.getClass(), target.value().getQualifiedName());
+		return false;
+	}
+
+
+	@Override
+	public boolean visit(UnaryExpression target)
+	{
+		open(target.getClass().getSimpleName(), "expression");
+		attribute("operation", target.operation().toString());
+		attribute("direction", target.direction().toString());
+		return true;
+	}
+
+
+	@Override
+	public void finish(UnaryExpression target)
+	{
+		close();
 	}
 
 }

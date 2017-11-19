@@ -9,6 +9,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(BooleanLiteral target)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(IAnnotation target)
 	{
 		finish();
@@ -22,12 +28,6 @@ public class TreeVisitor implements ITreeVisitor
 
 	@Override
 	public void finish(IBlock target)
-	{
-		finish();
-	}
-
-	@Override
-	public void finish(IBooleanLiteral target)
 	{
 		finish();
 	}
@@ -81,13 +81,25 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(IntegerLiteral target)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(IPackage target1)
 	{
 		finish();
 	}
 
 	@Override
-	public void finish(IStringLiteral target)
+	public boolean visit(AtomicExpression target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(AtomicExpression target)
 	{
 		finish();
 	}
@@ -141,9 +153,21 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(StringLiteral target)
+	{
+		finish();
+	}
+
+	@Override
 	public boolean visit()
 	{
 		return true;
+	}
+
+	@Override
+	public boolean visit(BooleanLiteral target)
+	{
+		return visit();
 	}
 
 	@Override
@@ -160,12 +184,6 @@ public class TreeVisitor implements ITreeVisitor
 
 	@Override
 	public boolean visit(IBlock target)
-	{
-		return visit();
-	}
-
-	@Override
-	public boolean visit(IBooleanLiteral target)
 	{
 		return visit();
 	}
@@ -219,13 +237,13 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
-	public boolean visit(IPackage target)
+	public boolean visit(IntegerLiteral target)
 	{
 		return visit();
 	}
 
 	@Override
-	public boolean visit(IStringLiteral target)
+	public boolean visit(IPackage target)
 	{
 		return visit();
 	}
@@ -274,6 +292,48 @@ public class TreeVisitor implements ITreeVisitor
 
 	@Override
 	public boolean visit(IVariableDeclaration target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(StringLiteral target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(NullLiteral target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(NullLiteral target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(NameLiteral target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(NameLiteral target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(UnaryExpression target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(UnaryExpression target)
 	{
 		return visit();
 	}

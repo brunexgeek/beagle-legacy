@@ -46,6 +46,7 @@ public enum TokenType
 	TOK_NAME,
 	TOK_CONTINUE("continue", true),
 	TOK_TRY("try", true),
+	TOK_NOT("not", true),
 	TOK_BOOL_LITERAL,
 	TOK_STRING_LITERAL("string literal", false),
 	//TOK_UINT8("uint8", true),
@@ -120,7 +121,8 @@ public enum TokenType
 	TOK_DOCSTRING,
 	TOK_EOF("end of file", false),
 	TOK_VAR("var", true),
-	TOK_DEF("def", true);
+	TOK_DEF("def", true),
+	TOK_NULL("null", true);
 
 	private static HashMap<String, TokenType> lookup = new HashMap<>();
 

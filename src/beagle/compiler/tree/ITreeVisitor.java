@@ -5,13 +5,13 @@ public interface ITreeVisitor
 
 	void finish();
 
+	void finish(BooleanLiteral target);
+
 	void finish(IAnnotation target);
 
 	void finish(IAnnotationList target);
 
 	void finish(IBlock target);
-
-	void finish(IBooleanLiteral target);
 
 	void finish(ICompilationUnit target);
 
@@ -29,9 +29,9 @@ public interface ITreeVisitor
 
 	void finish(IName target);
 
-	void finish(IPackage target);
+	void finish(IntegerLiteral target);
 
-	void finish(IStringLiteral target);
+	void finish(IPackage target);
 
 	void finish(ITypeBody target);
 
@@ -49,15 +49,17 @@ public interface ITreeVisitor
 
 	void finish(IVariableDeclaration target);
 
+	void finish(StringLiteral target);
+
 	boolean visit();
+
+	boolean visit(BooleanLiteral target);
 
 	boolean visit(IAnnotation target);
 
 	boolean visit(IAnnotationList target);
 
 	boolean visit(IBlock target);
-
-	boolean visit(IBooleanLiteral target);
 
 	boolean visit(ICompilationUnit target);
 
@@ -75,9 +77,9 @@ public interface ITreeVisitor
 
 	boolean visit(IName target);
 
-	boolean visit(IPackage target);
+	boolean visit(IntegerLiteral target);
 
-	boolean visit(IStringLiteral target);
+	boolean visit(IPackage target);
 
 	boolean visit(ITypeBody target);
 
@@ -94,4 +96,22 @@ public interface ITreeVisitor
 	boolean visit(ITypeReferenceList target);
 
 	boolean visit(IVariableDeclaration target);
+
+	boolean visit(StringLiteral target);
+
+	void finish(NullLiteral target);
+
+	boolean visit(NullLiteral target);
+
+	void finish(NameLiteral target);
+
+	boolean visit(NameLiteral target);
+
+	void finish(UnaryExpression target);
+
+	boolean visit(UnaryExpression target);
+
+	boolean visit(AtomicExpression target);
+
+	void finish(AtomicExpression target);
 }

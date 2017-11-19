@@ -1,9 +1,9 @@
 package beagle.compiler.tree;
 
-public class StringLiteral extends Literal<String>
+public class IntegerLiteral extends Literal<Long>
 {
 
-	public StringLiteral(String value)
+	public IntegerLiteral(Long value)
 	{
 		super(value);
 	}

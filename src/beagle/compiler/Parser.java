@@ -2,8 +2,11 @@ package beagle.compiler;
 
 import static beagle.compiler.TokenType.TOK_TRUE;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.ParameterList;
+
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
+import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.Block;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
@@ -12,7 +15,6 @@ import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
-import beagle.compiler.tree.IBooleanLiteral;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
 import beagle.compiler.tree.IExpression;
@@ -21,15 +23,17 @@ import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
-import beagle.compiler.tree.IStringLiteral;
 import beagle.compiler.tree.ITreeElement;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
 import beagle.compiler.tree.ITypeReference;
 import beagle.compiler.tree.ITypeReferenceList;
 import beagle.compiler.tree.IVariableDeclaration;
+import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.MethodDeclaration;
 import beagle.compiler.tree.Name;
+import beagle.compiler.tree.NameLiteral;
+import beagle.compiler.tree.NullLiteral;
 import beagle.compiler.tree.Package;
 import beagle.compiler.tree.StringLiteral;
 import beagle.compiler.tree.TypeBody;
@@ -37,6 +41,7 @@ import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.TypeReferenceList;
+import beagle.compiler.tree.UnaryExpression;
 import beagle.compiler.tree.VariableDeclaration;
 
 
@@ -497,11 +502,168 @@ public class Parser implements IParser
 
 	IExpression parseExpression()
 	{
+		return parsePrefixUnaryExpression();
+	}
+
+	/**
+	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation PrefixUnaryExpression )*
+	 *
+	 */
+	IExpression  parseMultiplicativeExpression()
+	{
+		IExpression expr = parseAtomicExpression();
+
+		return null;
+	}
+
+
+	/**
+	 *
+	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation*
+	 *
+	 */
+	IExpression parsePrefixUnaryExpression()
+	{
+		UnaryExpression first = null, last = null;
+
+		while (true)
+		{
+			TokenType type = null;
+			switch(tokens.peekType())
+			{
+				case TOK_INC:
+				case TOK_DEC:
+				case TOK_PLUS:
+				case TOK_MINUS:
+				case TOK_NOT:
+					type = tokens.read().type;
+					break;
+				default:
+					type = null;
+			}
+
+			if (type != null)
+			{
+				if (last == null)
+					first = last = new UnaryExpression(type, null);
+				else
+					last = new UnaryExpression(type, last);
+				continue;
+			}
+			break;
+		}
+
+		IExpression expr = parsePostfixUnaryExpression();
+
+		if (first == null)
+			return expr;
+		else
+		{
+			first.expression(expr);
+			return last;
+		}
+	}
+
+	/**
+	 *
+	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation*
+	 *
+	 */
+	IExpression parsePostfixUnaryExpression()
+	{
+		IExpression expr = parseAtomicExpression();
+		UnaryExpression first = null, last = null;
+
+		while (true)
+		{
+			TokenType type = null;
+			switch(tokens.peekType())
+			{
+				case TOK_INC:
+				case TOK_DEC:
+					type = tokens.read().type;
+					break;
+				default:
+					type = null;
+			}
+
+			if (type != null)
+			{
+				if (last == null)
+					first = last = new UnaryExpression(type, null);
+				else
+					last = new UnaryExpression(type, last);
+				continue;
+			}
+			break;
+		}
+
+		if (first == null)
+			return expr;
+		else
+		{
+			first.expression(expr);
+			return last;
+		}
+	}
+
+	/**
+	 *
+	 * AtomicExpression
+	 *   : "(" Expression ")"
+	 *   : LiteralConstant
+	 *   : Name
+	 *   ;
+	 *
+	 * @return
+	 */
+	IExpression parseAtomicExpression()
+	{
+		IExpression result = null;
+
 		switch(tokens.peekType())
 		{
+			case TOK_LEFT_PAR:
+				tokens.discard();
+				result = new AtomicExpression(parseExpression());
+				tokens.discard();
+				break;
+			case TOK_NAME:
+				result = new NameLiteral( parseName() );
+				break;
+			default:
+				result = parseLiteralConstant();
+		}
+
+		return result;
+	}
+
+	/**
+	 * LiteralConstant
+	 *  : BooleanLiteral
+	 *  : StringLiteral
+	 *  : IntegerLiteral
+	 *  : HexadecimalLiteral
+	 *  : "null"
+	 *  ;
+	 *
+	 * @return
+	 */
+	IExpression parseLiteralConstant()
+	{
+		switch(tokens.peekType())
+		{
+			case TOK_NULL:
+				tokens.discard();
+				return new NullLiteral();
 			case TOK_TRUE:
 			case TOK_FALSE:
 				return parseBooleanLiteral();
+			case TOK_HEX_LITERAL:
+			case TOK_BIN_LITERAL:
+			case TOK_OCT_LITERAL:
+			case TOK_DEC_LITERAL:
+				return parseIntegerLiteral();
 			case TOK_STRING_LITERAL:
 				return parseStringLiteral();
 			default:
@@ -511,12 +673,32 @@ public class Parser implements IParser
 
 	}
 
-	IStringLiteral parseStringLiteral()
+	IntegerLiteral parseIntegerLiteral()
+	{
+		String value = tokens.peek().value;
+		switch(tokens.read().type)
+		{
+			case TOK_HEX_LITERAL:
+				value = value.substring(2);
+				return new IntegerLiteral( Long.valueOf(value, 16));
+			case TOK_BIN_LITERAL:
+				value = value.substring(2);
+				return new IntegerLiteral( Long.valueOf(value, 2));
+			case TOK_OCT_LITERAL:
+				return new IntegerLiteral( Long.valueOf(value, 8));
+			case TOK_DEC_LITERAL:
+				return new IntegerLiteral( Long.valueOf(value, 10));
+			default:
+				return null;
+		}
+	}
+
+	StringLiteral parseStringLiteral()
 	{
 		return new StringLiteral(tokens.read().value);
 	}
 
-	IBooleanLiteral parseBooleanLiteral()
+	BooleanLiteral parseBooleanLiteral()
 	{
 		if (!expected(TOK_TRUE)) return null;
 

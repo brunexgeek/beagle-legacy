@@ -1,13 +1,11 @@
 package beagle.compiler.tree;
 
-public class BooleanLiteral extends TreeElement implements IBooleanLiteral
+public class BooleanLiteral extends Literal<Boolean>
 {
 
-	protected boolean value;
-
-	public BooleanLiteral(boolean value)
+	public BooleanLiteral(Boolean value)
 	{
-		this.value = value;
+		super(value);
 	}
 
 	@Override
@@ -15,18 +13,6 @@ public class BooleanLiteral extends TreeElement implements IBooleanLiteral
 	{
 		visitor.visit(this);
 		visitor.finish(this);
-	}
-
-	@Override
-	public boolean value()
-	{
-		return value;
-	}
-
-	@Override
-	public void value(boolean value)
-	{
-		this.value = value;
 	}
 
 }
