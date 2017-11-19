@@ -505,6 +505,7 @@ public class Scanner implements IScanner
 			}
 		}
 
+		source.previous();
 		return createToken(type, capture.toString());
 	}
 

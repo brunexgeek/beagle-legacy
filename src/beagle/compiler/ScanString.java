@@ -178,7 +178,7 @@ public class ScanString
 		return buffer[index];
 	}
 
-	/*protected char previous()
+	protected char previous()
 	{
 		return previous(1);
 	}
@@ -191,7 +191,7 @@ public class ScanString
 		else
 			index = 0;
 		return peek();
-	}*/
+	}
 
     public void unescape( char[] data )
     {

@@ -338,4 +338,16 @@ public class TreeVisitor implements ITreeVisitor
 		return visit();
 	}
 
+	@Override
+	public boolean visit(BinaryExpression target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(BinaryExpression binaryExpression)
+	{
+		finish();
+	}
+
 }

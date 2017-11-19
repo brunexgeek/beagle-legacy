@@ -17,7 +17,7 @@ class Alice : Bob, Eve
 {
 
 	@Private
-	var variable : Foobar = abobrinha -- ++
+	var variable : Foobar = ((55 * --8) * 2)
 
 	@Protected
 	@beagle.compiler.Optimize

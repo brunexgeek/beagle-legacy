@@ -2,11 +2,10 @@ package beagle.compiler;
 
 import static beagle.compiler.TokenType.TOK_TRUE;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.ParameterList;
-
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
 import beagle.compiler.tree.AtomicExpression;
+import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.Block;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
@@ -502,7 +501,7 @@ public class Parser implements IParser
 
 	IExpression parseExpression()
 	{
-		return parsePrefixUnaryExpression();
+		return parseMultiplicativeExpression();
 	}
 
 	/**
@@ -511,9 +510,35 @@ public class Parser implements IParser
 	 */
 	IExpression  parseMultiplicativeExpression()
 	{
-		IExpression expr = parseAtomicExpression();
+		return parseMultiplicativeExpression(null);
+	}
 
-		return null;
+	IExpression  parseMultiplicativeExpression(IExpression value)
+	{
+		IExpression left = value;
+		IExpression right = null;
+
+		if (left == null)
+			left = parsePrefixUnaryExpression();
+
+		TokenType type = null;
+		switch(tokens.peekType())
+		{
+			case TOK_MUL:
+			case TOK_DIV:
+			case TOK_MOD:
+				type = tokens.read().type;
+				break;
+			default:
+				return left;
+		}
+
+		right = parseMultiplicativeExpression(value);
+
+		if (type == null || left == null || right == null)
+			return null;
+
+		return new BinaryExpression(left, type, right);
 	}
 
 
@@ -524,44 +549,37 @@ public class Parser implements IParser
 	 */
 	IExpression parsePrefixUnaryExpression()
 	{
-		UnaryExpression first = null, last = null;
+		return parsePrefixUnaryExpression(null);
+	}
 
-		while (true)
+	IExpression parsePrefixUnaryExpression(IExpression value)
+	{
+		boolean recursive = false;
+
+		TokenType type = null;
+		switch(tokens.peekType())
 		{
-			TokenType type = null;
-			switch(tokens.peekType())
-			{
-				case TOK_INC:
-				case TOK_DEC:
-				case TOK_PLUS:
-				case TOK_MINUS:
-				case TOK_NOT:
-					type = tokens.read().type;
-					break;
-				default:
-					type = null;
-			}
-
-			if (type != null)
-			{
-				if (last == null)
-					first = last = new UnaryExpression(type, null);
-				else
-					last = new UnaryExpression(type, last);
-				continue;
-			}
-			break;
+			case TOK_INC:
+			case TOK_DEC:
+				type = tokens.read().type;
+				break;
+			default:
+				type = null;
 		}
 
-		IExpression expr = parsePostfixUnaryExpression();
+		IExpression expr = value;
+		if (value == null)
+			expr = parsePostfixUnaryExpression();
 
-		if (first == null)
-			return expr;
-		else
+		if (type != null)
 		{
-			first.expression(expr);
-			return last;
+			if (recursive)
+				return new UnaryExpression(type, parsePrefixUnaryExpression(expr));
+			else
+				return new UnaryExpression(type, expr);
 		}
+
+		return expr;
 	}
 
 	/**
@@ -571,40 +589,38 @@ public class Parser implements IParser
 	 */
 	IExpression parsePostfixUnaryExpression()
 	{
-		IExpression expr = parseAtomicExpression();
-		UnaryExpression first = null, last = null;
+		return parsePostfixUnaryExpression(null);
+	}
 
-		while (true)
+	IExpression parsePostfixUnaryExpression(IExpression value)
+	{
+		IExpression expr = value;
+
+		if (value == null)
+			expr = parseAtomicExpression();
+
+		boolean recursive = false;
+
+		TokenType type = null;
+		switch(tokens.peekType())
 		{
-			TokenType type = null;
-			switch(tokens.peekType())
-			{
-				case TOK_INC:
-				case TOK_DEC:
-					type = tokens.read().type;
-					break;
-				default:
-					type = null;
-			}
-
-			if (type != null)
-			{
-				if (last == null)
-					first = last = new UnaryExpression(type, null);
-				else
-					last = new UnaryExpression(type, last);
-				continue;
-			}
-			break;
+			case TOK_INC:
+			case TOK_DEC:
+				type = tokens.read().type;
+				break;
+			default:
+				type = null;
 		}
 
-		if (first == null)
-			return expr;
-		else
+		if (type != null)
 		{
-			first.expression(expr);
-			return last;
+			if (recursive)
+				return new UnaryExpression(parsePostfixUnaryExpression(expr), type);
+			else
+				return new UnaryExpression(expr, type);
 		}
+
+		return expr;
 	}
 
 	/**

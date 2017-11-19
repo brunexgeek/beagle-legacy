@@ -3,6 +3,7 @@ package beagle.compiler;
 import java.io.PrintStream;
 
 import beagle.compiler.tree.AtomicExpression;
+import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.IAnnotation;
 import beagle.compiler.tree.IAnnotationList;
@@ -491,6 +492,22 @@ public class HtmlVisitor extends TreeVisitor
 
 	@Override
 	public void finish(UnaryExpression target)
+	{
+		close();
+	}
+
+
+	@Override
+	public boolean visit(BinaryExpression target)
+	{
+		open(target.getClass().getSimpleName(), "expression");
+		attribute("operation", target.operation().toString());
+		return true;
+	}
+
+
+	@Override
+	public void finish(BinaryExpression binaryExpression)
 	{
 		close();
 	}

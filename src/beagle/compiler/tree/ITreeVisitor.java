@@ -114,4 +114,8 @@ public interface ITreeVisitor
 	boolean visit(AtomicExpression target);
 
 	void finish(AtomicExpression target);
+
+	boolean visit(BinaryExpression target);
+
+	void finish(BinaryExpression binaryExpression);
 }
