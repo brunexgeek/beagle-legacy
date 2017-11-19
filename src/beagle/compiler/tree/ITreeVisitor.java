@@ -11,6 +11,8 @@ public interface ITreeVisitor
 
 	void finish(IBlock target);
 
+	void finish(IBooleanLiteral target);
+
 	void finish(ICompilationUnit target);
 
 	void finish(IConstantDeclaration target);
@@ -28,6 +30,8 @@ public interface ITreeVisitor
 	void finish(IName target);
 
 	void finish(IPackage target);
+
+	void finish(IStringLiteral target);
 
 	void finish(ITypeBody target);
 
@@ -53,6 +57,8 @@ public interface ITreeVisitor
 
 	boolean visit(IBlock target);
 
+	boolean visit(IBooleanLiteral target);
+
 	boolean visit(ICompilationUnit target);
 
 	boolean visit(IConstantDeclaration target);
@@ -70,6 +76,8 @@ public interface ITreeVisitor
 	boolean visit(IName target);
 
 	boolean visit(IPackage target);
+
+	boolean visit(IStringLiteral target);
 
 	boolean visit(ITypeBody target);
 

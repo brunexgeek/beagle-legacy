@@ -7,15 +7,15 @@ import beagle.compiler.tree.IComment;
 public class Token
 {
 
-	TokenType type;
+	public TokenType type;
 
-	String value;
+	public String value;
 
-	SourceLocation location;
+	public SourceLocation location;
 
-	int lineBreak;
+	public int lineBreak;
 
-	List<IComment> comments;
+	public List<IComment> comments;
 
 	/**
 	 *
@@ -37,7 +37,7 @@ public class Token
 		this.lineBreak = lineBreak;
 		this.comments = comments;
 		if (type == null)
-			this.type = TokenType.getType(value);
+			this.type = TokenType.fromString(value);
 		else
 			this.type = type;
 		this.value = value;

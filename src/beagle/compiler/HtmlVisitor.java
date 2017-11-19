@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import beagle.compiler.tree.IAnnotation;
 import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
+import beagle.compiler.tree.IBooleanLiteral;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
 import beagle.compiler.tree.IFormalParameter;
@@ -14,6 +15,7 @@ import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IModule;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.IStringLiteral;
 import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeDeclarationList;
@@ -82,21 +84,6 @@ public class HtmlVisitor extends TreeVisitor
 	}
 
 	@Override
-	public void finish()
-	{
-	}
-/*
-	void writeAnnotations( List<IAnnotation> target )
-	{
-		if (target.size() == 0) return;
-		title("Annotations");
-		level++;
-		for (IAnnotation item : target)
-			attribute(item.getType().getQualifiedName());
-		level--;
-	}*/
-
-	@Override
 	public void finish(IAnnotation target)
 	{
 		close();
@@ -111,7 +98,7 @@ public class HtmlVisitor extends TreeVisitor
 	@Override
 	public void finish(IBlock target)
 	{
-		if (target.statements().size() != 0) close();
+		if (target.size() != 0) close();
 	}
 
 	@Override
@@ -163,15 +150,14 @@ public class HtmlVisitor extends TreeVisitor
 
 
 	@Override
-	public void finish(IName name)
+	public void finish(IName target)
 	{
 	}
 
 
 	@Override
-	public void finish(IPackage target1)
+	public void finish(IPackage target)
 	{
-		//close();
 	}
 
 
@@ -231,43 +217,22 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-
-	protected boolean open()
-	{
-		return open(null);
-	}
-
-
-	protected boolean open( String title )
+	protected boolean open( String type )
 	{
 		out.append("<div class='container'>");
-		if (title != null)
+		if (type != null)
 		{
 			out.append("<div class='title'>");
-			out.append(title);
+			out.append(type);
 			out.append("</div>");
 		}
 		return true;
 	}
-/*
-	protected boolean open( String title, String description )
-	{
-		out.append("<div class='container'>");
-		if (title != null && description != null)
-		{
-			out.append("<div><span class='title'>");
-			out.append(title);
-			out.append("</span><span class='description'>(");
-			out.append(description);
-			out.append(")</span></div>");
-		}
-		return true;
-	}*/
 
-	protected boolean open( String title, String description )
+	protected boolean open( String type, String description )
 	{
 		out.append("<div class='container'>");
-		if (title != null && description != null)
+		if (type != null && description != null)
 		{
 			out.append("<div class='dedent'>");
 
@@ -276,44 +241,11 @@ public class HtmlVisitor extends TreeVisitor
 			out.append("</span>");
 
 			out.append(" &rarr; <span class='title'>");
-			out.append(title);
+			out.append(type);
 			out.append("</span>");
 
 			out.append("</div>");
 		}
-		return true;
-	}
-
-/*
-	protected void title( String value )
-	{
-		out.append("<div class='title'>");
-		out.append(value);
-		out.append("</div>");
-		out.flush();
-	}
-
-
-	protected void title( String value, String clazz )
-	{
-		if (clazz == null)
-			title(value);
-		else
-		{
-			out.append("<div class='title ");
-			out.append(clazz);
-			out.append("'>");
-			out.append(value);
-			out.append("</div>");
-			out.flush();
-		}
-	}
-*/
-
-	@Override
-	public boolean visit()
-	{
-		open(this.getClass().getSimpleName());
 		return true;
 	}
 
@@ -322,7 +254,6 @@ public class HtmlVisitor extends TreeVisitor
 	public boolean visit(IAnnotation target)
 	{
 		open(target.getClass().getSimpleName());
-		//attribute("name", target.type().getQualifiedName());
 		return true;
 	}
 
@@ -340,7 +271,7 @@ public class HtmlVisitor extends TreeVisitor
 	@Override
 	public boolean visit(IBlock target)
 	{
-		if (target.statements().size() == 0) return false;
+		if (target.size() == 0) return false;
 
 		return open(target.getClass().getSimpleName());
 	}
@@ -466,7 +397,6 @@ public class HtmlVisitor extends TreeVisitor
 		}
 	}
 
-
 	@Override
 	public boolean visit(ITypeReferenceList target)
 	{
@@ -491,6 +421,34 @@ public class HtmlVisitor extends TreeVisitor
 		out.append(".container .description {color: blue}");
 		out.append(".attribute .value {font-style: italic; color: green}");
 		out.append("</style>");
+	}
+
+
+	@Override
+	public boolean visit(IBooleanLiteral target)
+	{
+		attribute("expression", target.getClass(), Boolean.toString(target.value()));
+		return false;
+	}
+
+
+	@Override
+	public void finish(IBooleanLiteral target)
+	{
+	}
+
+
+	@Override
+	public boolean visit(IStringLiteral target)
+	{
+		attribute("expression", target.getClass(), target.value());
+		return false;
+	}
+
+
+	@Override
+	public void finish(IStringLiteral stringLiteral)
+	{
 	}
 
 }

@@ -1,21 +1,27 @@
 package beagle.compiler;
 
+import static beagle.compiler.TokenType.TOK_TRUE;
+
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
 import beagle.compiler.tree.Block;
+import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
+import beagle.compiler.tree.IBooleanLiteral;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
+import beagle.compiler.tree.IExpression;
 import beagle.compiler.tree.IFormalParameterList;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.IStringLiteral;
 import beagle.compiler.tree.ITreeElement;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
@@ -25,12 +31,14 @@ import beagle.compiler.tree.IVariableDeclaration;
 import beagle.compiler.tree.MethodDeclaration;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.Package;
+import beagle.compiler.tree.StringLiteral;
 import beagle.compiler.tree.TypeBody;
 import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.TypeReferenceList;
 import beagle.compiler.tree.VariableDeclaration;
+
 
 public class Parser implements IParser
 {
@@ -106,7 +114,13 @@ public class Parser implements IParser
 		return unit;
 	}
 
-
+	/**
+	 * Parse a name.
+	 *
+	 *   QualifiedName: Name ( "." Name )*
+	 *
+	 * @return
+	 */
 	IName parseName()
 	{
 		return parseName(true);
@@ -116,7 +130,7 @@ public class Parser implements IParser
 	/**
 	 * Parse a name.
 	 *
-	 *   QualifiedName := TOK_NAME [ "." TOK_NAME ]*
+	 *   QualifiedName: Name ( "." Name )*
 	 *
 	 * @return
 	 */
@@ -308,6 +322,7 @@ public class Parser implements IParser
 
 		IName name = parseName(false);
 		ITypeReference type = null;
+		IExpression initializer = null;
 
 		// check whether we have the var/const type
 		if (tokens.peekType() == TokenType.TOK_COLON)
@@ -319,8 +334,7 @@ public class Parser implements IParser
 		if (tokens.peekType() == TokenType.TOK_ASSIGN)
 		{
 			tokens.discard(); // =
-			tokens.discard();
-			// TODO: parse expression
+			initializer = parseExpression();
 		}
 		else
 		if (kind == TokenType.TOK_CONST)
@@ -330,9 +344,9 @@ public class Parser implements IParser
 		}
 
 		if (kind == TokenType.TOK_CONST)
-			return new ConstantDeclaration(annots, name, type);
+			return new ConstantDeclaration(annots, name, type, initializer);
 		else
-			return new VariableDeclaration(annots, name, type);
+			return new VariableDeclaration(annots, name, type, initializer);
 	}
 
 
@@ -479,6 +493,35 @@ public class Parser implements IParser
 
 		Block block = new Block();
 		return block;
+	}
+
+	IExpression parseExpression()
+	{
+		switch(tokens.peekType())
+		{
+			case TOK_TRUE:
+			case TOK_FALSE:
+				return parseBooleanLiteral();
+			case TOK_STRING_LITERAL:
+				return parseStringLiteral();
+			default:
+				context.listener.onError(tokens.peek().location, "Unexpected token '" + tokens.peek() + "'");
+				return null;
+		}
+
+	}
+
+	IStringLiteral parseStringLiteral()
+	{
+		return new StringLiteral(tokens.read().value);
+	}
+
+	IBooleanLiteral parseBooleanLiteral()
+	{
+		if (!expected(TOK_TRUE)) return null;
+
+		boolean value = (tokens.read().type == TOK_TRUE);
+		return new BooleanLiteral(value);
 	}
 
 }

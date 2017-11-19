@@ -17,4 +17,8 @@ public interface IStorageDeclaration extends ITreeElement
 
 	void type(ITypeReference value);
 
+	IExpression initializer();
+
+	void initializer(IExpression value);
+
 }

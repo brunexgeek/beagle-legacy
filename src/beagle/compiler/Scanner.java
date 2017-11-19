@@ -23,7 +23,7 @@ public class Scanner implements IScanner
 
 	List<IComment> comments;
 
-	Scanner( CompilationContext context, ScanString source )
+	public Scanner( CompilationContext context, ScanString source )
 	{
 		this.source = source;
 		this.context = context;

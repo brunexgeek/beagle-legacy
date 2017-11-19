@@ -1,30 +1,16 @@
 package beagle.compiler.tree;
 
-import java.util.LinkedList;
-import java.util.List;
-
-public class Block extends TreeElement implements IBlock
+public class Block extends TreeElementList<IStatement> implements IBlock
 {
 
-	List<IStatement> statements;
-
-	public Block()
-	{
-		statements = new LinkedList<>();
-	}
-
-	@Override
-	public List<IStatement> statements()
-	{
-		return statements;
-	}
+	private static final long serialVersionUID = -7176997723846769980L;
 
 	@Override
 	public void accept(ITreeVisitor visitor)
 	{
 		if (visitor.visit(this))
 		{
-			for (IStatement item : statements)
+			for (IStatement item : this)
 				item.accept(visitor);
 		}
 		visitor.finish(this);

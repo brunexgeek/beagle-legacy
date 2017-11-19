@@ -34,7 +34,12 @@ public class TokenArray
 				break;
 	}
 
-	public Token pull()
+	/**
+	 * Return the current token and advances the cursor.
+	 *
+	 * @return
+	 */
+	public Token read()
 	{
 		if (buffer[current] != null)
 		{
@@ -110,13 +115,13 @@ public class TokenArray
 
 	public void discard()
 	{
-		pull();
+		read();
 	}
 
 	public void discard( int count )
 	{
 		for (int i = 0; i < count; ++i)
-			pull();
+			read();
 	}
 
 	public boolean discard( TokenType type )
@@ -124,12 +129,12 @@ public class TokenArray
 		Token current = peek();
 		if (current != null && current.type == type)
 		{
-			pull();
+			read();
 			return true;
 		}
 		else
 		{
-			scanner.getContext().getListener().onError(null, "Syntax error, expected '" + type+ "'");
+			scanner.getContext().getListener().onError(null, "Syntax error, expected '" + type + "'");
 			return false;
 		}
 	}

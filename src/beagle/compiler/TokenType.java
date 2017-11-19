@@ -47,7 +47,7 @@ public enum TokenType
 	TOK_CONTINUE("continue", true),
 	TOK_TRY("try", true),
 	TOK_BOOL_LITERAL,
-	TOK_STRING_LITERAL,
+	TOK_STRING_LITERAL("string literal", false),
 	//TOK_UINT8("uint8", true),
 	//TOK_UINT16("uint16", true),
 	//TOK_UINT32("uint32", true),
@@ -124,9 +124,9 @@ public enum TokenType
 
 	private static HashMap<String, TokenType> lookup = new HashMap<>();
 
-	private String name;
+	private String name = null;
 
-	private boolean isKeyword;
+	private boolean isKeyword = false;
 
 	static
 	{
@@ -164,7 +164,7 @@ public enum TokenType
 	 * @param text
 	 * @return
 	 */
-	public static TokenType getType(String text)
+	public static TokenType fromString(String text)
 	{
 		if (lookup.containsKey(text))
 		{

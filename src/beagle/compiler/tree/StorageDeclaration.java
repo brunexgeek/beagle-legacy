@@ -11,19 +11,25 @@ public abstract class StorageDeclaration extends TreeElement implements IStorage
 
 	protected IAnnotationList annotations;
 
-	protected Object initializer;
+	protected IExpression initializer;
 
-	public StorageDeclaration( IAnnotationList annotations, IName name, ITypeReference type, Object initializer)
+	public StorageDeclaration( IAnnotationList annotations, IName name, ITypeReference type, IExpression initializer)
 	{
 		this.annotations = annotations;
 		this.modifiers = null;
 		this.type = type;
 		this.name = name;
+		this.initializer = initializer;
 	}
 
-	public StorageDeclaration( IAnnotationList annotations, ITypeReference type )
+	public StorageDeclaration( IAnnotationList annotations, IName name, IExpression initializer )
 	{
-		this(annotations,  null, type, null);
+		this(annotations,  name, null, initializer);
+	}
+
+	public StorageDeclaration( IAnnotationList annotations, IName name, ITypeReference type )
+	{
+		this(annotations,  name, type, null);
 	}
 
 	@Override
@@ -66,6 +72,18 @@ public abstract class StorageDeclaration extends TreeElement implements IStorage
 	public IAnnotationList annotations()
 	{
 		return annotations;
+	}
+
+	@Override
+	public IExpression initializer()
+	{
+		return initializer;
+	}
+
+	@Override
+	public void initializer(IExpression value)
+	{
+		this.initializer = value;
 	}
 
 }

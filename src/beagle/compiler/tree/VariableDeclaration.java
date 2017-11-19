@@ -3,9 +3,19 @@ package beagle.compiler.tree;
 public class VariableDeclaration extends StorageDeclaration implements IVariableDeclaration
 {
 
+	public VariableDeclaration( IAnnotationList annotations, IName name, ITypeReference type, IExpression initializer)
+	{
+		super(annotations,  name, type, initializer);
+	}
+
+	public VariableDeclaration( IAnnotationList annotations, IName name, IExpression initializer )
+	{
+		super(annotations,  name, null, initializer);
+	}
+
 	public VariableDeclaration( IAnnotationList annotations, IName name, ITypeReference type )
 	{
-		super(annotations, name, type, null);
+		super(annotations,  name, type, null);
 	}
 
 	@Override
@@ -17,7 +27,7 @@ public class VariableDeclaration extends StorageDeclaration implements IVariable
 			accept(visitor, modifiers);
 			accept(visitor, name);
 			accept(visitor, type);
-			//accept(visitor, initializer);
+			accept(visitor, initializer);
 		}
 		visitor.finish(this);
 	}

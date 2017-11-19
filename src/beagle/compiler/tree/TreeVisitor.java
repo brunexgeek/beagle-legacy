@@ -27,6 +27,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public void finish(IBooleanLiteral target)
+	{
+		finish();
+	}
+
+	@Override
 	public void finish(ICompilationUnit target)
 	{
 		finish();
@@ -76,6 +82,12 @@ public class TreeVisitor implements ITreeVisitor
 
 	@Override
 	public void finish(IPackage target1)
+	{
+		finish();
+	}
+
+	@Override
+	public void finish(IStringLiteral target)
 	{
 		finish();
 	}
@@ -153,6 +165,12 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
+	public boolean visit(IBooleanLiteral target)
+	{
+		return visit();
+	}
+
+	@Override
 	public boolean visit(ICompilationUnit target)
 	{
 		return visit();
@@ -202,6 +220,12 @@ public class TreeVisitor implements ITreeVisitor
 
 	@Override
 	public boolean visit(IPackage target)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(IStringLiteral target)
 	{
 		return visit();
 	}

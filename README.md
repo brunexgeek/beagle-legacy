@@ -6,7 +6,7 @@ An ahead-of-time compiler for [Beagle programming language](http://github.com/br
 
 **Q: Why another language? Don't we have enough?**
 
-Beagle is a hobby project and I don't intend to create the next *<insert a popular programming language here>*. 
+Beagle is a hobby project and I don't intend to create the next *&lt;insert a popular programming language here&gt;*. 
 
 **Q: Why write the compiler in Java? Why not use language *X*?**
 

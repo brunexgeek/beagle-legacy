@@ -1,10 +1,7 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
-public interface IBlock extends ITreeElement
+public interface IBlock extends ITreeElementList<IStatement>
 {
 
-	List<IStatement> statements();
 
 }
