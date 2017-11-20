@@ -17,7 +17,7 @@ class Alice : Bob, Eve
 {
 
 	@Private
-	var variable : Foobar = (1 + 2) - 3 > 3 in 7
+	var variable : Foobar = true and (1 + 2) - test == 3 > 3 in 7
 
 	@Protected
 	@beagle.compiler.Optimize

@@ -499,22 +499,70 @@ public class Parser implements IParser
 		return block;
 	}
 
+	/**
+	 * Parse an expression.
+	 *
+	 * @return
+	 */
 	IExpression parseExpression()
 	{
-		return parseComparison();
+		return parseConjunction();
 	}
 
+	IExpression createBinaryExpression(IExpression left, TokenType type, IExpression right)
+	{
+		if (type == null || left == null || right == null)
+			return null;
+		else
+			return new BinaryExpression(left, type, right);
+	}
 
 	/**
-	 * Comparison: NamedInfix ( ComparisonOperation NamedInfix )*
+	 * Conjunction: EqualityComparison ( “and” Conjunction )*
+	 */
+	IExpression parseConjunction()
+	{
+		IExpression left = parseEquality();
+		if (left == null) return null;
+
+		TokenType type = null;
+		if (tokens.peekType() == TOK_AND)
+			type = tokens.read().type;
+		else
+			return left;
+
+		return createBinaryExpression(left, type, parseConjunction());
+	}
+
+	/**
+	 * EqualityComparison: Comparison ( EqualityOperation EqualityComparison )*
+	 */
+	IExpression parseEquality()
+	{
+		IExpression left = parseComparison();
+		if (left == null) return null;
+
+		TokenType type = null;
+		switch(tokens.peekType())
+		{
+			case TOK_EQ: // ==
+			case TOK_NE: // !=
+				type = tokens.read().type;
+				break;
+			default:
+				return left;
+		}
+
+		return createBinaryExpression(left, type, parseEquality());
+	}
+
+	/**
+	 * Comparison: NamedInfix ( ComparisonOperation Comparison )*
 	 */
 	IExpression parseComparison()
 	{
-		IExpression left = null;
-		IExpression right = null;
-
-		if (left == null)
-			left = parseNamedInfix();
+		IExpression left = parseNamedInfix();
+		if (left == null) return null;
 
 		TokenType type = null;
 		switch(tokens.peekType())
@@ -529,12 +577,7 @@ public class Parser implements IParser
 				return left;
 		}
 
-		right = parseComparison();
-
-		if (type == null || left == null || right == null)
-			return null;
-
-		return new BinaryExpression(left, type, right);
+		return createBinaryExpression(left, type, parseComparison());
 	}
 
 	/**
@@ -546,11 +589,10 @@ public class Parser implements IParser
 	 */
 	IExpression parseNamedInfix()
 	{
-		IExpression left = null;
-		IExpression right = null;
+		IExpression left = parseAdditiveExpression();
+		if (left == null) return null;
 
-		if (left == null)
-			left = parseAdditiveExpression();
+		IExpression right = null;
 
 		TokenType type = null;
 		if ((tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IN) ||  // not in
@@ -573,8 +615,7 @@ public class Parser implements IParser
 		else
 		if (type == TOK_IS)
 			right = new NameLiteral(parseName());
-
-		if (type == null || left == null || right == null)
+		else
 			return null;
 
 		return new BinaryExpression(left, type, right);
@@ -586,11 +627,8 @@ public class Parser implements IParser
 	 */
 	IExpression  parseAdditiveExpression()
 	{
-		IExpression left = null;
-		IExpression right = null;
-
-		if (left == null)
-			left = parseMultiplicativeExpression();
+		IExpression left = parseMultiplicativeExpression();
+		if (left == null) return null;
 
 		TokenType type = null;
 		switch(tokens.peekType())
@@ -603,25 +641,17 @@ public class Parser implements IParser
 				return left;
 		}
 
-		right = parseAdditiveExpression();
-
-		if (type == null || left == null || right == null)
-			return null;
-
-		return new BinaryExpression(left, type, right);
+		return createBinaryExpression(left, type, parseAdditiveExpression());
 	}
 
 	/**
 	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation MultiplicativeExpression )*
 	 *
 	 */
-	IExpression  parseMultiplicativeExpression()
+	IExpression parseMultiplicativeExpression()
 	{
-		IExpression left = null;
-		IExpression right = null;
-
-		if (left == null)
-			left = parsePrefixUnaryExpression();
+		IExpression left = parsePrefixUnaryExpression();
+		if (left == null) return null;
 
 		TokenType type = null;
 		switch(tokens.peekType())
@@ -635,12 +665,7 @@ public class Parser implements IParser
 				return left;
 		}
 
-		right = parseMultiplicativeExpression();
-
-		if (type == null || left == null || right == null)
-			return null;
-
-		return new BinaryExpression(left, type, right);
+		return createBinaryExpression(left, type, parseMultiplicativeExpression());
 	}
 
 
