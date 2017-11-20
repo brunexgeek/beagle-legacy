@@ -26,6 +26,10 @@ class Alice : Bob, Eve
 	@Public	
 	def myMethod( argument : double ) : int
 	{
+		if a > 0 then 
+			if (5 in test) then return 8 
+		else 
+			return 0
 		return constant * argument
 	}
 

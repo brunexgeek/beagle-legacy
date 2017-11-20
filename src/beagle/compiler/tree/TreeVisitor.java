@@ -362,4 +362,28 @@ public class TreeVisitor implements ITreeVisitor
 		finish();
 	}
 
+	@Override
+	public boolean visit(ReturnStmt target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(ReturnStmt target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(IfThenElseStmt target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(IfThenElseStmt target)
+	{
+		finish();
+	}
+
 }

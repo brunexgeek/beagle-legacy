@@ -35,6 +35,7 @@ public enum TokenType
 	TOK_PROTECTED("protected", true),
 	TOK_PUBLIC("public", true),
 	TOK_RETURN("return", true),
+	TOK_THEN("then", true),
 	TOK_SUSPEND("suspend", true),
 	TOK_STATIC("static", true),
 	TOK_SUPER("super", true),

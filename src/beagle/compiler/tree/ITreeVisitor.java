@@ -122,4 +122,12 @@ public interface ITreeVisitor
 	boolean visit(ExpressionList target);
 
 	void finish(ExpressionList target);
+
+	boolean visit(ReturnStmt target);
+
+	void finish(ReturnStmt target);
+
+	boolean visit(IfThenElseStmt target);
+
+	void finish(IfThenElseStmt target);
 }

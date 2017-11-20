@@ -11,6 +11,7 @@ import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.ExpressionList;
+import beagle.compiler.tree.ExpressionStmt;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.IAnnotationList;
@@ -23,18 +24,21 @@ import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.IStatement;
 import beagle.compiler.tree.ITreeElement;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeImport;
 import beagle.compiler.tree.ITypeReference;
 import beagle.compiler.tree.ITypeReferenceList;
 import beagle.compiler.tree.IVariableDeclaration;
+import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.MethodDeclaration;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.NameLiteral;
 import beagle.compiler.tree.NullLiteral;
 import beagle.compiler.tree.Package;
+import beagle.compiler.tree.ReturnStmt;
 import beagle.compiler.tree.StringLiteral;
 import beagle.compiler.tree.TypeBody;
 import beagle.compiler.tree.TypeDeclaration;
@@ -492,12 +496,85 @@ public class Parser implements IParser
 	IBlock parseBlock()
 	{
 		if (!expected(TokenType.TOK_LEFT_BRACE)) return null;
-
-		while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE) tokens.discard();
 		tokens.discard();
 
 		Block block = new Block();
+
+		while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
+		{
+			IStatement current = parseStatement();
+			if (current == null) return null;
+
+			block.add(current);
+		}
+		tokens.discard();
+
 		return block;
+	}
+
+	IStatement parseStatement()
+	{
+		switch (tokens.peekType())
+		{
+			case TOK_RETURN:
+				return parseReturnStmt();
+			case TOK_IF:
+				return parseIfThenElseStmt();
+			default:
+				break;
+		}
+
+		IExpression expr = parseExpression();
+		return new ExpressionStmt(expr);
+	}
+
+	IStatement parseIfThenElseStmt()
+	{
+		if (!expected(TOK_IF)) return null;
+		tokens.discard();
+
+		IExpression condition = parseExpression();
+
+		if (!expected(TOK_THEN)) return null;
+		tokens.discard();
+
+		IStatement thenSide = null;
+		IStatement elseSide = null;
+
+		if (tokens.peekType() == TOK_LEFT_BRACE)
+			thenSide = parseBlock();
+		else
+			thenSide = parseStatement();
+		if (thenSide == null) return null;
+
+		if (tokens.peekType() == TOK_ELSE)
+		{
+			tokens.discard();
+
+			if (tokens.peekType() == TOK_LEFT_BRACE)
+				elseSide = parseBlock();
+			else
+				elseSide = parseStatement();
+			if (elseSide == null) return null;
+		}
+
+		return new IfThenElseStmt(condition, thenSide, elseSide);
+	}
+
+	/**
+	 * Return: "return" Expression
+	 *
+	 * @return
+	 */
+	IStatement parseReturnStmt()
+	{
+		if (!expected(TOK_RETURN)) return null;
+		tokens.discard();
+
+		IExpression expr = parseExpression();
+		if (expr == null) return null;
+
+		return new ReturnStmt(expr);
 	}
 
 	/**
