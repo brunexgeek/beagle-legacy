@@ -17,7 +17,7 @@ class Alice : Bob, Eve
 {
 
 	@Private
-	var variable : Foobar = ((55 * --8) * 2)
+	var variable : Foobar = (1 + 2) - 3 > 3 in 7
 
 	@Protected
 	@beagle.compiler.Optimize

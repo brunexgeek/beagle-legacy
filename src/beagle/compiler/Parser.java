@@ -1,6 +1,6 @@
 package beagle.compiler;
 
-import static beagle.compiler.TokenType.TOK_TRUE;
+import static beagle.compiler.TokenType.*;
 
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
@@ -501,21 +501,123 @@ public class Parser implements IParser
 
 	IExpression parseExpression()
 	{
-		return parseMultiplicativeExpression();
+		return parseComparison();
+	}
+
+
+	/**
+	 * Comparison: NamedInfix ( ComparisonOperation NamedInfix )*
+	 */
+	IExpression parseComparison()
+	{
+		IExpression left = null;
+		IExpression right = null;
+
+		if (left == null)
+			left = parseNamedInfix();
+
+		TokenType type = null;
+		switch(tokens.peekType())
+		{
+			case TOK_GT: // >
+			case TOK_GE: // >=
+			case TOK_LT: // <
+			case TOK_LE: // <=
+				type = tokens.read().type;
+				break;
+			default:
+				return left;
+		}
+
+		right = parseComparison();
+
+		if (type == null || left == null || right == null)
+			return null;
+
+		return new BinaryExpression(left, type, right);
 	}
 
 	/**
-	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation PrefixUnaryExpression )*
+	 * NamedInfix
+	 *   : AdditiveExpression ( InOperation AdditiveExpression )*
+	 *   : AdditiveExpression IsOperation TypeReference
+	 *   ;
+	 *
+	 */
+	IExpression parseNamedInfix()
+	{
+		IExpression left = null;
+		IExpression right = null;
+
+		if (left == null)
+			left = parseAdditiveExpression();
+
+		TokenType type = null;
+		if ((tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IN) ||  // not in
+		    (tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IS))    // not is
+		{
+			tokens.discard();
+			type = tokens.read().type;
+		}
+		else
+		if (tokens.peekType() == TOK_IN ||  // in
+		    tokens.peekType() == TOK_IS)    // is
+		{
+			type = tokens.read().type;
+		}
+		else
+			return left;
+
+		if (type == TOK_IN)
+			right = parseAdditiveExpression();
+		else
+		if (type == TOK_IS)
+			right = new NameLiteral(parseName());
+
+		if (type == null || left == null || right == null)
+			return null;
+
+		return new BinaryExpression(left, type, right);
+	}
+
+	/**
+	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation MultiplicativeExpression )*
+	 *
+	 */
+	IExpression  parseAdditiveExpression()
+	{
+		IExpression left = null;
+		IExpression right = null;
+
+		if (left == null)
+			left = parseMultiplicativeExpression();
+
+		TokenType type = null;
+		switch(tokens.peekType())
+		{
+			case TOK_MINUS: // -
+			case TOK_PLUS:  // +
+				type = tokens.read().type;
+				break;
+			default:
+				return left;
+		}
+
+		right = parseAdditiveExpression();
+
+		if (type == null || left == null || right == null)
+			return null;
+
+		return new BinaryExpression(left, type, right);
+	}
+
+	/**
+	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation MultiplicativeExpression )*
 	 *
 	 */
 	IExpression  parseMultiplicativeExpression()
 	{
-		return parseMultiplicativeExpression(null);
-	}
-
-	IExpression  parseMultiplicativeExpression(IExpression value)
-	{
-		IExpression left = value;
+		IExpression left = null;
 		IExpression right = null;
 
 		if (left == null)
@@ -524,16 +626,16 @@ public class Parser implements IParser
 		TokenType type = null;
 		switch(tokens.peekType())
 		{
-			case TOK_MUL:
-			case TOK_DIV:
-			case TOK_MOD:
+			case TOK_MUL: // *
+			case TOK_DIV: // /
+			case TOK_MOD: // %
 				type = tokens.read().type;
 				break;
 			default:
 				return left;
 		}
 
-		right = parseMultiplicativeExpression(value);
+		right = parseMultiplicativeExpression();
 
 		if (type == null || left == null || right == null)
 			return null;
@@ -544,7 +646,7 @@ public class Parser implements IParser
 
 	/**
 	 *
-	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation*
+	 * PrefixUnaryExpression: PrefixUnaryOperation? PostfixUnaryExpression
 	 *
 	 */
 	IExpression parsePrefixUnaryExpression()
@@ -552,7 +654,12 @@ public class Parser implements IParser
 		return parsePrefixUnaryExpression(null);
 	}
 
-	IExpression parsePrefixUnaryExpression(IExpression value)
+	/**
+	 *
+	 * PrefixUnaryExpression: PrefixUnaryOperation? PostfixUnaryExpression
+	 *
+	 */
+	IExpression parsePrefixUnaryExpression(IExpression leftValue)
 	{
 		boolean recursive = false;
 
@@ -566,9 +673,9 @@ public class Parser implements IParser
 			default:
 				type = null;
 		}
-
-		IExpression expr = value;
-		if (value == null)
+		// FIXME: broken in recursive case (should test for more prefixes)
+		IExpression expr = leftValue;
+		if (leftValue == null)
 			expr = parsePostfixUnaryExpression();
 
 		if (type != null)
@@ -584,7 +691,7 @@ public class Parser implements IParser
 
 	/**
 	 *
-	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation*
+	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation?
 	 *
 	 */
 	IExpression parsePostfixUnaryExpression()
@@ -592,11 +699,16 @@ public class Parser implements IParser
 		return parsePostfixUnaryExpression(null);
 	}
 
-	IExpression parsePostfixUnaryExpression(IExpression value)
+	/**
+	 *
+	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation?
+	 *
+	 */
+	IExpression parsePostfixUnaryExpression(IExpression leftValue)
 	{
-		IExpression expr = value;
+		IExpression expr = leftValue;
 
-		if (value == null)
+		if (leftValue == null)
 			expr = parseAtomicExpression();
 
 		boolean recursive = false;

@@ -266,7 +266,7 @@ public class Scanner implements IScanner
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return createToken(TokenType.TOK_GREATER_THAN);
+						return createToken(TokenType.TOK_GT);
 					}
 					if (source.peek(1) == '>')
 					{
@@ -279,12 +279,12 @@ public class Scanner implements IScanner
 						else
 							return createToken(TokenType.TOK_SHR);
 					}
-					return createToken(TokenType.TOK_GREATER_THAN);
+					return createToken(TokenType.TOK_GT);
 				case '<':
 					if (source.peek(1) == '=')
 					{
 						source.next();
-						return createToken(TokenType.TOK_LESS_THAN);
+						return createToken(TokenType.TOK_LT);
 					}
 					if (source.peek(1) == '<')
 					{
@@ -297,7 +297,7 @@ public class Scanner implements IScanner
 						else
 							return createToken(TokenType.TOK_SHL);
 					}
-					return createToken(TokenType.TOK_LESS_THAN);
+					return createToken(TokenType.TOK_LT);
 
 				case ',':
 					return createToken(TokenType.TOK_COMA);
