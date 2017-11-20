@@ -24,6 +24,7 @@ public enum TokenType
 	TOK_IMPLEMENTS("implements", true),
 	TOK_IMPORT("import", true),
 	TOK_IS("is", true),
+	TOK_NIS("not is", false),
 	TOK_INTERFACE("interface", true),
 	TOK_LONG("long", true),
 	TOK_NATIVE("native", true),
@@ -109,6 +110,7 @@ public enum TokenType
 	TOK_INDENT,
 	TOK_DEDENT,
 	TOK_IN("in", true),
+	TOK_NIN("not in", false),
 	TOK_HEX_LITERAL,
 	TOK_BIN_LITERAL,
 	TOK_OCT_LITERAL,
@@ -146,8 +148,10 @@ public enum TokenType
 	/**
 	 * Create a token type for keywords, operators and symbols.
 	 *
-	 * If the token type contains a non-null keyword, this keyword will be used
-	 * when looking up for matches in the {@link getType} method.
+	 * If the token type contains a non-null name and the parameter {@code isKeyword} is {@code true},
+	 * this name will be used when looking up for matches in the {@link fromString} method.
+	 *
+	 * The name is also used to output error/warning information.
 	 *
 	 * @param name
 	 * @param isKeyword
@@ -159,7 +163,7 @@ public enum TokenType
 	}
 
 	/**
-	 * Return a token type given the identifier.
+	 * Return a token type given the name.
 	 *
 	 * If no match is found, this method returns {@link TOK_NAME}.
 	 *

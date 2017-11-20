@@ -506,7 +506,7 @@ public class Parser implements IParser
 	 */
 	IExpression parseExpression()
 	{
-		return parseConjunction();
+		return parseAssignment();
 	}
 
 	IExpression createBinaryExpression(IExpression left, TokenType type, IExpression right)
@@ -518,7 +518,55 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * Conjunction: EqualityComparison ( “and” Conjunction )*
+	 * Expression: Disjunction ( AssignmentOperator Expression )*
+	 */
+	IExpression parseAssignment()
+	{
+		IExpression left = parseDisjunction();
+		if (left == null) return null;
+
+		TokenType type = null;
+		switch(tokens.peekType())
+		{
+			case TOK_ASSIGN:       // =
+			case TOK_PLUS_ASSIGN:  // +=
+			case TOK_MINUS_ASSIGN: // -=
+			case TOK_MUL_ASSIGN:   // *=
+			case TOK_DIV_ASSIGN:   // /=
+			case TOK_BAND_ASSIGN:  // &=
+			case TOK_BOR_ASSIGN:   // |=
+			case TOK_XOR_ASSIGN:   // ^=
+			case TOK_SHL_ASSIGN:   // <<=
+			case TOK_SHR_ASSIGN:   // >>=
+			case TOK_MOD_ASSIGN:   // %=
+				type = tokens.read().type;
+				break;
+			default:
+				return left;
+		}
+
+		return createBinaryExpression(left, type, parseAssignment());
+	}
+
+	/**
+	 * Disjunction: Conjunction ( "or" Disjunction )*
+	 */
+	IExpression parseDisjunction()
+	{
+		IExpression left = parseConjunction();
+		if (left == null) return null;
+
+		TokenType type = null;
+		if (tokens.peekType() == TOK_OR)
+			type = tokens.read().type;
+		else
+			return left;
+
+		return createBinaryExpression(left, type, parseDisjunction());
+	}
+
+	/**
+	 * Conjunction: EqualityComparison ( "and" Conjunction )*
 	 */
 	IExpression parseConjunction()
 	{
@@ -595,11 +643,16 @@ public class Parser implements IParser
 		IExpression right = null;
 
 		TokenType type = null;
-		if ((tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IN) ||  // not in
-		    (tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IS))    // not is
+		if (tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IN) // not in
 		{
-			tokens.discard();
-			type = tokens.read().type;
+			tokens.discard(2);
+			type = TOK_NIN;
+		}
+		else
+		if (tokens.peekType() == TOK_NOT && tokens.peekType(1) == TOK_IS) // not is
+		{
+			tokens.discard(2);
+			type = TOK_NIS;
 		}
 		else
 		if (tokens.peekType() == TOK_IN ||  // in
@@ -610,10 +663,10 @@ public class Parser implements IParser
 		else
 			return left;
 
-		if (type == TOK_IN)
+		if (type == TOK_IN || type == TOK_NIN)
 			right = parseAdditiveExpression();
 		else
-		if (type == TOK_IS)
+		if (type == TOK_IS || type == TOK_NIS)
 			right = new NameLiteral(parseName());
 		else
 			return null;
