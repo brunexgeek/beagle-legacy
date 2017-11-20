@@ -15,4 +15,9 @@ public class NameLiteral extends Literal<IName>
 		visitor.finish(this);
 	}
 
+	@Override
+	public String toString()
+	{
+		return value.getQualifiedName();
+	}
 }

@@ -17,7 +17,7 @@ class Alice : Bob, Eve
 {
 
 	@Private
-	var variable : Foobar = store *= 5 += true and (1 + 2) - test == 3 > 3 not in 7 or 42
+	var variable : Foobar = store *= 5 += true and (1 + 2) - table.data[1,2,3] == 3 > 3 not in 7 or 42
 
 	@Protected
 	@beagle.compiler.Optimize

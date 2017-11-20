@@ -15,4 +15,10 @@ public class IntegerLiteral extends Literal<Long>
 		visitor.finish(this);
 	}
 
+	@Override
+	public String toString()
+	{
+		return Long.toString(value);
+	}
+
 }

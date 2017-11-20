@@ -117,5 +117,9 @@ public interface ITreeVisitor
 
 	boolean visit(BinaryExpression target);
 
-	void finish(BinaryExpression binaryExpression);
+	void finish(BinaryExpression target);
+
+	boolean visit(ExpressionList target);
+
+	void finish(ExpressionList target);
 }

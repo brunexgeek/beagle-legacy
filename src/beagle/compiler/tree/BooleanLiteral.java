@@ -15,4 +15,9 @@ public class BooleanLiteral extends Literal<Boolean>
 		visitor.finish(this);
 	}
 
+	@Override
+	public String toString()
+	{
+		return Boolean.toString(value);
+	}
 }

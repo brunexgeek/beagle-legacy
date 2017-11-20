@@ -11,6 +11,8 @@ public class UnaryExpression extends TreeElement implements IExpression
 
 	IExpression expression;
 
+	IExpression extra = null;
+
 	public UnaryExpression(IExpression expression, TokenType operation)
 	{
 		this.operation = operation;
@@ -65,8 +67,22 @@ public class UnaryExpression extends TreeElement implements IExpression
 	public void accept(ITreeVisitor visitor)
 	{
 		if (visitor.visit(this))
+		{
 			accept(visitor, expression);
+			accept(visitor, extra);
+		}
 		visitor.finish(this);
+	}
+
+	public void extra(IExpression value)
+	{
+		this.extra = value;
+		if (extra != null) extra.parent(this);
+	}
+
+	public IExpression extra()
+	{
+		return extra;
 	}
 
 }

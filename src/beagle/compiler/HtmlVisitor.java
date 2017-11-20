@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.BooleanLiteral;
+import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.IAnnotation;
 import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
@@ -486,6 +487,8 @@ public class HtmlVisitor extends TreeVisitor
 		open(target.getClass().getSimpleName(), "expression");
 		attribute("operation", target.operation().toString());
 		attribute("direction", target.direction().toString());
+		/*if (target.extra() != null)
+			attribute("extra", target.extra().toString());*/
 		return true;
 	}
 
@@ -508,6 +511,23 @@ public class HtmlVisitor extends TreeVisitor
 
 	@Override
 	public void finish(BinaryExpression binaryExpression)
+	{
+		close();
+	}
+
+
+	@Override
+	public boolean visit(ExpressionList target)
+	{
+		String name = "expressionList";
+		if (target.parent() instanceof UnaryExpression) name = "extra";
+		open(target.getClass().getSimpleName(), name);
+		return true;
+	}
+
+
+	@Override
+	public void finish(ExpressionList target)
 	{
 		close();
 	}

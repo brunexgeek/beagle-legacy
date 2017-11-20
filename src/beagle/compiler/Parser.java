@@ -10,6 +10,7 @@ import beagle.compiler.tree.Block;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
+import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.IAnnotationList;
@@ -751,7 +752,7 @@ public class Parser implements IParser
 			default:
 				type = null;
 		}
-		// FIXME: broken in recursive case (should test for more prefixes)
+		// FIXME: broken in recursive case (should test for more prefixes)?
 		IExpression expr = leftValue;
 		if (leftValue == null)
 			expr = parsePostfixUnaryExpression();
@@ -785,9 +786,11 @@ public class Parser implements IParser
 	IExpression parsePostfixUnaryExpression(IExpression leftValue)
 	{
 		IExpression expr = leftValue;
+		IExpression extra = null;
 
 		if (leftValue == null)
 			expr = parseAtomicExpression();
+		if (expr == null) return null;
 
 		boolean recursive = false;
 
@@ -798,19 +801,60 @@ public class Parser implements IParser
 			case TOK_DEC:
 				type = tokens.read().type;
 				break;
+			case TOK_LEFT_BRACKET:
+				type = tokens.peekType();
+				extra = parseArrayAccess(null);
+				break;
 			default:
 				type = null;
 		}
 
 		if (type != null)
 		{
+			UnaryExpression result = null;
+
 			if (recursive)
-				return new UnaryExpression(parsePostfixUnaryExpression(expr), type);
+				result =  new UnaryExpression(parsePostfixUnaryExpression(expr), type);
 			else
-				return new UnaryExpression(expr, type);
+				result =  new UnaryExpression(expr, type);
+
+			if (extra != null) result.extra(extra);
+			return result;
 		}
 
 		return expr;
+	}
+
+	/**
+	 * ArrayAccess: "[" Expression ( "," Expression )* "]"
+	 */
+	IExpression parseArrayAccess(ExpressionList value)
+	{
+		if (value == null)
+		{
+			if (!expected(TOK_LEFT_BRACKET)) return null;
+			tokens.discard();
+
+			ExpressionList result = new ExpressionList( parseExpression() );
+			if (tokens.peekType() == TOK_COMA)
+				parseArrayAccess(result);
+
+			if (!expected(TOK_RIGHT_BRACKET)) return null;
+			tokens.discard();
+
+			return result;
+		}
+		else
+		{
+			if (!expected(TOK_COMA)) return null;
+			tokens.discard();
+
+			value.add( parseExpression() );
+			if (tokens.peekType() == TOK_COMA)
+				return parseArrayAccess(value);
+			else
+				return value;
+		}
 	}
 
 	/**
@@ -833,15 +877,12 @@ public class Parser implements IParser
 				tokens.discard();
 				result = new AtomicExpression(parseExpression());
 				tokens.discard();
-				break;
+				return result;
 			case TOK_NAME:
-				result = new NameLiteral( parseName() );
-				break;
+				return new NameLiteral( parseName() );
 			default:
-				result = parseLiteralConstant();
+				return parseLiteralConstant();
 		}
-
-		return result;
 	}
 
 	/**

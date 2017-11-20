@@ -350,4 +350,16 @@ public class TreeVisitor implements ITreeVisitor
 		finish();
 	}
 
+	@Override
+	public boolean visit(ExpressionList target)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(ExpressionList target)
+	{
+		finish();
+	}
+
 }
