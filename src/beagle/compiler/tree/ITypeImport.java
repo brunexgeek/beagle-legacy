@@ -13,4 +13,8 @@ public interface ITypeImport extends ITreeElement
 
 	void name(IName value);
 
+	IName alias();
+
+	void alias(IName value);
+
 }

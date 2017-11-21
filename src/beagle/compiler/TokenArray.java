@@ -18,13 +18,13 @@ public class TokenArray
 
 	public TokenArray(IScanner scanner)
 	{
-		this(scanner, 16);
+		this(scanner, 8);
 	}
 
 	public TokenArray( IScanner scanner, int size)
 	{
 		current = 0;
-		this.size = size;
+		this.size = Math.max(5, size);
 		buffer = new Token[size];
 		this.scanner = scanner;
 

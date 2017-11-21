@@ -1,7 +1,5 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public interface ICompilationUnit extends ITreeElement
 {
 
@@ -15,5 +13,5 @@ public interface ICompilationUnit extends ITreeElement
 
 	void filename( String value );
 
-	List<ITypeImport> imports();
+	ITypeImportList imports();
 }

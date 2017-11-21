@@ -194,23 +194,31 @@ public class Parser implements IParser
 		{
 			tokens.discard();
 			IName qualifiedName = parseName();
+			if (qualifiedName == null) return null;
+
 			if (tokens.lookahead(TokenType.TOK_DOT, TokenType.TOK_MUL))
 			{
 				tokens.discard(2);
-				//tokens.discard(TokenType.TOK_EOL);
 				return new TypeImport(context, qualifiedName);
 			}
 			else
 			{
+				IName alias = null;
+				if (tokens.peekType() == TokenType.TOK_AS)
+				{
+					tokens.discard();
+					alias = parseName();
+					if (alias == null) return null;
+				}
 				if (!qualifiedName.isQualified())
 				{
 					context.listener.onError(null, "Invalid qualified type name");
 					return null;
 				}
-				IName typeName = qualifiedName.slice(qualifiedName.getCount() - 1);
-				IName packageName = qualifiedName.slice(0, qualifiedName.getCount() - 1);
-				//tokens.discard(TokenType.TOK_EOL);
-				return new TypeImport(context, packageName, typeName);
+				IName typeName = qualifiedName.slice(qualifiedName.count() - 1);
+				IName packageName = qualifiedName.slice(0, qualifiedName.count() - 1);
+
+				return new TypeImport(context, packageName, typeName, alias);
 			}
 		}
 		return null;
@@ -520,11 +528,15 @@ public class Parser implements IParser
 				return parseReturnStmt();
 			case TOK_IF:
 				return parseIfThenElseStmt();
+			case TOK_VAR:
+			case TOK_CONST:
+				return (IStatement) parseVariableOrConstant(null);
 			default:
 				break;
 		}
 
 		IExpression expr = parseExpression();
+		if (expr == null) return null;
 		return new ExpressionStmt(expr);
 	}
 

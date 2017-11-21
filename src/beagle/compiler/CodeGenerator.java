@@ -44,15 +44,15 @@ public class CodeGenerator extends TreeVisitor
 	@Override
 	public boolean visit(IModule target)
 	{
-		printer.println("; module '" + target.getName().getQualifiedName() + "'");
+		printer.println("; module '" + target.getName().qualifiedName() + "'");
 		return true;
 	}
 
 	@Override
 	public boolean visit(IMethodDeclaration target)
 	{
-		printer.println("; method of '" + target.parent().getParent().name().getQualifiedName() + "'");
-		printer.println("define void @" + target.name().getQualifiedName() + "() {}");
+		printer.println("; method of '" + target.parent().getParent().name().qualifiedName() + "'");
+		printer.println("define void @" + target.name().qualifiedName() + "() {}");
 		return true;
 	}
 

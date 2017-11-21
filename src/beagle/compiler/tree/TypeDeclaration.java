@@ -33,7 +33,7 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	public TypeDeclaration(ICompilationUnit parent, IAnnotationList annots, IModifiers modifiers, IName name,
 			ITypeReferenceList extended, ITypeBody body)
 	{
-		if (name.getCount() > 1)
+		if (name.count() > 1)
 			throw new IllegalArgumentException("Invalid simple name");
 		if (parent == null)
 			throw new IllegalArgumentException("Compilation unit can not be null");
@@ -58,7 +58,7 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	 */
 	public TypeDeclaration(IPackage pack, IName name)
 	{
-		if (name.getCount() > 1)
+		if (name.count() > 1)
 			throw new IllegalArgumentException("Invalid simple name");
 		if (pack == null)
 			throw new IllegalArgumentException("Package can not be null");

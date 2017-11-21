@@ -9,6 +9,8 @@ public class TypeImport extends TreeElement implements ITypeImport
 
 	IName name;
 
+	IName alias;
+
 	/**
 	 * Creates an package import.
 	 *
@@ -17,22 +19,22 @@ public class TypeImport extends TreeElement implements ITypeImport
 	 */
 	public TypeImport( CompilationContext context, IName packageName)
 	{
-		this(context, packageName, null);
+		this(context, packageName, null, null);
 	}
 
 	/**
 	 * Creates an type import.
 	 *
-	 * If the imported type is unknown, an incomplete type will be created.
-	 *
 	 * @param context
 	 * @param packageName Qualified name of the package.
 	 * @param typeName Simple name of the type.
+	 * @param typeName Simple name to be used as alias.
 	 */
-	public TypeImport( CompilationContext context, IName packageName, IName typeName)
+	public TypeImport( CompilationContext context, IName packageName, IName typeName, IName alias)
 	{
 		this.pack = context.createPackage(packageName);
 		this.name = typeName;
+		this.alias = alias;
 	}
 
 	@Override
@@ -69,12 +71,25 @@ public class TypeImport extends TreeElement implements ITypeImport
 	}
 
 	@Override
+	public IName alias()
+	{
+		return alias;
+	}
+
+	@Override
+	public void alias(IName value)
+	{
+		this.alias = value;
+	}
+
+	@Override
 	public void accept(ITreeVisitor visitor)
 	{
 		if (visitor.visit(this))
 		{
-			accept(visitor, namespace());
-			accept(visitor, name());
+			accept(visitor, pack);
+			accept(visitor, name);
+			accept(visitor, alias);
 		}
 		visitor.finish(this);
 	}

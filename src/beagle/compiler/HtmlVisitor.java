@@ -2,6 +2,7 @@ package beagle.compiler;
 
 import java.io.PrintStream;
 
+import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.ExpressionList;
@@ -85,9 +86,16 @@ public class HtmlVisitor extends TreeVisitor
 	 */
 	protected void attribute( String name, Class<?> clazz, String value )
 	{
-		out.append("<div class='container'><div class='attribute'><span class='name'>");
-		out.append(name);
-		out.append("</span> &rarr; <span class='title'>");
+		out.append("<div class='container'><div class='attribute'>");
+
+		if (name != null)
+		{
+			out.append("<span class='name'>");
+			out.append(name);
+			out.append("</span> &rarr; ");
+		}
+
+		out.append("<span class='title'>");
 		out.append(clazz.getSimpleName());
 		out.append("</span>(<span class='value'>");
 		out.append(value);
@@ -108,6 +116,12 @@ public class HtmlVisitor extends TreeVisitor
 		out.append("</span> &rarr; (<span class='value'>");
 		out.append(value);
 		out.append("</span>)</div></div>");
+		out.flush();
+	}
+
+	protected void missing()
+	{
+		out.append("<div class='container'><span class='missing'>missing</span></div>");
 		out.flush();
 	}
 
@@ -163,11 +177,14 @@ public class HtmlVisitor extends TreeVisitor
 		{
 			out.append("<div class='dedent'>");
 
-			out.append("<span class='description'>");
-			out.append(name);
-			out.append("</span>");
+			if (name != null)
+			{
+				out.append("<span class='description'>");
+				out.append(name);
+				out.append("</span> &rarr; ");
+			}
 
-			out.append(" &rarr; <span class='title'>");
+			out.append("<span class='title'>");
 			out.append(clazz.getSimpleName());
 			out.append("</span>");
 
@@ -187,7 +204,7 @@ public class HtmlVisitor extends TreeVisitor
 
 	public void printAnnotationList(IAnnotationList target)
 	{
-		if (target.size() == 0) return;
+		if (target == null || target.size() == 0) return;
 
 		open("annotations", target.getClass());
 		for (IAnnotation item : target)
@@ -207,20 +224,22 @@ public class HtmlVisitor extends TreeVisitor
 
 		open(target.getClass());
 		attribute("fileName", target.fileName());
+		printPackage(target.namespace());
+		printTypeImportList(target.imports());
 		printTypes(target.types());
 		out.append("</body></html>");
 	}
 
 
-	public void printConstantOrVariable(IStorageDeclaration target)
+	public void printConstantOrVariable(boolean heading, IStorageDeclaration target)
 	{
-		open(target.getClass());
+		if (heading) open(target.getClass());
 		printAnnotationList(target.annotations());
 		printModifiers(target.modifiers());
 		printName(target.name());
 		printTypeReference(target.type());
 		printExpression("initializer",target.initializer());
-		close();
+		if (heading) close();
 	}
 
 	public void printFormalParameterList(IFormalParameterList target)
@@ -250,7 +269,6 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-
 	public void printModifiers(IModifiers target)
 	{
 		if (target == null) return;
@@ -259,7 +277,14 @@ public class HtmlVisitor extends TreeVisitor
 
 	public void printName(IName target)
 	{
-		attribute("name", target.getClass(), target.getQualifiedName());
+		printName(null, target);
+	}
+
+	public void printName(String name, IName target)
+	{
+		if (target == null) return;
+		if (name == null) name = "name";
+		attribute(name, target.getClass(), target.qualifiedName());
 	}
 
 	public void printTypeBody(ITypeBody target)
@@ -267,10 +292,10 @@ public class HtmlVisitor extends TreeVisitor
 		open("body", target.getClass());
 
 		for (IConstantDeclaration item : target.getConstants())
-			printConstantOrVariable(item);
+			printConstantOrVariable(true, item);
 
 		for (IVariableDeclaration item : target.getVariables())
-			printConstantOrVariable(item);
+			printConstantOrVariable(true, item);
 
 		for (IMethodDeclaration item : target.getMethods())
 			printeMethodDeclaration(item);
@@ -309,8 +334,11 @@ public class HtmlVisitor extends TreeVisitor
 		open("imports", target.getClass());
 		for (ITypeImport item : target)
 		{
-			printName(item.name());
+			open(item.getClass());
 			printPackage(item.namespace());
+			printName(item.name());
+			printName("alias", item.alias());
+			close();
 		}
 		close();
 	}
@@ -367,6 +395,13 @@ public class HtmlVisitor extends TreeVisitor
 			for (IStatement item : (IBlock)stmt)
 				printStatement(null, item);
 		}
+		else
+		if (stmt instanceof IStorageDeclaration)
+		{
+			printConstantOrVariable(false, (IStorageDeclaration)stmt);
+		}
+		else
+			missing();
 
 		close();
 	}
@@ -377,7 +412,7 @@ public class HtmlVisitor extends TreeVisitor
 
 		if (expr instanceof NameLiteral)
 		{
-			attribute(name, NameLiteral.class, ((NameLiteral)expr).value().getQualifiedName());
+			attribute(name, NameLiteral.class, ((NameLiteral)expr).value().qualifiedName());
 			return;
 		}
 
@@ -407,6 +442,11 @@ public class HtmlVisitor extends TreeVisitor
 
 		open(name, expr.getClass());
 
+		if (expr instanceof AtomicExpression)
+		{
+			printExpression("expression", ((AtomicExpression)expr).value());
+		}
+		else
 		if (expr instanceof UnaryExpression)
 		{
 			attribute("operation", ((UnaryExpression)expr).operation().toString());
@@ -420,6 +460,14 @@ public class HtmlVisitor extends TreeVisitor
 			printExpression("left", ((BinaryExpression)expr).left());
 			printExpression("right", ((BinaryExpression)expr).right());
 		}
+		else
+		if (expr instanceof ExpressionList)
+		{
+			for (IExpression item : ((ExpressionList)expr))
+				printExpression(null, item);
+		}
+		else
+			missing();
 
 		close();
 	}
@@ -431,6 +479,7 @@ public class HtmlVisitor extends TreeVisitor
 			+ "body div:first-of-type { border-left: none; }"
 			+ ".container {/*border: 1px solid red; margin-right: -1px; margin-bottom: -1px;*/ border-left: 1px dashed #ddd; padding-left: 1.5em; background-color: #fff}"
 			+ ".title {font-weight: 600;}"
+			+ ".missing {color: red}"
 			+ ".attribute .name {color: blue}"
 			+ ".container .description {color: blue}"
 			+ ".attribute .value {font-style: italic; color: green}"

@@ -3,11 +3,11 @@ package beagle.compiler.tree;
 public interface IName extends Comparable<IName>, ITreeElement
 {
 
-	public String getQualifiedName();
+	public String qualifiedName();
 
-	public String getName( int index );
+	public String name( int index );
 
-	public int getCount();
+	public int count();
 
 	public IName slice( int start, int length );
 

@@ -1,7 +1,5 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public class CompilationUnit extends TreeElement implements ICompilationUnit
 {
 
@@ -46,7 +44,7 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 	}
 
 	@Override
-	public List<ITypeImport> imports()
+	public ITypeImportList imports()
 	{
 		return importList;
 	}

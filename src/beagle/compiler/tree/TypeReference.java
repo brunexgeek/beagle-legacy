@@ -15,8 +15,8 @@ public class TypeReference extends TreeElement implements ITypeReference
 	{
 		if (qualifiedName.isQualified())
 		{
-			typeName = qualifiedName.slice(qualifiedName.getCount() - 1);
-			packageName = qualifiedName.slice(0, qualifiedName.getCount() - 1);
+			typeName = qualifiedName.slice(qualifiedName.count() - 1);
+			packageName = qualifiedName.slice(0, qualifiedName.count() - 1);
 		}
 		else
 			typeName = qualifiedName;

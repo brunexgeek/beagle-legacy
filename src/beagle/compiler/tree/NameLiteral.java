@@ -18,6 +18,6 @@ public class NameLiteral extends Literal<IName>
 	@Override
 	public String toString()
 	{
-		return value.getQualifiedName();
+		return value.qualifiedName();
 	}
 }

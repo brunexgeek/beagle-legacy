@@ -125,7 +125,8 @@ public enum TokenType
 	TOK_EOF("end of file", false),
 	TOK_VAR("var", true),
 	TOK_DEF("def", true),
-	TOK_NULL("null", true);
+	TOK_NULL("null", true),
+	TOK_AS("as", true);
 
 	private static HashMap<String, TokenType> lookup = new HashMap<>();
 

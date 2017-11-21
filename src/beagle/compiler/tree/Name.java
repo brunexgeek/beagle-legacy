@@ -30,13 +30,13 @@ public class Name extends TreeElement implements IName
 	}
 
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return qualifiedName;
 	}
 
 	@Override
-	public String getName(int index)
+	public String name(int index)
 	{
 		if (index >= names.size())
 			return null;
@@ -44,7 +44,7 @@ public class Name extends TreeElement implements IName
 	}
 
 	@Override
-	public int getCount()
+	public int count()
 	{
 		return names.size();
 	}
@@ -61,7 +61,7 @@ public class Name extends TreeElement implements IName
 	@Override
 	public int compareTo(IName name)
 	{
-		return qualifiedName.compareTo(name.getQualifiedName());
+		return qualifiedName.compareTo(name.qualifiedName());
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class Name extends TreeElement implements IName
 	@Override
 	public IName slice(int start)
 	{
-		return slice(start, getCount() - start);
+		return slice(start, count() - start);
 	}
 
 	@Override

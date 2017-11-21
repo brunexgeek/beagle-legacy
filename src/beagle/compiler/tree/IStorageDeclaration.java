@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public interface IStorageDeclaration extends ITreeElement
+public interface IStorageDeclaration extends ITreeElement, IStatement
 {
 
 	IAnnotationList annotations();

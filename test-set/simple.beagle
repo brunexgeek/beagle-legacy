@@ -6,7 +6,7 @@
 package test
 
 import foo.bar.* 
-import baz.FooBar
+import baz.FooBar as foobar
 
 /** bla */
 
@@ -26,6 +26,7 @@ class Alice : Bob, Eve
 	@Public	
 	def myMethod( argument : double ) : int
 	{
+		var a : int = 5
 		if a > 0 then 
 			if (5 in test) then return 8 
 		else 

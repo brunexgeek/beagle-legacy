@@ -24,7 +24,7 @@ public class Package extends TreeElement implements IPackage
 	@Override
 	public String getQualifiedName()
 	{
-		return name.getQualifiedName();
+		return name.qualifiedName();
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class Package extends TreeElement implements IPackage
 	@Override
 	public ITypeDeclaration getType(IName name)
 	{
-		return getType(name.getQualifiedName());
+		return getType(name.qualifiedName());
 	}
 
 	@Override
