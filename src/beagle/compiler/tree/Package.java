@@ -41,7 +41,7 @@ public class Package extends TreeElement implements IPackage
 
 	public void addType( ITypeDeclaration type )
 	{
-		types.put(type.getQualifiedName(), type);
+		types.put(type.qualifiedName(), type);
 	}
 
 	@Override

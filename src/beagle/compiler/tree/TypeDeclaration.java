@@ -75,72 +75,62 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	}
 
 	@Override
-	public boolean isComplete()
+	public boolean complete()
 	{
 		return complete;
 	}
 
-	public void setComplete( boolean state )
+	public void complete( boolean state )
 	{
 		complete = state;
 	}
 
 	@Override
-	public IPackage getPackage()
+	public IPackage namespace()
 	{
 		return pack;
 	}
 
 	@Override
-	public ICompilationUnit getCompilationUnit()
+	public ICompilationUnit compilationUnit()
 	{
 		return parent;
 	}
 
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return pack.getQualifiedName() + "." + name;
 	}
 
 	@Override
-	public IName getName()
+	public IName name()
 	{
 		return name;
 	}
 
 	@Override
-	public ITypeBody getBody()
+	public ITypeBody body()
 	{
 		return body;
 	}
 
-	/*@Override
-	public void print(Printer out, int level)
-	{
-		out.printTag(getClass().getSimpleName(), level);
-		out.printAttribute("name", getQualifiedName());
-		out.printAttribute("isComplete", complete);
-		out.println();
-
-		if (modifiers != null)
-			modifiers.print(out, level + 1);
-
-		if (extended != null)
-		{
-			out.printTag("Extended", level + 1);
-			out.println();
-			for (ITypeReference item : extended)
-				item.print(out, level + 2);
-		}
-
-		body.print(out, level + 1);
-	}*/
-
 	@Override
-	public IAnnotationList getAnnotations()
+	public IAnnotationList annotations()
 	{
 		return annotations;
+	}
+
+	@Override
+	public ITypeReferenceList extended()
+	{
+		return extended;
+	}
+
+	@Override
+	public IModifiers modifiers()
+	{
+		return modifiers;
 	}
 
 	@Override

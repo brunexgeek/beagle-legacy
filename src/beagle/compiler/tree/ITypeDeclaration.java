@@ -15,18 +15,22 @@ public interface ITypeDeclaration extends ITreeElement
 	 *
 	 * @return
 	 */
-	public boolean isComplete();
+	public boolean complete();
 
-	public IAnnotationList getAnnotations();
+	public IAnnotationList annotations();
 
-	public IPackage getPackage();
+	public IPackage namespace();
 
-	public ICompilationUnit getCompilationUnit();
+	public ICompilationUnit compilationUnit();
 
-	public String getQualifiedName();
+	public String qualifiedName();
 
-	public IName getName();
+	public IName name();
 
-	public ITypeBody getBody();
+	public ITypeBody body();
+
+	ITypeReferenceList extended();
+
+	IModifiers modifiers();
 
 }

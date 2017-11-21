@@ -130,7 +130,6 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 			accept(visitor, annotations);
 			accept(visitor, modifiers);
 			accept(visitor, name);
-			accept(visitor, modifiers);
 			accept(visitor, parameters);
 			accept(visitor, type);
 			accept(visitor, body);

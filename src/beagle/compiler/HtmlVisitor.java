@@ -1,9 +1,7 @@
 package beagle.compiler;
 
 import java.io.PrintStream;
-import java.util.LinkedList;
 
-import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.ExpressionList;
@@ -12,13 +10,15 @@ import beagle.compiler.tree.IAnnotationList;
 import beagle.compiler.tree.IBlock;
 import beagle.compiler.tree.ICompilationUnit;
 import beagle.compiler.tree.IConstantDeclaration;
+import beagle.compiler.tree.IExpression;
 import beagle.compiler.tree.IFormalParameter;
 import beagle.compiler.tree.IFormalParameterList;
 import beagle.compiler.tree.IMethodDeclaration;
 import beagle.compiler.tree.IModifiers;
-import beagle.compiler.tree.IModule;
 import beagle.compiler.tree.IName;
 import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.IStatement;
+import beagle.compiler.tree.IStorageDeclaration;
 import beagle.compiler.tree.ITypeBody;
 import beagle.compiler.tree.ITypeDeclaration;
 import beagle.compiler.tree.ITypeDeclarationList;
@@ -41,20 +41,24 @@ public class HtmlVisitor extends TreeVisitor
 
 	PrintStream out;
 
-	LinkedList<String> nameList = new LinkedList<>();
+	String currentName = null;
 
 	public HtmlVisitor( PrintStream out )
 	{
 		this.out = out;
 	}
 
-	/*protected void attribute( String value )
+	void currentName(String value)
 	{
-		out.append("<div class='attribute'><span class='value'>");
-		out.append(value);
-		out.append("</span></div>");
-		out.flush();
-	}*/
+		this.currentName = value;
+	}
+
+	String currentName()
+	{
+		String out = currentName;
+		currentName = null;
+		return out;
+	}
 
 	/**
 	 * name -> ClassName
@@ -123,165 +127,6 @@ public class HtmlVisitor extends TreeVisitor
 		out.append("</div>");
 	}
 
-	@Override
-	public void finish(AtomicExpression target)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(BinaryExpression binaryExpression)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(ExpressionList target)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(IAnnotation target)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(IAnnotationList target)
-	{
-		if (target.size() != 0) close();
-	}
-
-
-	@Override
-	public void finish(IBlock target)
-	{
-		if (target.size() != 0) close();
-	}
-
-
-	@Override
-	public void finish( ICompilationUnit target )
-	{
-		out.append("</body></html>");
-	}
-
-
-	@Override
-	public void finish(IConstantDeclaration target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(IFormalParameter target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(IFormalParameterList target)
-	{
-		if (target.size() != 0) close();
-	}
-
-	@Override
-	public void finish(IfThenElseStmt target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(IMethodDeclaration target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(IModifiers target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(IModule target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(ITypeBody target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(ITypeDeclaration target)
-	{
-		close();
-	}
-
-
-	@Override
-	public void finish(ITypeDeclarationList target)
-	{
-		if (target.size() != 0) close();
-	}
-
-
-	@Override
-	public void finish(ITypeImport target)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(ITypeImportList target)
-	{
-		if (target.size() != 0) close();
-	}
-
-	@Override
-	public void finish(ITypeReference target)
-	{
-		if (target.parent() instanceof ITypeReferenceList) close();
-	}
-
-
-	@Override
-	public void finish(ITypeReferenceList target)
-	{
-		if (target.size() == 0) return;
-		close();
-	}
-
-
-	@Override
-	public void finish(IVariableDeclaration target)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(ReturnStmt target)
-	{
-		close();
-	}
-
-	@Override
-	public void finish(UnaryExpression target)
-	{
-		close();
-	}
-
 	protected boolean open(Class<?> clazz)
 	{
 		out.append("<div class='container'>");
@@ -294,6 +139,13 @@ public class HtmlVisitor extends TreeVisitor
 		return true;
 	}
 
+	@Override
+	public boolean visit(ICompilationUnit target)
+	{
+		printCompilationUnit(target);
+		return false;
+	}
+
 	/**
 	 * name -> ClassName
 	 *
@@ -303,6 +155,9 @@ public class HtmlVisitor extends TreeVisitor
 	 */
 	protected boolean open( String name, Class<?> clazz )
 	{
+		String temp = currentName();
+		if (temp != null) name = temp;
+
 		out.append("<div class='container'>");
 		if (name != null && clazz != null)
 		{
@@ -321,305 +176,259 @@ public class HtmlVisitor extends TreeVisitor
 		return true;
 	}
 
-	@Override
-	public boolean visit(AtomicExpression target)
+	public void printExpressionList(String name, ExpressionList target)
 	{
-		open("expression", target.getClass());
-		return true;
-	}
-
-	@Override
-	public boolean visit(BinaryExpression target)
-	{
-		open("expression", target.getClass());
-		attribute("operation", target.operation().toString());
-		return true;
-	}
-
-	@Override
-	public boolean visit(BooleanLiteral target)
-	{
-		attribute("expression", target.getClass(), Boolean.toString(target.value()));
-		return false;
-	}
-
-	@Override
-	public boolean visit(ExpressionList target)
-	{
-		String name = "expressionList";
-		if (target.parent() instanceof UnaryExpression) name = "extra";
+		if (name == null) name = "expressionList";
 		open(name, target.getClass());
-		return true;
+		for (IExpression item : target)
+			printExpression(null, item);
+		close();
 	}
 
-	@Override
-	public boolean visit(IAnnotation target)
+	public void printAnnotationList(IAnnotationList target)
 	{
-		open(target.getClass());
-		return true;
-	}
-
-	@Override
-	public boolean visit(IAnnotationList target)
-	{
-		if (target.size() == 0) return false;
+		if (target.size() == 0) return;
 
 		open("annotations", target.getClass());
-
-		return true;
+		for (IAnnotation item : target)
+		{
+			open(item.getClass());
+			printTypeReference(item.type());
+			close();
+		}
+		close();
 	}
 
-	@Override
-	public boolean visit(IBlock target)
-	{
-		if (target.size() == 0) return false;
-
-		return open(target.getClass());
-	}
-
-
-	@Override
-	public boolean visit(ICompilationUnit target)
+	public void printCompilationUnit(ICompilationUnit target)
 	{
 		out.append("<html><head><title>Beagle AST</title>");
 		writeCSS();
 		out.append("</head><body>");
 
 		open(target.getClass());
-
 		attribute("fileName", target.fileName());
-
-		return true;
+		printTypes(target.types());
+		out.append("</body></html>");
 	}
 
 
-	@Override
-	public boolean visit(IConstantDeclaration target)
-	{
-		return open(target.getClass());
-	}
-
-
-	@Override
-	public boolean visit(IFormalParameter target)
-	{
-		return open(target.getClass());
-	}
-
-
-	@Override
-	public boolean visit(IFormalParameterList target)
-	{
-		return open("parameters", target.getClass());
-	}
-
-	@Override
-	public boolean visit(IfThenElseStmt target)
+	public void printConstantOrVariable(IStorageDeclaration target)
 	{
 		open(target.getClass());
-		//attribute("condition", target.condition().getClass());
-		return true;
+		printAnnotationList(target.annotations());
+		printModifiers(target.modifiers());
+		printName(target.name());
+		printTypeReference(target.type());
+		printExpression("initializer",target.initializer());
+		close();
 	}
 
-	@Override
-	public boolean visit(IMethodDeclaration target)
+	public void printFormalParameterList(IFormalParameterList target)
 	{
-		return open(target.getClass());
+		if (target == null) return;
+
+		open("parameters", target.getClass());
+		for (IFormalParameter item : target)
+		{
+			open(item.getClass());
+			printName(item.name());
+			printTypeReference(item.type());
+			close();
+		}
+		close();
 	}
 
-	@Override
-	public boolean visit(IModifiers target)
+	public void printeMethodDeclaration(IMethodDeclaration target)
 	{
-		return open(target.getClass());
+		open(target.getClass());
+		printAnnotationList(target.annotations());
+		printModifiers(target.modifiers());
+		printName(target.name());
+		printFormalParameterList(target.parameters());
+		printTypeReference(target.returnType());
+		printStatement("body",target.body());
+		close();
 	}
 
-	@Override
-	public boolean visit(IModule target)
+
+	public void printModifiers(IModifiers target)
 	{
-		return open(target.getClass());
+		if (target == null) return;
+		attribute("modifiers", target.getClass(), target.toString());
 	}
 
-
-	@Override
-	public boolean visit(IName target)
+	public void printName(IName target)
 	{
 		attribute("name", target.getClass(), target.getQualifiedName());
-		return false;
 	}
 
-	@Override
-	public boolean visit(IntegerLiteral target)
-	{
-		attribute("expression", target.getClass(), String.valueOf(target.value()));
-		return false;
-	}
-
-
-	@Override
-	public boolean visit(IPackage target)
-	{
-		attribute("package", target.getClass(), target.getQualifiedName());
-		return false;
-	}
-
-
-	@Override
-	public boolean visit(ITypeBody target)
+	public void printTypeBody(ITypeBody target)
 	{
 		open("body", target.getClass());
-		return true;
+
+		for (IConstantDeclaration item : target.getConstants())
+			printConstantOrVariable(item);
+
+		for (IVariableDeclaration item : target.getVariables())
+			printConstantOrVariable(item);
+
+		for (IMethodDeclaration item : target.getMethods())
+			printeMethodDeclaration(item);
+
+		close();
 	}
 
 
-	@Override
-	public boolean visit(ITypeDeclaration target)
-	{
-		open(target.getClass());
-		return true;
-	}
-
-
-	@Override
-	public boolean visit(ITypeDeclarationList target)
+	public void printTypes(ITypeDeclarationList target)
 	{
 		open("types", target.getClass());
-		return true;
+		for (ITypeDeclaration item : target)
+		{
+			open(item.getClass());
+			printAnnotationList(item.annotations());
+			printModifiers(item.modifiers());
+			printName(item.name());
+			printTypeReferenceList(item.extended());
+			printTypeBody(item.body());
+			close();
+		}
+		close();
+	}
+
+	public void printPackage(IPackage target)
+	{
+		if (target == null) return;
+		attribute("package", target.getClass(), target.getQualifiedName());
 	}
 
 
-	@Override
-	public boolean visit(ITypeImport target)
+	public void printTypeImportList(ITypeImportList target)
 	{
-		open(target.getClass());
-		return true;
-	}
-
-
-	@Override
-	public boolean visit(ITypeImportList target)
-	{
-		if (target.size() == 0) return false;
+		if (target.size() == 0) return;
 
 		open("imports", target.getClass());
-		return true;
+		for (ITypeImport item : target)
+		{
+			printName(item.name());
+			printPackage(item.namespace());
+		}
+		close();
 	}
 
 
-	@Override
-	public boolean visit(ITypeReference target)
+	public void printTypeReference(ITypeReference target)
 	{
+		if (target == null) return;
+
 		if (target.parent() instanceof ITypeReferenceList)
 		{
 			open(target.getClass());
-			return true;
+			attribute("type", target.getClass(), target.getQualifiedName());
+			close();
 		}
 		else
 		{
 			attribute("type", target.getClass(), target.getQualifiedName());
-			return false;
 		}
 	}
 
 
-	@Override
-	public boolean visit(ITypeReferenceList target)
+	public void printTypeReferenceList(ITypeReferenceList target)
 	{
-		return open("inherit", target.getClass());
+		open("inherit", target.getClass());
+		for (ITypeReference item : target)
+			printTypeReference(item);
+		close();
 	}
 
-
-	@Override
-	public boolean visit(IVariableDeclaration target)
+	protected void printStatement(String name, IStatement stmt)
 	{
-		open(target.getClass());
-		return true;
+		if (stmt == null) return;
+
+		if (name == null)
+			open(stmt.getClass());
+		else
+			open(name, stmt.getClass());
+
+		if (stmt instanceof ReturnStmt)
+		{
+			printExpression("value", ((ReturnStmt)stmt).expression());
+		}
+		else
+		if (stmt instanceof IfThenElseStmt)
+		{
+			printExpression("condition", ((IfThenElseStmt)stmt).condition());
+			printStatement("then", ((IfThenElseStmt)stmt).thenSide());
+			printStatement("else", ((IfThenElseStmt)stmt).elseSide());
+		}
+		else
+		if (stmt instanceof IBlock)
+		{
+			for (IStatement item : (IBlock)stmt)
+				printStatement(null, item);
+		}
+
+		close();
 	}
 
-
-	@Override
-	public boolean visit(NameLiteral target)
+	protected void printExpression(String name, IExpression expr)
 	{
-		attribute("expression", target.getClass(), target.value().getQualifiedName());
-		return false;
-	}
+		if (expr == null) return;
 
-
-	@Override
-	public boolean visit(NullLiteral target)
-	{
-		attribute("expression", target.getClass());
-		return false;
-	}
-
-
-	@Override
-	public boolean visit(ReturnStmt target)
-	{
-		return open(target.getClass());
-	}
-
-
-	@Override
-	public boolean visit(StringLiteral target)
-	{
-		attribute("expression", target.getClass(), target.value());
-		return false;
-	}
-
-
-	@Override
-	public boolean visit(UnaryExpression target)
-	{
-		open("expression", target.getClass());
-		attribute("operation", target.operation().toString());
-		attribute("direction", target.direction().toString());
-		return true;
-	}
-
-/*
-	protected boolean printExpression(String name, IExpression expr)
-	{
 		if (expr instanceof NameLiteral)
 		{
 			attribute(name, NameLiteral.class, ((NameLiteral)expr).value().getQualifiedName());
-			return false;
+			return;
 		}
 
 		if (expr instanceof StringLiteral)
 		{
 			attribute(name, StringLiteral.class, ((StringLiteral)expr).value());
-			return false;
+			return;
 		}
 
 		if (expr instanceof IntegerLiteral)
 		{
-			attribute(name, StringLiteral.class, ((StringLiteral)expr).value());
-			return false;
+			attribute(name, IntegerLiteral.class, Long.toString( ((IntegerLiteral)expr).value() ));
+			return;
 		}
 
-		else
-		if (expr instanceof StringLiteral)
-			attribute(name, StringLiteral.class, ((StringLiteral)expr).value());
-
-		open("expression", expr.getClass());
-
-		if (expr instanceof NameLiteral)
+		if (expr instanceof BooleanLiteral)
 		{
-			attribute("name", NameLiteral.class, ((NameLiteral)expr).value().getQualifiedName());
+			attribute(name, BooleanLiteral.class, Boolean.toString( ((BooleanLiteral)expr).value()) );
+			return;
+		}
+
+		if (expr instanceof NullLiteral)
+		{
+			attribute("expression", NullLiteral.class);
+			return;
+		}
+
+		open(name, expr.getClass());
+
+		if (expr instanceof UnaryExpression)
+		{
+			attribute("operation", ((UnaryExpression)expr).operation().toString());
+			printExpression("expression", ((UnaryExpression)expr).expression());
+			printExpression("right", ((UnaryExpression)expr).extra());
 		}
 		else
-		if (expr instanceof StringLiteral)
+		if (expr instanceof BinaryExpression)
 		{
-
+			attribute("operation", ((BinaryExpression)expr).operation().toString());
+			printExpression("left", ((BinaryExpression)expr).left());
+			printExpression("right", ((BinaryExpression)expr).right());
 		}
+
 		close();
-		return false;
 	}
-*/
+
 	public void writeCSS()
 	{
 		out.append("<style>"
 			+ "html * {font-family: monospace; font-size: 14px; line-height: 20px}"
+			+ "body div:first-of-type { border-left: none; }"
 			+ ".container {/*border: 1px solid red; margin-right: -1px; margin-bottom: -1px;*/ border-left: 1px dashed #ddd; padding-left: 1.5em; background-color: #fff}"
 			+ ".title {font-weight: 600;}"
 			+ ".attribute .name {color: blue}"

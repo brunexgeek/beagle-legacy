@@ -38,7 +38,7 @@ public class TypeReference extends TreeElement implements ITypeReference
 	public IName getName()
 	{
 		if (type != null)
-			return type.getName();
+			return type.name();
 		else
 			return typeName;
 	}
@@ -56,7 +56,7 @@ public class TypeReference extends TreeElement implements ITypeReference
 	public String getQualifiedName()
 	{
 		if (type != null)
-			return type.getQualifiedName();
+			return type.qualifiedName();
 		if (pack != null)
 			return pack.getQualifiedName() + "." + typeName;
 		if (packageName != null)
