@@ -90,7 +90,7 @@ public class Parser implements IParser
 	/**
 	 * Parse a compilation unit.
 	 *
-	 *   Unit: PackageDeclaration? ImportDeclaration* TypeDeclaration+
+	 *   Unit: Package? Import* Type+
 	 *
 	 * @return
 	 */
@@ -277,9 +277,9 @@ public class Parser implements IParser
 	/**
 	 * Parse a class body.
 	 *
-	 *	  ClassBody: "{" Member* "}"
+	 *	  ClassBody: "{" TypeMember* "}"
 	 *
-	 *    Member: ( Variable | Constant | Method )*
+	 *    TypeMember: ( TypeVariable | TypeConstant | TypeFunction )*
 	 *
 	 * @return
 	 */
@@ -325,9 +325,13 @@ public class Parser implements IParser
 	/**
 	 * Parse a variable.
 	 *
-	 *    Variable: Annotation* "var" Name ( ":" TypeReference )? ( "=" Expression )?
+	 *    TypeVariable: Annotation* Variable
 	 *
-	 *    Constant: Annotation* "const" Name ( ":" TypeReference )? "=" Expression
+	 *    TypeConstant: Annotation* Constant
+	 *
+	 *    Variable: "var" Name ( ":" TypeReference )? ( "=" Expression )?
+	 *
+	 *    Constant: "const" Name ( ":" TypeReference )? "=" Expression
 	 *
 	 * @return
 	 */
@@ -368,9 +372,9 @@ public class Parser implements IParser
 
 
 	/**
-	 * Parse a method.
+	 * Parse a function.
 	 *
-	 *    Method: Annotation* “def” Name ParameterList ( ":" TypeReference )? Block?
+	 *    TypeFunction: Annotation* "def" Name ParameterList ( ":" TypeReference )? Block?
 	 *
 	 * @param modifiers
 	 * @param type
@@ -404,7 +408,10 @@ public class Parser implements IParser
 	/**
 	 * Parse a parameter list.
 	 *
-	 *    ParameterList: "(" ")" | "(" Parameter ( "," Parameter )* ")"
+	 *    ParameterList:
+	 *    	: "(" ")"
+	 *      : "(" Parameter ( "," Parameter )* ")"
+	 *      ;
 	 *
 	 *    Parameter: ( "var" | "const" )? Name ":" TypeReference
 	 *
@@ -501,6 +508,13 @@ public class Parser implements IParser
 		return output;
 	}
 
+	/**
+	 * Parse a block of statements.
+	 *
+	 *    Block: "{" Statement* "}"
+	 *
+	 * @return
+	 */
 	IBlock parseBlock()
 	{
 		if (!expected(TokenType.TOK_LEFT_BRACE)) return null;
@@ -520,6 +534,17 @@ public class Parser implements IParser
 		return block;
 	}
 
+	/**
+	 *
+	 * Statement
+	 *   : Variable
+	 *   : Constant
+	 *   : IfThenElse
+	 *   : Return
+	 *   : Expression
+	 *   ;
+	 *
+	 */
 	IStatement parseStatement()
 	{
 		switch (tokens.peekType())
@@ -540,6 +565,13 @@ public class Parser implements IParser
 		return new ExpressionStmt(expr);
 	}
 
+
+	/**
+	 *
+	 * IfThenElse: "if" Expression "then" BlockOrStatement ( "else" BlockOrStatement )?
+	 *
+	 * @return
+	 */
 	IStatement parseIfThenElseStmt()
 	{
 		if (!expected(TOK_IF)) return null;
@@ -673,7 +705,7 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * EqualityComparison: Comparison ( EqualityOperation EqualityComparison )*
+	 * EqualityComparison: Comparison ( EqualityOperator EqualityComparison )*
 	 */
 	IExpression parseEquality()
 	{
@@ -695,7 +727,7 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * Comparison: NamedInfix ( ComparisonOperation Comparison )*
+	 * Comparison: NamedInfix ( ComparisonOperator Comparison )*
 	 */
 	IExpression parseComparison()
 	{
@@ -720,8 +752,8 @@ public class Parser implements IParser
 
 	/**
 	 * NamedInfix
-	 *   : AdditiveExpression ( InOperation AdditiveExpression )*
-	 *   : AdditiveExpression IsOperation TypeReference
+	 *   : AdditiveExpression ( InOperator AdditiveExpression )*
+	 *   : AdditiveExpression IsOperator TypeReference
 	 *   ;
 	 *
 	 */
@@ -765,7 +797,7 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation MultiplicativeExpression )*
+	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperator MultiplicativeExpression )*
 	 *
 	 */
 	IExpression  parseAdditiveExpression()
@@ -788,7 +820,7 @@ public class Parser implements IParser
 	}
 
 	/**
-	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperation MultiplicativeExpression )*
+	 * MultiplicativeExpression: PrefixUnaryExpression ( MultiplicativeOperator MultiplicativeExpression )*
 	 *
 	 */
 	IExpression parseMultiplicativeExpression()
@@ -814,7 +846,7 @@ public class Parser implements IParser
 
 	/**
 	 *
-	 * PrefixUnaryExpression: PrefixUnaryOperation? PostfixUnaryExpression
+	 * PrefixUnaryExpression: PrefixUnaryOperator? PostfixUnaryExpression
 	 *
 	 */
 	IExpression parsePrefixUnaryExpression()
@@ -824,7 +856,7 @@ public class Parser implements IParser
 
 	/**
 	 *
-	 * PrefixUnaryExpression: PrefixUnaryOperation? PostfixUnaryExpression
+	 * PrefixUnaryExpression: PrefixUnaryOperator? PostfixUnaryExpression
 	 *
 	 */
 	IExpression parsePrefixUnaryExpression(IExpression leftValue)
@@ -859,7 +891,7 @@ public class Parser implements IParser
 
 	/**
 	 *
-	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation?
+	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperator?
 	 *
 	 */
 	IExpression parsePostfixUnaryExpression()
@@ -869,7 +901,7 @@ public class Parser implements IParser
 
 	/**
 	 *
-	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperation?
+	 * PostfixUnaryExpression: AtomicExpression PostfixUnaryOperator?
 	 *
 	 */
 	IExpression parsePostfixUnaryExpression(IExpression leftValue)
@@ -979,7 +1011,6 @@ public class Parser implements IParser
 	 *  : BooleanLiteral
 	 *  : StringLiteral
 	 *  : IntegerLiteral
-	 *  : HexadecimalLiteral
 	 *  : "null"
 	 *  ;
 	 *
