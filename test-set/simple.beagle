@@ -31,6 +31,7 @@ class Alice : Bob, Eve
 			if (5 in test) then return 8 
 		else 
 			return 0
+		bla(content=1) + 2
 		return constant * argument
 	}
 

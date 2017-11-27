@@ -130,4 +130,12 @@ public interface ITreeVisitor
 	boolean visit(IfThenElseStmt target);
 
 	void finish(IfThenElseStmt target);
+
+	boolean visit(Argument target);
+
+	void finish(Argument target);
+
+	boolean visit(ArgumentList target);
+
+	void finish(ArgumentList target);
 }

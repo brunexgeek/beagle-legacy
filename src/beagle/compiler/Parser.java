@@ -4,6 +4,8 @@ import static beagle.compiler.TokenType.*;
 
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
+import beagle.compiler.tree.Argument;
+import beagle.compiler.tree.ArgumentList;
 import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.Block;
@@ -926,6 +928,10 @@ public class Parser implements IParser
 				type = tokens.peekType();
 				extra = parseArrayAccess(null);
 				break;
+			case TOK_LEFT_PAR:
+				type = tokens.peekType();
+				extra = parseArgumentList(null);
+				break;
 			default:
 				type = null;
 		}
@@ -944,6 +950,66 @@ public class Parser implements IParser
 		}
 
 		return expr;
+	}
+
+	/**
+	 * ArgumentList:
+	 *   : "(" ")"
+	 *   : "(" Argument ( "," Argument )* ")"
+	 */
+	IExpression parseArgumentList(ArgumentList value)
+	{
+		if (tokens.lookahead(TOK_LEFT_PAR, TOK_RIGHT_PAR))
+		{
+			tokens.discard(2);
+			return new ArgumentList();
+		}
+
+		if (value == null)
+		{
+			if (!expected(TOK_LEFT_PAR)) return null;
+			tokens.discard();
+
+			ArgumentList result = new ArgumentList( parseArgument() );
+			if (tokens.peekType() == TOK_COMA)
+				parseArgumentList(result);
+
+			if (!expected(TOK_RIGHT_PAR)) return null;
+			tokens.discard();
+
+			return result;
+		}
+		else
+		{
+			if (!expected(TOK_COMA)) return null;
+			tokens.discard();
+
+			while (true)
+			{
+				value.add( parseArgument() );
+				if (tokens.peekType() == TOK_COMA)
+				{
+					tokens.discard();
+					continue;
+				}
+				break;
+			}
+
+			return value;
+		}
+	}
+
+	Argument parseArgument()
+	{
+		IName name = null;
+
+		if (tokens.lookahead(TOK_NAME, TOK_ASSIGN))
+		{
+			name = parseName();
+			tokens.discard();
+		}
+
+		return new Argument(name, parseExpression());
 	}
 
 	/**

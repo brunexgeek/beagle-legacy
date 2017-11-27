@@ -2,6 +2,8 @@ package beagle.compiler;
 
 import java.io.PrintStream;
 
+import beagle.compiler.tree.Argument;
+import beagle.compiler.tree.ArgumentList;
 import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.BooleanLiteral;
@@ -242,6 +244,16 @@ public class HtmlVisitor extends TreeVisitor
 		if (heading) close();
 	}
 
+	public void printArgument(Argument target)
+	{
+		if (target == null) return;
+
+		open(target.getClass());
+		printName(target.name());
+		printExpression("value", target.value());
+		close();
+	}
+
 	public void printFormalParameterList(IFormalParameterList target)
 	{
 		if (target == null) return;
@@ -465,6 +477,12 @@ public class HtmlVisitor extends TreeVisitor
 		{
 			for (IExpression item : ((ExpressionList)expr))
 				printExpression(null, item);
+		}
+		else
+		if (expr instanceof ArgumentList)
+		{
+			for (Argument item : ((ArgumentList)expr))
+				printArgument(item);
 		}
 		else
 			missing();
