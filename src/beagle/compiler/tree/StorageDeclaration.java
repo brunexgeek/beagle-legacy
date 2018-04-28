@@ -1,19 +1,19 @@
 package beagle.compiler.tree;
 
-public abstract class StorageDeclaration extends TreeElement implements IStorageDeclaration
+public abstract class StorageDeclaration extends TreeElement implements IStatement
 {
 
-	protected IModifiers modifiers;
+	protected Modifiers modifiers;
 
-	protected ITypeReference type;
+	protected TypeReference type;
 
-	protected IName name;
+	protected Name name;
 
-	protected IAnnotationList annotations;
+	protected AnnotationList annotations;
 
 	protected IExpression initializer;
 
-	public StorageDeclaration( IAnnotationList annotations, IName name, ITypeReference type, IExpression initializer)
+	public StorageDeclaration( AnnotationList annotations, Name name, TypeReference type, IExpression initializer)
 	{
 		this.annotations = annotations;
 		this.modifiers = null;
@@ -22,65 +22,56 @@ public abstract class StorageDeclaration extends TreeElement implements IStorage
 		this.initializer = initializer;
 	}
 
-	public StorageDeclaration( IAnnotationList annotations, IName name, IExpression initializer )
+	public StorageDeclaration( AnnotationList annotations, Name name, IExpression initializer )
 	{
 		this(annotations,  name, null, initializer);
 	}
 
-	public StorageDeclaration( IAnnotationList annotations, IName name, ITypeReference type )
+	public StorageDeclaration( AnnotationList annotations, Name name, TypeReference type )
 	{
 		this(annotations,  name, type, null);
 	}
 
-	@Override
-	public IModifiers modifiers()
+	public Modifiers modifiers()
 	{
 		return modifiers;
 	}
 
-	@Override
-	public void modifiers(IModifiers value)
+	public void modifiers(Modifiers value)
 	{
 		this.modifiers = value;
 	}
 
-	@Override
-	public ITypeReference type()
+	public TypeReference type()
 	{
 		return type;
 	}
 
-	@Override
-	public void type(ITypeReference value)
+	public void type(TypeReference value)
 	{
 		this.type = value;
 	}
 
-	@Override
-	public IName name()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public void name(IName value)
+	public void name(Name value)
 	{
 		this.name = value;
 	}
 
-	@Override
-	public IAnnotationList annotations()
+	public AnnotationList annotations()
 	{
 		return annotations;
 	}
 
-	@Override
 	public IExpression initializer()
 	{
 		return initializer;
 	}
 
-	@Override
 	public void initializer(IExpression value)
 	{
 		this.initializer = value;

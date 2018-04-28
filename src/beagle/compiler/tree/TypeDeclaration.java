@@ -1,24 +1,23 @@
 package beagle.compiler.tree;
 
-public class TypeDeclaration extends TreeElement implements ITypeDeclaration
+public class TypeDeclaration extends TreeElement
 {
 
-	protected IPackage pack;
+	protected Package pack;
 
 	protected boolean complete;
 
-	protected ICompilationUnit parent;
+	protected CompilationUnit parent;
 
-	protected IAnnotationList annotations;
+	protected AnnotationList annotations;
 
-	protected IModifiers modifiers;
+	protected Modifiers modifiers;
 
-	protected IName name;
+	protected Name name;
 
-	protected ITypeReferenceList extended;
+	protected TypeReferenceList extended;
 
-	protected ITypeBody body;
-
+	protected TypeBody body;
 
 	/**
 	 * Create a complete type declaration
@@ -30,8 +29,8 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	 * @param implemented
 	 * @param body
 	 */
-	public TypeDeclaration(ICompilationUnit parent, IAnnotationList annots, IModifiers modifiers, IName name,
-			ITypeReferenceList extended, ITypeBody body)
+	public TypeDeclaration(CompilationUnit parent, AnnotationList annots, Modifiers modifiers, Name name,
+			TypeReferenceList extended, TypeBody body)
 	{
 		if (name.count() > 1)
 			throw new IllegalArgumentException("Invalid simple name");
@@ -47,7 +46,7 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 		this.extended = extended;
 		this.body = body;
 
-		if (body != null) body.setParent(this);
+		if (body != null) body.parent(this);
 	}
 
 	/**
@@ -56,7 +55,7 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 	 * @param pack
 	 * @param name
 	 */
-	public TypeDeclaration(IPackage pack, IName name)
+	public TypeDeclaration(Package pack, Name name)
 	{
 		if (name.count() > 1)
 			throw new IllegalArgumentException("Invalid simple name");
@@ -69,13 +68,12 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 		this.complete = false;
 	}
 
-	public TypeDeclaration( ICompilationUnit unit, IName name )
+	public TypeDeclaration(CompilationUnit unit, Name name )
 	{
 
 	}
 
-	@Override
-	public boolean complete()
+	public boolean isComplete()
 	{
 		return complete;
 	}
@@ -85,50 +83,42 @@ public class TypeDeclaration extends TreeElement implements ITypeDeclaration
 		complete = state;
 	}
 
-	@Override
-	public IPackage namespace()
+	public Package namespace()
 	{
 		return pack;
 	}
 
-	@Override
-	public ICompilationUnit compilationUnit()
+	public CompilationUnit compilationUnit()
 	{
 		return parent;
 	}
 
-	@Override
 	public String qualifiedName()
 	{
-		return pack.getQualifiedName() + "." + name;
+		return pack.qualifiedName() + "." + name;
 	}
 
-	@Override
-	public IName name()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public ITypeBody body()
+	public TypeBody body()
 	{
 		return body;
 	}
 
-	@Override
-	public IAnnotationList annotations()
+	public AnnotationList annotations()
 	{
 		return annotations;
 	}
 
-	@Override
-	public ITypeReferenceList extended()
+	public TypeReferenceList extended()
 	{
 		return extended;
 	}
 
-	@Override
-	public IModifiers modifiers()
+	public Modifiers modifiers()
 	{
 		return modifiers;
 	}

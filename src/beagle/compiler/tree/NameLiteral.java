@@ -1,9 +1,9 @@
 package beagle.compiler.tree;
 
-public class NameLiteral extends Literal<IName>
+public class NameLiteral extends Literal<Name>
 {
 
-	public NameLiteral(IName value)
+	public NameLiteral(Name value)
 	{
 		super(value);
 	}

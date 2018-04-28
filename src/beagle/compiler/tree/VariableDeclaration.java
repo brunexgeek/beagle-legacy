@@ -1,19 +1,19 @@
 package beagle.compiler.tree;
 
-public class VariableDeclaration extends StorageDeclaration implements IVariableDeclaration
+public class VariableDeclaration extends StorageDeclaration
 {
 
-	public VariableDeclaration( IAnnotationList annotations, IName name, ITypeReference type, IExpression initializer)
+	public VariableDeclaration( AnnotationList annotations, Name name, TypeReference type, IExpression initializer)
 	{
 		super(annotations,  name, type, initializer);
 	}
 
-	public VariableDeclaration( IAnnotationList annotations, IName name, IExpression initializer )
+	public VariableDeclaration( AnnotationList annotations, Name name, IExpression initializer )
 	{
 		super(annotations,  name, null, initializer);
 	}
 
-	public VariableDeclaration( IAnnotationList annotations, IName name, ITypeReference type )
+	public VariableDeclaration( AnnotationList annotations, Name name, TypeReference type )
 	{
 		super(annotations,  name, type, null);
 	}

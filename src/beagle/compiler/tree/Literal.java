@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public abstract class Literal<T> extends TreeElement implements ILiteral<T>
+public abstract class Literal<T> extends TreeElement implements IExpression
 {
 
 	protected T value;
@@ -10,13 +10,11 @@ public abstract class Literal<T> extends TreeElement implements ILiteral<T>
 		this.value = value;
 	}
 
-	@Override
 	public T value()
 	{
 		return value;
 	}
 
-	@Override
 	public void value(T value)
 	{
 		this.value = value;

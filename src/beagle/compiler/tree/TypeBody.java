@@ -3,23 +3,23 @@ package beagle.compiler.tree;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TypeBody extends TreeElement implements ITypeBody
+public class TypeBody extends TreeElement
 {
 
-	List<IConstantDeclaration> constants;
+	List<ConstantDeclaration> constants;
 
-	List<IVariableDeclaration> variables;
+	List<VariableDeclaration> variables;
 
-	List<IMethodDeclaration> methods;
+	List<MethodDeclaration> methods;
 
-	ITypeDeclaration parent;
+	TypeDeclaration parent;
 
 	public TypeBody()
 	{
 		this(null);
 	}
 
-	public TypeBody( ITypeDeclaration parent )
+	public TypeBody( TypeDeclaration parent )
 	{
 		this.methods = new LinkedList<>();
 		this.variables = new LinkedList<>();
@@ -36,32 +36,28 @@ public class TypeBody extends TreeElement implements ITypeBody
 //			item.print(out, level + 1);
 //	}
 
-	@Override
-	public List<IMethodDeclaration> getMethods()
+	public List<MethodDeclaration> methods()
 	{
 		return methods;
 	}
 
 	@Override
-	public ITypeDeclaration getParent()
+	public TypeDeclaration parent()
 	{
 		return parent;
 	}
 
-	@Override
-	public void setParent( ITypeDeclaration parent)
+	public void parent( TypeDeclaration parent)
 	{
 		this.parent = parent;
 	}
 
-	@Override
-	public List<IVariableDeclaration> getVariables()
+	public List<VariableDeclaration> variables()
 	{
 		return variables;
 	}
 
-	@Override
-	public List<IConstantDeclaration> getConstants()
+	public List<ConstantDeclaration> constants()
 	{
 		return constants;
 	}
@@ -71,11 +67,11 @@ public class TypeBody extends TreeElement implements ITypeBody
 	{
 		if (visitor.visit(this))
 		{
-			for (IConstantDeclaration item : constants)
+			for (ConstantDeclaration item : constants)
 				item.accept(visitor);
-			for (IVariableDeclaration item : variables)
+			for (VariableDeclaration item : variables)
 				item.accept(visitor);
-			for (IMethodDeclaration item : methods)
+			for (MethodDeclaration item : methods)
 				item.accept(visitor);
 		}
 		visitor.finish(this);

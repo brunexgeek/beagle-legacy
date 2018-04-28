@@ -6,8 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import beagle.compiler.tree.ICompilationUnit;
-import beagle.compiler.tree.ITreeVisitor;
+import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.TreeVisitor;
 
 public class Main
 {
@@ -34,9 +34,9 @@ public class Main
 			else
 			{
 				IParser parser = new Parser(context, scanner);
-				ICompilationUnit unit = parser.parse();
+				CompilationUnit unit = parser.parse();
 				if (unit == null) return;
-				ITreeVisitor visitor = new HtmlVisitor(new PrintStream(System.out));
+				TreeVisitor visitor = new HtmlVisitor(new PrintStream(System.out));
 				unit.accept(visitor);
 				//unit.print(new Printer(System.out), 0);
 				/*IModule module = new Module( new Name("beagle"));

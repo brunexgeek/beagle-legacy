@@ -1,17 +1,17 @@
 package beagle.compiler.tree;
 
-public class CompilationUnit extends TreeElement implements ICompilationUnit
+public class CompilationUnit extends TreeElement
 {
 
 	private String fileName;
 
-	private ITypeImportList importList;
+	private TypeImportList importList;
 
-	private IPackage pack;
+	private Package pack;
 
-	private ITypeDeclarationList typeList;
+	private TypeDeclarationList typeList;
 
-	public CompilationUnit( String fileName, IPackage pack )
+	public CompilationUnit( String fileName, Package pack )
 	{
 		this.fileName = fileName;
 		this.pack = pack;
@@ -31,38 +31,32 @@ public class CompilationUnit extends TreeElement implements ICompilationUnit
 		visitor.finish(this);
 	}
 
-	@Override
 	public void filename(String value)
 	{
 		this.fileName = value;
 	}
 
-	@Override
 	public String fileName()
 	{
 		return fileName;
 	}
 
-	@Override
-	public ITypeImportList imports()
+	public TypeImportList imports()
 	{
 		return importList;
 	}
 
-	@Override
-	public IPackage namespace()
+	public Package namespace()
 	{
 		return pack;
 	}
 
-	@Override
-	public void namespace(IPackage value)
+	public void namespace(Package value)
 	{
 		this.pack = value;
 	}
 
-	@Override
-	public ITypeDeclarationList types()
+	public TypeDeclarationList types()
 	{
 		return typeList;
 	}

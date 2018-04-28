@@ -1,38 +1,34 @@
 package beagle.compiler.tree;
 
-public class FormalParameter extends TreeElement implements IFormalParameter
+public class FormalParameter extends TreeElement
 {
 
-	private ITypeReference type;
+	private TypeReference type;
 
-	private IName name;
+	private Name name;
 
-	public FormalParameter( IName name, ITypeReference type )
+	public FormalParameter( Name name, TypeReference type )
 	{
 		this.type = type;
 		this.name = name;
 	}
 
-	@Override
-	public IName name()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public void name(IName value)
+	public void name(Name value)
 	{
 		this.name = value;
 	}
 
-	@Override
-	public ITypeReference type()
+	public TypeReference type()
 	{
 		return type;
 	}
 
-	@Override
-	public void type(ITypeReference value)
+	public void type(TypeReference value)
 	{
 		this.type = value;
 	}

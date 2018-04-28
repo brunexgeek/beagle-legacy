@@ -1,14 +1,14 @@
 package beagle.compiler.tree;
 
-public class ConstantDeclaration extends StorageDeclaration implements IConstantDeclaration
+public class ConstantDeclaration extends StorageDeclaration
 {
 
-	public ConstantDeclaration( IAnnotationList annotations, IName name, ITypeReference type, IExpression initializer)
+	public ConstantDeclaration( AnnotationList annotations, Name name, TypeReference type, IExpression initializer)
 	{
 		super(annotations,  name, type, initializer);
 	}
 
-	public ConstantDeclaration( IAnnotationList annotations, IName name, IExpression initializer )
+	public ConstantDeclaration( AnnotationList annotations, Name name, IExpression initializer )
 	{
 		super(annotations,  name, null, initializer);
 	}

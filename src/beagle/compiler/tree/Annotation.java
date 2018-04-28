@@ -1,17 +1,16 @@
 package beagle.compiler.tree;
 
-public class Annotation extends TreeElement implements IAnnotation
+public class Annotation extends TreeElement
 {
 
-	ITypeReference type;
+	TypeReference type;
 
-	public Annotation( ITypeReference type )
+	public Annotation( TypeReference type )
 	{
 		this.type = type;
 	}
 
-	@Override
-	public ITypeReference type()
+	public TypeReference type()
 	{
 		return type;
 	}
@@ -19,7 +18,7 @@ public class Annotation extends TreeElement implements IAnnotation
 	@Override
 	public String toString()
 	{
-		return "@" + type.getQualifiedName();
+		return "@" + type.qualifiedName();
 	}
 
 	@Override

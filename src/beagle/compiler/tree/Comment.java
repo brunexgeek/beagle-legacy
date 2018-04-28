@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public class Comment implements IComment
+public class Comment
 {
 
 	String text;
@@ -13,13 +13,11 @@ public class Comment implements IComment
 		this.isDoc = isDoc;
 	}
 
-	@Override
-	public String getText()
+	public String text()
 	{
 		return text;
 	}
 
-	@Override
 	public boolean isDocumentation()
 	{
 		return isDoc;

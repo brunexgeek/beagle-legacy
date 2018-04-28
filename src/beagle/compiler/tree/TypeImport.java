@@ -2,14 +2,14 @@ package beagle.compiler.tree;
 
 import beagle.compiler.CompilationContext;
 
-public class TypeImport extends TreeElement implements ITypeImport
+public class TypeImport extends TreeElement
 {
 
-	IPackage pack;
+	Package pack;
 
-	IName name;
+	Name name;
 
-	IName alias;
+	Name alias;
 
 	/**
 	 * Creates an package import.
@@ -17,7 +17,7 @@ public class TypeImport extends TreeElement implements ITypeImport
 	 * @param context
 	 * @param packageName Qualified name of the package.
 	 */
-	public TypeImport( CompilationContext context, IName packageName)
+	public TypeImport( CompilationContext context, Name packageName)
 	{
 		this(context, packageName, null, null);
 	}
@@ -30,54 +30,47 @@ public class TypeImport extends TreeElement implements ITypeImport
 	 * @param typeName Simple name of the type.
 	 * @param typeName Simple name to be used as alias.
 	 */
-	public TypeImport( CompilationContext context, IName packageName, IName typeName, IName alias)
+	public TypeImport( CompilationContext context, Name packageName, Name typeName, Name alias)
 	{
 		this.pack = context.createPackage(packageName);
 		this.name = typeName;
 		this.alias = alias;
 	}
 
-	@Override
-	public IPackage namespace()
+	public Package namespace()
 	{
 		return pack;
 	}
 
-	@Override
-	public void namespace(IPackage value)
+	public void namespace(Package value)
 	{
 		this.pack = value;
 	}
 
-	@Override
 	public String qualifiedName()
 	{
 		if (name != null)
-			return pack.getQualifiedName() + "." + name;
+			return pack.qualifiedName() + "." + name;
 		else
-			return pack.getQualifiedName() + ".*";
+			return pack.qualifiedName() + ".*";
 	}
 
-	@Override
-	public IName name()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public void name(IName value)
+	public void name(Name value)
 	{
 		this.name = value;
 	}
 
-	@Override
-	public IName alias()
+	public Name alias()
 	{
 		return alias;
 	}
 
-	@Override
-	public void alias(IName value)
+	public void alias(Name value)
 	{
 		this.alias = value;
 	}

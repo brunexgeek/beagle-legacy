@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public class Modifiers extends TreeElement implements IModifiers
+public class Modifiers extends TreeElement
 {
 
 	private int modifiers;
@@ -10,13 +10,11 @@ public class Modifiers extends TreeElement implements IModifiers
 		this.modifiers = flags;
 	}
 
-	@Override
-	public int getModifiers()
+	public int modifiers()
 	{
 		return modifiers;
 	}
 
-	@Override
 	public boolean hasModifier(int flags)
 	{
 		return (this.modifiers & flags) == flags;

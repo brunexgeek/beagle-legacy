@@ -1,6 +1,25 @@
 package beagle.compiler;
 
-import static beagle.compiler.TokenType.*;
+import static beagle.compiler.TokenType.TOK_AND;
+import static beagle.compiler.TokenType.TOK_ASSIGN;
+import static beagle.compiler.TokenType.TOK_COMA;
+import static beagle.compiler.TokenType.TOK_ELSE;
+import static beagle.compiler.TokenType.TOK_IF;
+import static beagle.compiler.TokenType.TOK_IN;
+import static beagle.compiler.TokenType.TOK_IS;
+import static beagle.compiler.TokenType.TOK_LEFT_BRACE;
+import static beagle.compiler.TokenType.TOK_LEFT_BRACKET;
+import static beagle.compiler.TokenType.TOK_LEFT_PAR;
+import static beagle.compiler.TokenType.TOK_NAME;
+import static beagle.compiler.TokenType.TOK_NIN;
+import static beagle.compiler.TokenType.TOK_NIS;
+import static beagle.compiler.TokenType.TOK_NOT;
+import static beagle.compiler.TokenType.TOK_OR;
+import static beagle.compiler.TokenType.TOK_RETURN;
+import static beagle.compiler.TokenType.TOK_RIGHT_BRACKET;
+import static beagle.compiler.TokenType.TOK_RIGHT_PAR;
+import static beagle.compiler.TokenType.TOK_THEN;
+import static beagle.compiler.TokenType.TOK_TRUE;
 
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
@@ -16,23 +35,23 @@ import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.ExpressionStmt;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
-import beagle.compiler.tree.IAnnotationList;
-import beagle.compiler.tree.IBlock;
-import beagle.compiler.tree.ICompilationUnit;
-import beagle.compiler.tree.IConstantDeclaration;
+import beagle.compiler.tree.AnnotationList;
+import beagle.compiler.tree.Block;
+import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.IExpression;
-import beagle.compiler.tree.IFormalParameterList;
-import beagle.compiler.tree.IMethodDeclaration;
-import beagle.compiler.tree.IModifiers;
-import beagle.compiler.tree.IName;
-import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.FormalParameterList;
+import beagle.compiler.tree.MethodDeclaration;
+import beagle.compiler.tree.Modifiers;
+import beagle.compiler.tree.Name;
+import beagle.compiler.tree.Package;
 import beagle.compiler.tree.IStatement;
 import beagle.compiler.tree.ITreeElement;
-import beagle.compiler.tree.ITypeDeclaration;
-import beagle.compiler.tree.ITypeImport;
-import beagle.compiler.tree.ITypeReference;
-import beagle.compiler.tree.ITypeReferenceList;
-import beagle.compiler.tree.IVariableDeclaration;
+import beagle.compiler.tree.TypeDeclaration;
+import beagle.compiler.tree.TypeImport;
+import beagle.compiler.tree.TypeReference;
+import beagle.compiler.tree.TypeReferenceList;
+import beagle.compiler.tree.VariableDeclaration;
 import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.MethodDeclaration;
@@ -97,20 +116,20 @@ public class Parser implements IParser
 	 * @return
 	 */
 	@Override
-	public ICompilationUnit parse()
+	public CompilationUnit parse()
 	{
 		Token current = tokens.peek();
-		IPackage pack = null;
+		Package pack = null;
 
 		if (tokens.peekType() == TokenType.TOK_PACKAGE)
 			pack = parsePackage();
 
-		ICompilationUnit unit = new CompilationUnit(fileName, pack);
+		CompilationUnit unit = new CompilationUnit(fileName, pack);
 
 		current = tokens.peek();
 		while (current != null && current.type == TokenType.TOK_IMPORT)
 		{
-			ITypeImport imp = parseImport();
+			TypeImport imp = parseImport();
 			unit.imports().add(imp);
 			if (imp == null) break;
 			current = tokens.peek();
@@ -118,7 +137,7 @@ public class Parser implements IParser
 
 		while (tokens.peek().type != TokenType.TOK_EOF)
 		{
-			ITypeDeclaration type = parseType(unit);
+			TypeDeclaration type = parseType(unit);
 			if (type == null) return null;
 			unit.types().add(type);
 		}
@@ -132,7 +151,7 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	IName parseName()
+	Name parseName()
 	{
 		return parseName(true);
 	}
@@ -145,7 +164,7 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	IName parseName( boolean isQualified )
+	Name parseName( boolean isQualified )
 	{
 		if (!expected(TokenType.TOK_NAME))
 			return null;
@@ -171,12 +190,12 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	IPackage parsePackage()
+	Package parsePackage()
 	{
 		if (tokens.peekType() == TokenType.TOK_PACKAGE)
 		{
 			tokens.discard();
-			IName name = parseName();
+			Name name = parseName();
 			//tokens.discard(TokenType.TOK_EOL);
 			return new Package(name);
 		}
@@ -190,12 +209,12 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	ITypeImport parseImport()
+	TypeImport parseImport()
 	{
 		if (tokens.peekType() == TokenType.TOK_IMPORT)
 		{
 			tokens.discard();
-			IName qualifiedName = parseName();
+			Name qualifiedName = parseName();
 			if (qualifiedName == null) return null;
 
 			if (tokens.lookahead(TokenType.TOK_DOT, TokenType.TOK_MUL))
@@ -205,7 +224,7 @@ public class Parser implements IParser
 			}
 			else
 			{
-				IName alias = null;
+				Name alias = null;
 				if (tokens.peekType() == TokenType.TOK_AS)
 				{
 					tokens.discard();
@@ -217,8 +236,8 @@ public class Parser implements IParser
 					context.listener.onError(null, "Invalid qualified type name");
 					return null;
 				}
-				IName typeName = qualifiedName.slice(qualifiedName.count() - 1);
-				IName packageName = qualifiedName.slice(0, qualifiedName.count() - 1);
+				Name typeName = qualifiedName.slice(qualifiedName.count() - 1);
+				Name packageName = qualifiedName.slice(0, qualifiedName.count() - 1);
 
 				return new TypeImport(context, packageName, typeName, alias);
 			}
@@ -234,9 +253,9 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	ITypeDeclaration parseType( ICompilationUnit unit )
+	TypeDeclaration parseType( CompilationUnit unit )
 	{
-		IAnnotationList annots = parseAnnotations();
+		AnnotationList annots = parseAnnotations();
 		//IModifiers modifiers = parseModifiers(false);
 
 		if (tokens.peekType() == TokenType.TOK_CLASS)
@@ -256,15 +275,15 @@ public class Parser implements IParser
 	 * @param modifiers
 	 * @return
 	 */
-	ITypeDeclaration parseClass( ICompilationUnit unit, IAnnotationList annots, IModifiers modifiers )
+	TypeDeclaration parseClass( CompilationUnit unit, AnnotationList annots, Modifiers modifiers )
 	{
 		if (!expected(TokenType.TOK_CLASS))
 			return null;
 		tokens.discard();
 
-		ITypeReferenceList extended = null;
+		TypeReferenceList extended = null;
 
-		IName name = parseName();
+		Name name = parseName();
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 			extended = parseExtends();
@@ -296,19 +315,19 @@ public class Parser implements IParser
 			// parse every class member
 			while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
 			{
-				IAnnotationList annots = parseAnnotations();
+				AnnotationList annots = parseAnnotations();
 				//IModifiers modifiers = parseModifiers();
 
 				// variable or constant
 				if (tokens.peekType() == TokenType.TOK_CONST)
-					body.getConstants().add( (IConstantDeclaration) parseVariableOrConstant(annots) );
+					body.constants().add( (ConstantDeclaration) parseVariableOrConstant(annots) );
 				else
 				if (tokens.peekType() == TokenType.TOK_VAR)
-					body.getVariables().add( (IVariableDeclaration) parseVariableOrConstant(annots) );
+					body.variables().add( (VariableDeclaration) parseVariableOrConstant(annots) );
 				else
 				if (tokens.peekType() == TokenType.TOK_DEF)
 				{
-					body.getMethods().add( parseMethod(annots, body) );
+					body.methods().add( parseMethod(annots, body) );
 				}
 				else
 				{
@@ -337,14 +356,14 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	ITreeElement parseVariableOrConstant( IAnnotationList annots )
+	ITreeElement parseVariableOrConstant( AnnotationList annots )
 	{
 		// get 'var' or 'const' keyword
 		TokenType kind = tokens.peekType();
 		tokens.discard();
 
-		IName name = parseName(false);
-		ITypeReference type = null;
+		Name name = parseName(false);
+		TypeReference type = null;
 		IExpression initializer = null;
 
 		// check whether we have the var/const type
@@ -382,16 +401,16 @@ public class Parser implements IParser
 	 * @param type
 	 * @param body
 	 */
-	IMethodDeclaration parseMethod( IAnnotationList annots, TypeBody body )
+	MethodDeclaration parseMethod( AnnotationList annots, TypeBody body )
 	{
 		if (!expected(TokenType.TOK_DEF)) return null;
 		tokens.discard();
 
-		ITypeReference type = null;
-		IName name = parseName();
+		TypeReference type = null;
+		Name name = parseName();
 
 		if (!expected(TokenType.TOK_LEFT_PAR)) return null;
-		IFormalParameterList params = parseFormalParameters();
+		FormalParameterList params = parseFormalParameters();
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
@@ -399,9 +418,9 @@ public class Parser implements IParser
 			type = new TypeReference( parseName() );
 		}
 
-		IBlock block = parseBlock();
+		Block block = parseBlock();
 
-		IMethodDeclaration method = new MethodDeclaration(annots, type, name, params, block);
+		MethodDeclaration method = new MethodDeclaration(annots, type, name, params, block);
 		method.parent(body);
 
 		return method;
@@ -419,13 +438,13 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	IFormalParameterList parseFormalParameters()
+	FormalParameterList parseFormalParameters()
 	{
 		if (tokens.peekType() != TokenType.TOK_LEFT_PAR) return null;
 		tokens.discard();
 
-		IFormalParameterList output = new FormalParameterList();
-		IName typeName, name;
+		FormalParameterList output = new FormalParameterList();
+		Name typeName, name;
 
 		while (tokens.peekType() != TokenType.TOK_RIGHT_PAR)
 		{
@@ -453,9 +472,9 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	ITypeReferenceList parseExtends()
+	TypeReferenceList parseExtends()
 	{
-		ITypeReferenceList extended = null;
+		TypeReferenceList extended = null;
 
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
@@ -490,7 +509,7 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	IAnnotationList parseAnnotations()
+	AnnotationList parseAnnotations()
 	{
 		if (tokens.peekType() != TokenType.TOK_AT)
 		{
@@ -502,7 +521,7 @@ public class Parser implements IParser
 		while (tokens.peekType() == TokenType.TOK_AT)
 		{
 			tokens.discard();
-			IName name = parseName();
+			Name name = parseName();
 			if (name == null) return null;
 			output.add( new Annotation( new TypeReference(name)));
 		}
@@ -517,7 +536,7 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	IBlock parseBlock()
+	Block parseBlock()
 	{
 		if (!expected(TokenType.TOK_LEFT_BRACE)) return null;
 		tokens.discard();
@@ -1001,7 +1020,7 @@ public class Parser implements IParser
 
 	Argument parseArgument()
 	{
-		IName name = null;
+		Name name = null;
 
 		if (tokens.lookahead(TOK_NAME, TOK_ASSIGN))
 		{

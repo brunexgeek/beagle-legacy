@@ -3,408 +3,384 @@ package beagle.compiler.tree;
 public class TreeVisitor implements ITreeVisitor
 {
 
-	@Override
 	public void finish()
 	{
 	}
 
-	@Override
 	public void finish(BooleanLiteral target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IAnnotation target)
+	public void finish(Annotation target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IAnnotationList target)
+	public void finish(AnnotationList target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IBlock target)
+	public void finish(Block target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ICompilationUnit target)
+	public void finish(CompilationUnit target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IConstantDeclaration target)
+	public void finish(ConstantDeclaration target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IFormalParameter target)
+	public void finish(FormalParameter target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IFormalParameterList target)
+	public void finish(FormalParameterList target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IMethodDeclaration target)
+	public void finish(MethodDeclaration target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IModifiers target)
+	public void finish(Modifiers target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IModule target)
+	public void finish(Module target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IName name)
+	public void finish(Name name)
 	{
 		finish();
 	}
 
-	@Override
 	public void finish(IntegerLiteral target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IPackage target1)
+
+	public void finish(Package target1)
 	{
 		finish();
 	}
 
-	@Override
 	public boolean visit(AtomicExpression target)
 	{
 		return visit();
 	}
 
-	@Override
 	public void finish(AtomicExpression target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeBody target)
+	public void finish(TypeBody target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeDeclaration target)
+
+	public void finish(TypeDeclaration target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeDeclarationList target)
+	public void finish(TypeDeclarationList target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeImport target)
+	public void finish(TypeImport target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeImportList target)
+	public void finish(TypeImportList target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeReference target)
+	public void finish(TypeReference target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(ITypeReferenceList target)
+	public void finish(TypeReferenceList target)
 	{
 		finish();
 	}
 
-	@Override
-	public void finish(IVariableDeclaration target)
+	public void finish(VariableDeclaration target)
 	{
 		finish();
 	}
 
-	@Override
 	public void finish(StringLiteral target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit()
 	{
 		return true;
 	}
 
-	@Override
+
 	public boolean visit(BooleanLiteral target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IAnnotation target)
+
+	public boolean visit(Annotation target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IAnnotationList target)
+
+	public boolean visit(AnnotationList target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IBlock target)
+
+	public boolean visit(Block target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ICompilationUnit target)
+
+	public boolean visit(CompilationUnit target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IConstantDeclaration target)
+
+	public boolean visit(ConstantDeclaration target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IFormalParameter target)
+
+	public boolean visit(FormalParameter target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IFormalParameterList target)
+
+	public boolean visit(FormalParameterList target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IMethodDeclaration target)
+
+	public boolean visit(MethodDeclaration target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IModifiers target)
+
+	public boolean visit(Modifiers target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IModule target)
+
+	public boolean visit(Module target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IName target)
+
+	public boolean visit(Name target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public boolean visit(IntegerLiteral target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IPackage target)
+
+	public boolean visit(Package target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeBody target)
+
+	public boolean visit(TypeBody target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeDeclaration target)
+
+	public boolean visit(TypeDeclaration target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeDeclarationList target)
+
+	public boolean visit(TypeDeclarationList target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeImport target)
+
+	public boolean visit(TypeImport target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeImportList target)
+
+	public boolean visit(TypeImportList target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeReference target)
+
+	public boolean visit(TypeReference target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(ITypeReferenceList target)
+
+	public boolean visit(TypeReferenceList target)
 	{
 		return visit();
 	}
 
-	@Override
-	public boolean visit(IVariableDeclaration target)
+
+	public boolean visit(VariableDeclaration target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public boolean visit(StringLiteral target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(NullLiteral target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(NullLiteral target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(NameLiteral target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(NameLiteral target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(UnaryExpression target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(UnaryExpression target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public boolean visit(BinaryExpression target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(BinaryExpression binaryExpression)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(ExpressionList target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(ExpressionList target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(ReturnStmt target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(ReturnStmt target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(IfThenElseStmt target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(IfThenElseStmt target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(Argument target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(Argument target)
 	{
 		finish();
 	}
 
-	@Override
+
 	public boolean visit(ArgumentList target)
 	{
 		return visit();
 	}
 
-	@Override
+
 	public void finish(ArgumentList target)
 	{
 		finish();

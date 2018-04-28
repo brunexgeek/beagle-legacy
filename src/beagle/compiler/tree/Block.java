@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public class Block extends TreeElementList<IStatement> implements IBlock
+public class Block extends TreeElementList<IStatement> implements IStatement
 {
 
 	private static final long serialVersionUID = -7176997723846769980L;

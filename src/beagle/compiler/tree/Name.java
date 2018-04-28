@@ -2,7 +2,7 @@ package beagle.compiler.tree;
 
 import java.util.ArrayList;
 
-public class Name extends TreeElement implements IName
+public class Name extends TreeElement
 {
 
 	private ArrayList<String> names;
@@ -29,13 +29,11 @@ public class Name extends TreeElement implements IName
 		return this;
 	}
 
-	@Override
 	public String qualifiedName()
 	{
 		return qualifiedName;
 	}
 
-	@Override
 	public String name(int index)
 	{
 		if (index >= names.size())
@@ -43,7 +41,6 @@ public class Name extends TreeElement implements IName
 		return names.get(index);
 	}
 
-	@Override
 	public int count()
 	{
 		return names.size();
@@ -52,14 +49,13 @@ public class Name extends TreeElement implements IName
 	@Override
 	public boolean equals( Object name)
 	{
-		if (!(name instanceof IName))
+		if (!(name instanceof Name))
 			return false;
-		IName object = (Name) name;
+		Name object = (Name) name;
 		return compareTo(object) == 0;
 	}
 
-	@Override
-	public int compareTo(IName name)
+	public int compareTo(Name name)
 	{
 		return qualifiedName.compareTo(name.qualifiedName());
 	}
@@ -76,14 +72,12 @@ public class Name extends TreeElement implements IName
 		return qualifiedName;
 	}
 
-	@Override
-	public IName slice(int start)
+	public Name slice(int start)
 	{
 		return slice(start, count() - start);
 	}
 
-	@Override
-	public IName slice(int start, int length)
+	public Name slice(int start, int length)
 	{
 		if (start < 0 || start >= names.size() || length <= 0)
 			return null;
@@ -115,7 +109,6 @@ public class Name extends TreeElement implements IName
 		return output;
 	}
 
-	@Override
 	public boolean isQualified()
 	{
 		return names.size() > 1;

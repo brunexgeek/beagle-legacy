@@ -2,42 +2,44 @@ package beagle.compiler;
 
 import java.io.PrintStream;
 
+import beagle.compiler.tree.Annotation;
+import beagle.compiler.tree.AnnotationList;
 import beagle.compiler.tree.Argument;
 import beagle.compiler.tree.ArgumentList;
 import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
+import beagle.compiler.tree.Block;
 import beagle.compiler.tree.BooleanLiteral;
+import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.ExpressionList;
-import beagle.compiler.tree.IAnnotation;
-import beagle.compiler.tree.IAnnotationList;
-import beagle.compiler.tree.IBlock;
-import beagle.compiler.tree.ICompilationUnit;
-import beagle.compiler.tree.IConstantDeclaration;
+import beagle.compiler.tree.FormalParameter;
+import beagle.compiler.tree.FormalParameterList;
+import beagle.compiler.tree.Block;
 import beagle.compiler.tree.IExpression;
-import beagle.compiler.tree.IFormalParameter;
-import beagle.compiler.tree.IFormalParameterList;
-import beagle.compiler.tree.IMethodDeclaration;
-import beagle.compiler.tree.IModifiers;
-import beagle.compiler.tree.IName;
-import beagle.compiler.tree.IPackage;
+import beagle.compiler.tree.Package;
 import beagle.compiler.tree.IStatement;
-import beagle.compiler.tree.IStorageDeclaration;
-import beagle.compiler.tree.ITypeBody;
-import beagle.compiler.tree.ITypeDeclaration;
-import beagle.compiler.tree.ITypeDeclarationList;
-import beagle.compiler.tree.ITypeImport;
-import beagle.compiler.tree.ITypeImportList;
-import beagle.compiler.tree.ITypeReference;
-import beagle.compiler.tree.ITypeReferenceList;
-import beagle.compiler.tree.IVariableDeclaration;
+import beagle.compiler.tree.TypeDeclarationList;
+import beagle.compiler.tree.TypeImport;
+import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
+import beagle.compiler.tree.MethodDeclaration;
+import beagle.compiler.tree.Modifiers;
+import beagle.compiler.tree.Name;
 import beagle.compiler.tree.NameLiteral;
 import beagle.compiler.tree.NullLiteral;
 import beagle.compiler.tree.ReturnStmt;
+import beagle.compiler.tree.StorageDeclaration;
 import beagle.compiler.tree.StringLiteral;
 import beagle.compiler.tree.TreeVisitor;
+import beagle.compiler.tree.TypeBody;
+import beagle.compiler.tree.TypeDeclaration;
+import beagle.compiler.tree.TypeImportList;
+import beagle.compiler.tree.TypeReference;
+import beagle.compiler.tree.TypeReferenceList;
 import beagle.compiler.tree.UnaryExpression;
+import beagle.compiler.tree.VariableDeclaration;
 
 public class HtmlVisitor extends TreeVisitor
 {
@@ -155,8 +157,7 @@ public class HtmlVisitor extends TreeVisitor
 		return true;
 	}
 
-	@Override
-	public boolean visit(ICompilationUnit target)
+	public boolean visit(CompilationUnit target)
 	{
 		printCompilationUnit(target);
 		return false;
@@ -204,12 +205,12 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printAnnotationList(IAnnotationList target)
+	public void printAnnotationList(AnnotationList target)
 	{
 		if (target == null || target.size() == 0) return;
 
 		open("annotations", target.getClass());
-		for (IAnnotation item : target)
+		for (Annotation item : target)
 		{
 			open(item.getClass());
 			printTypeReference(item.type());
@@ -218,7 +219,7 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printCompilationUnit(ICompilationUnit target)
+	public void printCompilationUnit(CompilationUnit target)
 	{
 		out.append("<html><head><title>Beagle AST</title>");
 		writeCSS();
@@ -233,7 +234,7 @@ public class HtmlVisitor extends TreeVisitor
 	}
 
 
-	public void printConstantOrVariable(boolean heading, IStorageDeclaration target)
+	public void printConstantOrVariable(boolean heading, StorageDeclaration target)
 	{
 		if (heading) open(target.getClass());
 		printAnnotationList(target.annotations());
@@ -254,12 +255,12 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printFormalParameterList(IFormalParameterList target)
+	public void printFormalParameterList(FormalParameterList target)
 	{
 		if (target == null) return;
 
 		open("parameters", target.getClass());
-		for (IFormalParameter item : target)
+		for (FormalParameter item : target)
 		{
 			open(item.getClass());
 			printName(item.name());
@@ -269,7 +270,7 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printeMethodDeclaration(IMethodDeclaration target)
+	public void printeMethodDeclaration(MethodDeclaration target)
 	{
 		open(target.getClass());
 		printAnnotationList(target.annotations());
@@ -281,45 +282,45 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printModifiers(IModifiers target)
+	public void printModifiers(Modifiers target)
 	{
 		if (target == null) return;
 		attribute("modifiers", target.getClass(), target.toString());
 	}
 
-	public void printName(IName target)
+	public void printName(Name target)
 	{
 		printName(null, target);
 	}
 
-	public void printName(String name, IName target)
+	public void printName(String name, Name target)
 	{
 		if (target == null) return;
 		if (name == null) name = "name";
 		attribute(name, target.getClass(), target.qualifiedName());
 	}
 
-	public void printTypeBody(ITypeBody target)
+	public void printTypeBody(TypeBody target)
 	{
 		open("body", target.getClass());
 
-		for (IConstantDeclaration item : target.getConstants())
+		for (ConstantDeclaration item : target.constants())
 			printConstantOrVariable(true, item);
 
-		for (IVariableDeclaration item : target.getVariables())
+		for (VariableDeclaration item : target.variables())
 			printConstantOrVariable(true, item);
 
-		for (IMethodDeclaration item : target.getMethods())
+		for (MethodDeclaration item : target.methods())
 			printeMethodDeclaration(item);
 
 		close();
 	}
 
 
-	public void printTypes(ITypeDeclarationList target)
+	public void printTypes(TypeDeclarationList target)
 	{
 		open("types", target.getClass());
-		for (ITypeDeclaration item : target)
+		for (TypeDeclaration item : target)
 		{
 			open(item.getClass());
 			printAnnotationList(item.annotations());
@@ -332,19 +333,19 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printPackage(IPackage target)
+	public void printPackage(Package target)
 	{
 		if (target == null) return;
-		attribute("package", target.getClass(), target.getQualifiedName());
+		attribute("package", target.getClass(), target.qualifiedName());
 	}
 
 
-	public void printTypeImportList(ITypeImportList target)
+	public void printTypeImportList(TypeImportList target)
 	{
 		if (target.size() == 0) return;
 
 		open("imports", target.getClass());
-		for (ITypeImport item : target)
+		for (TypeImport item : target)
 		{
 			open(item.getClass());
 			printPackage(item.namespace());
@@ -356,27 +357,27 @@ public class HtmlVisitor extends TreeVisitor
 	}
 
 
-	public void printTypeReference(ITypeReference target)
+	public void printTypeReference(TypeReference target)
 	{
 		if (target == null) return;
 
-		if (target.parent() instanceof ITypeReferenceList)
+		if (target.parent() instanceof TypeReferenceList)
 		{
 			open(target.getClass());
-			attribute("type", target.getClass(), target.getQualifiedName());
+			attribute("type", target.getClass(), target.qualifiedName());
 			close();
 		}
 		else
 		{
-			attribute("type", target.getClass(), target.getQualifiedName());
+			attribute("type", target.getClass(), target.qualifiedName());
 		}
 	}
 
 
-	public void printTypeReferenceList(ITypeReferenceList target)
+	public void printTypeReferenceList(TypeReferenceList target)
 	{
 		open("inherit", target.getClass());
-		for (ITypeReference item : target)
+		for (TypeReference item : target)
 			printTypeReference(item);
 		close();
 	}
@@ -402,15 +403,15 @@ public class HtmlVisitor extends TreeVisitor
 			printStatement("else", ((IfThenElseStmt)stmt).elseSide());
 		}
 		else
-		if (stmt instanceof IBlock)
+		if (stmt instanceof Block)
 		{
-			for (IStatement item : (IBlock)stmt)
+			for (IStatement item : (Block)stmt)
 				printStatement(null, item);
 		}
 		else
-		if (stmt instanceof IStorageDeclaration)
+		if (stmt instanceof StorageDeclaration)
 		{
-			printConstantOrVariable(false, (IStorageDeclaration)stmt);
+			printConstantOrVariable(false, (StorageDeclaration)stmt);
 		}
 		else
 			missing();

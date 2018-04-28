@@ -1,6 +1,6 @@
 package beagle.compiler;
 
-import beagle.compiler.tree.ICompilationUnit;
+import beagle.compiler.tree.CompilationUnit;
 
 public interface IParser
 {
@@ -12,6 +12,6 @@ public interface IParser
 	 *
 	 * @return
 	 */
-	ICompilationUnit parse();
+	CompilationUnit parse();
 
 }

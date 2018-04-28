@@ -3,11 +3,11 @@ package beagle.compiler;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import beagle.compiler.tree.IMethodDeclaration;
-import beagle.compiler.tree.IModule;
-import beagle.compiler.tree.ITypeDeclaration;
-import beagle.compiler.tree.IVariableDeclaration;
+import beagle.compiler.tree.MethodDeclaration;
+import beagle.compiler.tree.Module;
 import beagle.compiler.tree.TreeVisitor;
+import beagle.compiler.tree.TypeDeclaration;
+import beagle.compiler.tree.VariableDeclaration;
 
 public class CodeGenerator extends TreeVisitor
 {
@@ -23,7 +23,7 @@ public class CodeGenerator extends TreeVisitor
 	}
 
 	@Override
-	public boolean visit(ITypeDeclaration current)
+	public boolean visit(TypeDeclaration current)
 	{
 		printer.println("; Type '" + current.qualifiedName() + "'");
 
@@ -31,10 +31,10 @@ public class CodeGenerator extends TreeVisitor
 		printer.print(current.qualifiedName());
 		printer.print(" = type { %.classref");
 
-		for (IVariableDeclaration field : current.body().getVariables())
+		for (VariableDeclaration field : current.body().variables())
 		{
 			printer.print(", %.dyn.");
-			printer.print(field.type().getQualifiedName());
+			printer.print(field.type().qualifiedName());
 		}
 
 		printer.println(" }");
@@ -42,16 +42,16 @@ public class CodeGenerator extends TreeVisitor
 	}
 
 	@Override
-	public boolean visit(IModule target)
+	public boolean visit(Module target)
 	{
-		printer.println("; module '" + target.getName().qualifiedName() + "'");
+		printer.println("; module '" + target.name().qualifiedName() + "'");
 		return true;
 	}
 
 	@Override
-	public boolean visit(IMethodDeclaration target)
+	public boolean visit(MethodDeclaration target)
 	{
-		printer.println("; method of '" + target.parent().getParent().name().qualifiedName() + "'");
+		printer.println("; method of '" + target.parent().parent().name().qualifiedName() + "'");
 		printer.println("define void @" + target.name().qualifiedName() + "() {}");
 		return true;
 	}

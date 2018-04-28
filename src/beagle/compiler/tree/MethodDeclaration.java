@@ -1,23 +1,23 @@
 package beagle.compiler.tree;
 
-public class MethodDeclaration extends TreeElement implements IMethodDeclaration
+public class MethodDeclaration extends TreeElement
 {
 
-	IAnnotationList annotations;
+	AnnotationList annotations;
 
-	IModifiers modifiers;
+	Modifiers modifiers;
 
-	IName name;
+	Name name;
 
-	IFormalParameterList parameters;
+	FormalParameterList parameters;
 
-	ITypeReference type;
+	TypeReference type;
 
-	IBlock body;
+	Block body;
 
-	ITypeBody parent;
+	TypeBody parent;
 
-	public MethodDeclaration(IAnnotationList annots, ITypeReference type, IName name, IFormalParameterList parameters, IBlock body)
+	public MethodDeclaration(AnnotationList annots, TypeReference type, Name name, FormalParameterList parameters, Block body)
 	{
 		this.annotations = annots;
 		this.type = type;
@@ -27,44 +27,38 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 		this.modifiers = null;
 	}
 
-	@Override
-	public ITypeReference returnType()
+
+	public TypeReference returnType()
 	{
 		return type;
 	}
 
-	@Override
-	public void returnType(ITypeReference value)
+	public void returnType(TypeReference value)
 	{
 		this.type = value;
 	}
 
-	@Override
-	public IFormalParameterList parameters()
+	public FormalParameterList parameters()
 	{
 		return parameters;
 	}
 
-	@Override
-	public IName name()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public void name(IName value)
+	public void name(Name value)
 	{
 		this.name = value;
 	}
 
-	@Override
-	public IBlock body()
+	public Block body()
 	{
 		return body;
 	}
 
-	@Override
-	public void body(IBlock value)
+	public void body(Block value)
 	{
 		this.body = value;
 	}
@@ -86,38 +80,34 @@ public class MethodDeclaration extends TreeElement implements IMethodDeclaration
 //			param.print(out, level + 2);
 //	}
 
-	@Override
+
 	public boolean isContructor()
 	{
-		return (name.equals(type.getName()));
+		return (name.equals(type.name()));
 	}
 
-	@Override
-	public IModifiers modifiers()
+	public Modifiers modifiers()
 	{
 		return modifiers;
 	}
 
-	@Override
-	public void modifiers(IModifiers value)
+	public void modifiers(Modifiers value)
 	{
 		this.modifiers = value;
 	}
 
 	@Override
-	public ITypeBody parent()
+	public TypeBody parent()
 	{
 		return parent;
 	}
 
-	@Override
-	public void parent(ITypeBody parent)
+	public void parent(TypeBody parent)
 	{
 		this.parent = parent;
 	}
 
-	@Override
-	public IAnnotationList annotations()
+	public AnnotationList annotations()
 	{
 		return annotations;
 	}

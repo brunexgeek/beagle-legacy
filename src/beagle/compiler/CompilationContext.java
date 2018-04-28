@@ -2,10 +2,9 @@ package beagle.compiler;
 
 import java.util.HashMap;
 
-import beagle.compiler.tree.IName;
-import beagle.compiler.tree.IPackage;
-import beagle.compiler.tree.ITypeDeclaration;
+import beagle.compiler.tree.Name;
 import beagle.compiler.tree.Package;
+import beagle.compiler.tree.TypeDeclaration;
 
 public class CompilationContext
 {
@@ -16,14 +15,14 @@ public class CompilationContext
 	 * Types can be obtained from loading modules or from compilation units
 	 * (both complete and incomplete types).
 	 */
-	public HashMap<String, ITypeDeclaration> types;
+	public HashMap<String, TypeDeclaration> types;
 
 	/**
 	 * Map containing every known package.
 	 *
 	 * Packages can be obtained from loading modules or from compilation units.
 	 */
-	public HashMap<String, IPackage> packages;
+	public HashMap<String, Package> packages;
 
 
 	public CompilationListener listener;
@@ -37,9 +36,9 @@ public class CompilationContext
 	}
 
 
-	public IPackage createPackage(IName packageName)
+	public Package createPackage(Name packageName)
 	{
-		IPackage result = packages.get(packageName);
+		Package result = packages.get(packageName);
 		if (result == null)
 		{
 			result = new Package(packageName);

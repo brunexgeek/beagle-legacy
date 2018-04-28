@@ -3,17 +3,17 @@ package beagle.compiler.tree;
 import java.util.HashMap;
 import java.util.Set;
 
-public class Package extends TreeElement implements IPackage
+public class Package extends TreeElement
 {
 
-	private IName name;
+	private Name name;
 
-	private HashMap<String, ITypeDeclaration> types;
+	private HashMap<String, TypeDeclaration> types;
 
-	public Package( IName name )
+	public Package( Name name )
 	{
 		this.name = name;
-		types = new HashMap<String, ITypeDeclaration>();
+		types = new HashMap<String, TypeDeclaration>();
 	}
 
 	public Package()
@@ -21,25 +21,22 @@ public class Package extends TreeElement implements IPackage
 		this.name = null;
 	}
 
-	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return name.qualifiedName();
 	}
 
-	@Override
-	public Set<String> getTypeNames()
+	public Set<String> typeNames()
 	{
 		return types.keySet();
 	}
 
-	@Override
-	public ITypeDeclaration getType( String name )
+	public TypeDeclaration type( String name )
 	{
 		return types.get(name);
 	}
 
-	public void addType( ITypeDeclaration type )
+	public void addType( TypeDeclaration type )
 	{
 		types.put(type.qualifiedName(), type);
 	}
@@ -58,16 +55,14 @@ public class Package extends TreeElement implements IPackage
 //		out.println();
 //	}
 
-	@Override
-	public IName getName()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public ITypeDeclaration getType(IName name)
+	public TypeDeclaration type(Name name)
 	{
-		return getType(name.qualifiedName());
+		return type(name.qualifiedName());
 	}
 
 	@Override

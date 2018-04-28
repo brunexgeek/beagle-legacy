@@ -3,14 +3,14 @@ package beagle.compiler.tree;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Module extends TreeElement implements IModule
+public class Module extends TreeElement
 {
 
-	protected IName name;
+	protected Name name;
 
-	protected HashMap<String, ICompilationUnit> units;
+	protected HashMap<String, CompilationUnit> units;
 
-	public Module( IName name )
+	public Module( Name name )
 	{
 		this.name = name;
 		this.units = new HashMap<>();
@@ -24,20 +24,17 @@ public class Module extends TreeElement implements IModule
 //		out.println();
 //	}
 
-	@Override
-	public Map<String, ICompilationUnit> getCompilationUnits()
+	public Map<String, CompilationUnit> compilationUnits()
 	{
 		return units;
 	}
 
-	@Override
-	public IName getName()
+	public Name name()
 	{
 		return name;
 	}
 
-	@Override
-	public void addCompilationUnit(ICompilationUnit unit)
+	public void addCompilationUnit(CompilationUnit unit)
 	{
 		units.put(unit.fileName(), unit);
 	}
@@ -46,7 +43,7 @@ public class Module extends TreeElement implements IModule
 	public void accept(ITreeVisitor visitor)
 	{
 		visitor.visit(this);
-		for (ICompilationUnit item : units.values())
+		for (CompilationUnit item : units.values())
 			item.accept(visitor);
 	}
 

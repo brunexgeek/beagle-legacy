@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public class TypeReferenceList extends TreeElementList<ITypeReference> implements ITypeReferenceList
+public class TypeReferenceList extends TreeElementList<TypeReference>
 {
 	private static final long serialVersionUID = -8292374162255444568L;
 
@@ -8,7 +8,7 @@ public class TypeReferenceList extends TreeElementList<ITypeReference> implement
 	public void accept(ITreeVisitor visitor)
 	{
 		if (visitor.visit(this))
-			for (ITypeReference item : this)
+			for (TypeReference item : this)
 				item.accept(visitor);
 		visitor.finish(this);
 	}

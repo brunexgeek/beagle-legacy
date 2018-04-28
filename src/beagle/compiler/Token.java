@@ -2,7 +2,7 @@ package beagle.compiler;
 
 import java.util.List;
 
-import beagle.compiler.tree.IComment;
+import beagle.compiler.tree.Comment;
 
 public class Token
 {
@@ -15,7 +15,7 @@ public class Token
 
 	public int lineBreak;
 
-	public List<IComment> comments;
+	public List<Comment> comments;
 
 	/**
 	 *
@@ -31,7 +31,7 @@ public class Token
 	 * @param type
 	 * @param value
 	 */
-	public Token(SourceLocation location, int lineBreak, List<IComment> comments, TokenType type, String value)
+	public Token(SourceLocation location, int lineBreak, List<Comment> comments, TokenType type, String value)
 	{
 		this.location = location.clone();
 		this.lineBreak = lineBreak;

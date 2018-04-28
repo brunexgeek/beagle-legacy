@@ -3,22 +3,22 @@ package beagle.compiler.tree;
 public class Argument extends TreeElement implements ITreeElement
 {
 
-	IName name;
+	Name name;
 
 	IExpression value;
 
-	public Argument(IName name, IExpression value)
+	public Argument(Name name, IExpression value)
 	{
 		this.name = name;
 		this.value = value;
 	}
 
-	public IName name()
+	public Name name()
 	{
 		return name;
 	}
 
-	public void name(IName name)
+	public void name(Name name)
 	{
 		this.name = name;
 	}

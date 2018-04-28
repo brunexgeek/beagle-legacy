@@ -5,7 +5,7 @@ import java.util.List;
 
 import beagle.compiler.Token.LineBreak;
 import beagle.compiler.tree.Comment;
-import beagle.compiler.tree.IComment;
+
 
 /**
  * Extract tokens from the input source code.
@@ -21,7 +21,7 @@ public class Scanner implements IScanner
 
 	boolean lineBreak = false;
 
-	List<IComment> comments;
+	List<Comment> comments;
 
 	public Scanner( CompilationContext context, ScanString source )
 	{
@@ -137,14 +137,14 @@ public class Scanner implements IScanner
 					// capture block comments
 					if (source.peek(1) == '*')
 					{
-						IComment comm = processBlockComment();
+						Comment comm = processBlockComment();
 						if (comm != null) comments.add(comm);
 						break;
 					}
 					// capture inline comments
 					if (source.peek(1) == '/')
 					{
-						IComment comm = processInlineComment();
+						Comment comm = processInlineComment();
 						if (comm != null) comments.add(comm);
 						break;
 					}
@@ -370,7 +370,7 @@ public class Scanner implements IScanner
 			return createToken(TokenType.TOK_STRING_LITERAL, capture.toString());
 	}
 
-	IComment processBlockComment()
+	Comment processBlockComment()
 	{
 		TokenType type = TokenType.TOK_COMMENT;
 		source.next(2);
@@ -420,7 +420,7 @@ public class Scanner implements IScanner
 		}
 	}
 
-	IComment processInlineComment()
+	Comment processInlineComment()
 	{
 		source.next(2);
 

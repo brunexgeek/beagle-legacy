@@ -7,47 +7,47 @@ public interface ITreeVisitor
 
 	void finish(BooleanLiteral target);
 
-	void finish(IAnnotation target);
+	void finish(Annotation target);
 
-	void finish(IAnnotationList target);
+	void finish(AnnotationList target);
 
-	void finish(IBlock target);
+	void finish(Block target);
 
-	void finish(ICompilationUnit target);
+	void finish(CompilationUnit target);
 
-	void finish(IConstantDeclaration target);
+	void finish(ConstantDeclaration target);
 
-	void finish(IFormalParameter target);
+	void finish(FormalParameter target);
 
-	void finish(IFormalParameterList target);
+	void finish(FormalParameterList target);
 
-	void finish(IMethodDeclaration target);
+	void finish(MethodDeclaration target);
 
-	void finish(IModifiers target);
+	void finish(Modifiers target);
 
-	void finish(IModule target);
+	void finish(Module target);
 
-	void finish(IName target);
+	void finish(Name target);
 
 	void finish(IntegerLiteral target);
 
-	void finish(IPackage target);
+	void finish(Package target);
 
-	void finish(ITypeBody target);
+	void finish(TypeBody target);
 
-	void finish(ITypeDeclaration target);
+	void finish(TypeDeclaration target);
 
-	void finish(ITypeDeclarationList target);
+	void finish(TypeDeclarationList target);
 
-	void finish(ITypeImport target);
+	void finish(TypeImport target);
 
-	void finish(ITypeImportList target);
+	void finish(TypeImportList target);
 
-	void finish(ITypeReference target);
+	void finish(TypeReference target);
 
-	void finish(ITypeReferenceList target);
+	void finish(TypeReferenceList target);
 
-	void finish(IVariableDeclaration target);
+	void finish(VariableDeclaration target);
 
 	void finish(StringLiteral target);
 
@@ -55,47 +55,47 @@ public interface ITreeVisitor
 
 	boolean visit(BooleanLiteral target);
 
-	boolean visit(IAnnotation target);
+	boolean visit(Annotation target);
 
-	boolean visit(IAnnotationList target);
+	boolean visit(AnnotationList target);
 
-	boolean visit(IBlock target);
+	boolean visit(Block target);
 
-	boolean visit(ICompilationUnit target);
+	boolean visit(CompilationUnit target);
 
-	boolean visit(IConstantDeclaration target);
+	boolean visit(ConstantDeclaration target);
 
-	boolean visit(IFormalParameter target);
+	boolean visit(FormalParameter target);
 
-	boolean visit(IFormalParameterList target);
+	boolean visit(FormalParameterList target);
 
-	boolean visit(IMethodDeclaration target);
+	boolean visit(MethodDeclaration target);
 
-	boolean visit(IModifiers target);
+	boolean visit(Modifiers target);
 
-	boolean visit(IModule target);
+	boolean visit(Module target);
 
-	boolean visit(IName target);
+	boolean visit(Name target);
 
 	boolean visit(IntegerLiteral target);
 
-	boolean visit(IPackage target);
+	boolean visit(Package target);
 
-	boolean visit(ITypeBody target);
+	boolean visit(TypeBody target);
 
-	boolean visit(ITypeDeclaration target);
+	boolean visit(TypeDeclaration target);
 
-	boolean visit(ITypeDeclarationList target);
+	boolean visit(TypeDeclarationList target);
 
-	boolean visit(ITypeImport target);
+	boolean visit(TypeImport target);
 
-	boolean visit(ITypeImportList target);
+	boolean visit(TypeImportList target);
 
-	boolean visit(ITypeReference target);
+	boolean visit(TypeReference target);
 
-	boolean visit(ITypeReferenceList target);
+	boolean visit(TypeReferenceList target);
 
-	boolean visit(IVariableDeclaration target);
+	boolean visit(VariableDeclaration target);
 
 	boolean visit(StringLiteral target);
 

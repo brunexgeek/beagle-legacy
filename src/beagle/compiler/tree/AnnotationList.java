@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public class AnnotationList extends TreeElementList<IAnnotation> implements IAnnotationList
+public class AnnotationList extends TreeElementList<Annotation>
 {
 
 	private static final long serialVersionUID = 1394405999887189989L;
@@ -9,7 +9,7 @@ public class AnnotationList extends TreeElementList<IAnnotation> implements IAnn
 	public void accept(ITreeVisitor visitor)
 	{
 		if (visitor.visit(this))
-			for (IAnnotation item : this)
+			for (Annotation item : this)
 				item.accept(visitor);
 		visitor.finish(this);
 	}
