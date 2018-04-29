@@ -21,7 +21,7 @@ public interface ITreeVisitor
 
 	void finish(FormalParameterList target);
 
-	void finish(MethodDeclaration target);
+	void finish(Function target);
 
 	void finish(Modifiers target);
 
@@ -69,7 +69,7 @@ public interface ITreeVisitor
 
 	boolean visit(FormalParameterList target);
 
-	boolean visit(MethodDeclaration target);
+	boolean visit(Function target);
 
 	boolean visit(Modifiers target);
 
@@ -138,4 +138,8 @@ public interface ITreeVisitor
 	boolean visit(ArgumentList target);
 
 	void finish(ArgumentList target);
+
+	boolean visit(FunctionList functionList);
+
+	void finish(FunctionList functionList);
 }

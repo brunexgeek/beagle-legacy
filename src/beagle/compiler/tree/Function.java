@@ -1,6 +1,6 @@
 package beagle.compiler.tree;
 
-public class MethodDeclaration extends TreeElement
+public class Function extends TreeElement
 {
 
 	AnnotationList annotations;
@@ -15,9 +15,9 @@ public class MethodDeclaration extends TreeElement
 
 	Block body;
 
-	TypeBody parent;
+	TreeElement parent;
 
-	public MethodDeclaration(AnnotationList annots, TypeReference type, Name name, FormalParameterList parameters, Block body)
+	public Function(AnnotationList annots, TypeReference type, Name name, FormalParameterList parameters, Block body)
 	{
 		this.annotations = annots;
 		this.type = type;
@@ -97,7 +97,7 @@ public class MethodDeclaration extends TreeElement
 	}
 
 	@Override
-	public TypeBody parent()
+	public TreeElement parent()
 	{
 		return parent;
 	}

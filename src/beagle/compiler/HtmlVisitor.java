@@ -24,7 +24,8 @@ import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
-import beagle.compiler.tree.MethodDeclaration;
+import beagle.compiler.tree.Function;
+import beagle.compiler.tree.FunctionList;
 import beagle.compiler.tree.Modifiers;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.NameLiteral;
@@ -229,8 +230,18 @@ public class HtmlVisitor extends TreeVisitor
 		attribute("fileName", target.fileName());
 		printPackage(target.namespace());
 		printTypeImportList(target.imports());
+		printFunctions(target.functions());
 		printTypes(target.types());
 		out.append("</body></html>");
+	}
+
+
+	public void printFunctions( FunctionList target )
+	{
+		open("functions", target.getClass());
+		for (Function func : target)
+			printFunction(func);
+		close();
 	}
 
 
@@ -270,7 +281,7 @@ public class HtmlVisitor extends TreeVisitor
 		close();
 	}
 
-	public void printeMethodDeclaration(MethodDeclaration target)
+	public void printFunction(Function target)
 	{
 		open(target.getClass());
 		printAnnotationList(target.annotations());
@@ -310,8 +321,8 @@ public class HtmlVisitor extends TreeVisitor
 		for (VariableDeclaration item : target.variables())
 			printConstantOrVariable(true, item);
 
-		for (MethodDeclaration item : target.methods())
-			printeMethodDeclaration(item);
+		for (Function item : target.methods())
+			printFunction(item);
 
 		close();
 	}
@@ -495,8 +506,10 @@ public class HtmlVisitor extends TreeVisitor
 	{
 		out.append("<style>"
 			+ "html * {font-family: monospace; font-size: 14px; line-height: 20px}"
-			+ "body div:first-of-type { border-left: none; }"
 			+ ".container {/*border: 1px solid red; margin-right: -1px; margin-bottom: -1px;*/ border-left: 1px dashed #ddd; padding-left: 1.5em; background-color: #fff}"
+			+ ".container:hover {border-left: 1px dashed #888;}"
+			+ "body div:first-of-type { border-left: none; }"
+			+ "body div:first-of-type:hover { border-left: none; }"
 			+ ".title {font-weight: 600;}"
 			+ ".missing {color: red}"
 			+ ".attribute .name {color: blue}"

@@ -3,7 +3,7 @@ package beagle.compiler;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import beagle.compiler.tree.MethodDeclaration;
+import beagle.compiler.tree.Function;
 import beagle.compiler.tree.Module;
 import beagle.compiler.tree.TreeVisitor;
 import beagle.compiler.tree.TypeDeclaration;
@@ -49,9 +49,9 @@ public class CodeGenerator extends TreeVisitor
 	}
 
 	@Override
-	public boolean visit(MethodDeclaration target)
+	public boolean visit(Function target)
 	{
-		printer.println("; method of '" + target.parent().parent().name().qualifiedName() + "'");
+		printer.println("; method of '" + "'");
 		printer.println("define void @" + target.name().qualifiedName() + "() {}");
 		return true;
 	}

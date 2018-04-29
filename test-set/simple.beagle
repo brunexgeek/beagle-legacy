@@ -12,6 +12,12 @@ import baz.FooBar as foobar
 
 /* asdasd */
 
+def doSomething()
+{
+	return ss
+}
+
+
 @Package 
 class Alice : Bob, Eve
 {

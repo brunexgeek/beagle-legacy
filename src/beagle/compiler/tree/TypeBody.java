@@ -10,7 +10,7 @@ public class TypeBody extends TreeElement
 
 	List<VariableDeclaration> variables;
 
-	List<MethodDeclaration> methods;
+	List<Function> methods;
 
 	TypeDeclaration parent;
 
@@ -36,7 +36,7 @@ public class TypeBody extends TreeElement
 //			item.print(out, level + 1);
 //	}
 
-	public List<MethodDeclaration> methods()
+	public List<Function> methods()
 	{
 		return methods;
 	}
@@ -71,7 +71,7 @@ public class TypeBody extends TreeElement
 				item.accept(visitor);
 			for (VariableDeclaration item : variables)
 				item.accept(visitor);
-			for (MethodDeclaration item : methods)
+			for (Function item : methods)
 				item.accept(visitor);
 		}
 		visitor.finish(this);

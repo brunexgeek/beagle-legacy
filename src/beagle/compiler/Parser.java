@@ -4,6 +4,7 @@ import static beagle.compiler.TokenType.TOK_AND;
 import static beagle.compiler.TokenType.TOK_ASSIGN;
 import static beagle.compiler.TokenType.TOK_COMA;
 import static beagle.compiler.TokenType.TOK_ELSE;
+import static beagle.compiler.TokenType.TOK_ELIF;
 import static beagle.compiler.TokenType.TOK_IF;
 import static beagle.compiler.TokenType.TOK_IN;
 import static beagle.compiler.TokenType.TOK_IS;
@@ -35,26 +36,13 @@ import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.ExpressionStmt;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
-import beagle.compiler.tree.AnnotationList;
-import beagle.compiler.tree.Block;
-import beagle.compiler.tree.CompilationUnit;
-import beagle.compiler.tree.ConstantDeclaration;
+import beagle.compiler.tree.Function;
 import beagle.compiler.tree.IExpression;
-import beagle.compiler.tree.FormalParameterList;
-import beagle.compiler.tree.MethodDeclaration;
-import beagle.compiler.tree.Modifiers;
-import beagle.compiler.tree.Name;
-import beagle.compiler.tree.Package;
 import beagle.compiler.tree.IStatement;
 import beagle.compiler.tree.ITreeElement;
-import beagle.compiler.tree.TypeDeclaration;
-import beagle.compiler.tree.TypeImport;
-import beagle.compiler.tree.TypeReference;
-import beagle.compiler.tree.TypeReferenceList;
-import beagle.compiler.tree.VariableDeclaration;
 import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
-import beagle.compiler.tree.MethodDeclaration;
+import beagle.compiler.tree.Modifiers;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.NameLiteral;
 import beagle.compiler.tree.NullLiteral;
@@ -137,9 +125,20 @@ public class Parser implements IParser
 
 		while (tokens.peek().type != TokenType.TOK_EOF)
 		{
-			TypeDeclaration type = parseType(unit);
-			if (type == null) return null;
-			unit.types().add(type);
+			AnnotationList annots = null;
+			if (tokens.peek().type == TokenType.TOK_AT)
+				annots = parseAnnotations();
+
+			if (tokens.peek().type == TokenType.TOK_DEF)
+			{
+				unit.functions().add(parseMethod(annots, null));
+			}
+			/*else
+			{
+				TypeDeclaration type = parseType(unit, annots);
+				unit.types().add(type);
+			}*/
+
 		}
 		return unit;
 	}
@@ -253,9 +252,8 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	TypeDeclaration parseType( CompilationUnit unit )
+	TypeDeclaration parseType( CompilationUnit unit, AnnotationList annots )
 	{
-		AnnotationList annots = parseAnnotations();
 		//IModifiers modifiers = parseModifiers(false);
 
 		if (tokens.peekType() == TokenType.TOK_CLASS)
@@ -401,7 +399,7 @@ public class Parser implements IParser
 	 * @param type
 	 * @param body
 	 */
-	MethodDeclaration parseMethod( AnnotationList annots, TypeBody body )
+	Function parseMethod( AnnotationList annots, TypeBody body )
 	{
 		if (!expected(TokenType.TOK_DEF)) return null;
 		tokens.discard();
@@ -420,7 +418,7 @@ public class Parser implements IParser
 
 		Block block = parseBlock();
 
-		MethodDeclaration method = new MethodDeclaration(annots, type, name, params, block);
+		Function method = new Function(annots, type, name, params, block);
 		method.parent(body);
 
 		return method;
@@ -595,7 +593,7 @@ public class Parser implements IParser
 	 */
 	IStatement parseIfThenElseStmt()
 	{
-		if (!expected(TOK_IF)) return null;
+		if (!expected(TOK_IF, TOK_ELIF)) return null;
 		tokens.discard();
 
 		IExpression condition = parseExpression();
@@ -612,6 +610,13 @@ public class Parser implements IParser
 			thenSide = parseStatement();
 		if (thenSide == null) return null;
 
+		if (tokens.peekType() == TOK_ELIF)
+		{
+			Block block = new Block();
+			block.add(parseIfThenElseStmt());
+			elseSide = block;
+		}
+		else
 		if (tokens.peekType() == TOK_ELSE)
 		{
 			tokens.discard();
@@ -637,7 +642,6 @@ public class Parser implements IParser
 		tokens.discard();
 
 		IExpression expr = parseExpression();
-		if (expr == null) return null;
 
 		return new ReturnStmt(expr);
 	}

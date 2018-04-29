@@ -47,7 +47,7 @@ public class TreeVisitor implements ITreeVisitor
 		finish();
 	}
 
-	public void finish(MethodDeclaration target)
+	public void finish(Function target)
 	{
 		finish();
 	}
@@ -189,7 +189,7 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 
-	public boolean visit(MethodDeclaration target)
+	public boolean visit(Function target)
 	{
 		return visit();
 	}
@@ -382,6 +382,18 @@ public class TreeVisitor implements ITreeVisitor
 
 
 	public void finish(ArgumentList target)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(FunctionList functionList)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(FunctionList functionList)
 	{
 		finish();
 	}

@@ -11,12 +11,15 @@ public class CompilationUnit extends TreeElement
 
 	private TypeDeclarationList typeList;
 
+	private FunctionList functionList;
+
 	public CompilationUnit( String fileName, Package pack )
 	{
 		this.fileName = fileName;
 		this.pack = pack;
 		importList = new TypeImportList();
 		typeList = new TypeDeclarationList();
+		functionList = new FunctionList();
 	}
 
 	@Override
@@ -27,6 +30,7 @@ public class CompilationUnit extends TreeElement
 			accept(visitor, pack);
 			accept(visitor, importList);
 			accept(visitor, typeList);
+			accept(visitor, functionList);
 		}
 		visitor.finish(this);
 	}
@@ -59,6 +63,11 @@ public class CompilationUnit extends TreeElement
 	public TypeDeclarationList types()
 	{
 		return typeList;
+	}
+
+	public FunctionList functions()
+	{
+		return functionList;
 	}
 
 }
