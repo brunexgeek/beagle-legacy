@@ -1,13 +1,13 @@
 package beagle.compiler;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import beagle.compiler.tree.CompilationUnit;
-import beagle.compiler.tree.TreeVisitor;
 
 public class Main
 {
@@ -20,8 +20,10 @@ public class Main
 		for (String fileName : args)
 		{
 			String content = new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8);
+			File outputFile = new File(fileName);
+			String outputName = "/tmp/beagle_" + outputFile.getName() + ".c";
 
-			//System.out.println("Compiling '" + fileName + "'");
+			System.out.println("Compiling '" + fileName + "'");
 			IScanner scanner = new Scanner(context, new ScanString(fileName, content));
 			if (false)
 			{
@@ -36,13 +38,11 @@ public class Main
 				IParser parser = new Parser(context, scanner);
 				CompilationUnit unit = parser.parse();
 				if (unit == null) return;
-				HtmlVisitor visitor = new HtmlVisitor(new PrintStream(System.out));
-				visitor.print(unit);
-				//unit.print(new Printer(System.out), 0);
-				/*IModule module = new Module( new Name("beagle"));
-				module.addCompilationUnit(unit);
-				CodeGenerator codegen = new CodeGenerator(System.out);
-				codegen.visitModule(module, null);*/
+
+				FileOutputStream output = new FileOutputStream(outputName);
+				CodeGenerator codegen = new CodeGenerator(output);
+				codegen.generate(unit);
+				output.close();
 			}
 		}
 	}

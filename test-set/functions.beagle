@@ -5,9 +5,15 @@ import something.nice.to.see
 
 var counter = 0
 
-struct Test : Base
+struct Fruit
 {
-	var weight
+	var weight : int
+}
+
+
+struct Apple : Fruit 
+{
+	var radius : float
 }
 
 def function1( value : int  )
