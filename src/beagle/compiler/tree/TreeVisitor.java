@@ -398,4 +398,46 @@ public class TreeVisitor implements ITreeVisitor
 		finish();
 	}
 
+	@Override
+	public void finish(StorageList storageList)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(StorageList storageList)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(StorageDeclaration item)
+	{
+		return visit();
+	}
+
+	@Override
+	public boolean visit(Structure structure)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(Structure structure)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(StructureList structureList)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(StructureList structureList)
+	{
+		finish();
+	}
+
 }

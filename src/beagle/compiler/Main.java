@@ -36,8 +36,8 @@ public class Main
 				IParser parser = new Parser(context, scanner);
 				CompilationUnit unit = parser.parse();
 				if (unit == null) return;
-				TreeVisitor visitor = new HtmlVisitor(new PrintStream(System.out));
-				unit.accept(visitor);
+				HtmlVisitor visitor = new HtmlVisitor(new PrintStream(System.out));
+				visitor.print(unit);
 				//unit.print(new Printer(System.out), 0);
 				/*IModule module = new Module( new Name("beagle"));
 				module.addCompilationUnit(unit);

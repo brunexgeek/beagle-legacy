@@ -3,6 +3,30 @@ package beagle.compiler.tree;
 public class TypeReference extends TreeElement
 {
 
+	public static TypeReference UINT64 = new TypeReference(new Name("uint64"));
+
+	public static TypeReference UINT32 = new TypeReference(new Name("uint32"));
+
+	public static TypeReference UINT16 = new TypeReference(new Name("uint16"));
+
+	public static TypeReference UINT8 = new TypeReference(new Name("uint8"));
+
+	public static TypeReference INT64 = new TypeReference(new Name("int64"));
+
+	public static TypeReference INT32 = new TypeReference(new Name("int32"));
+
+	public static TypeReference INT16 = new TypeReference(new Name("int16"));
+
+	public static TypeReference INT8 = new TypeReference(new Name("int8"));
+
+	public static TypeReference FLOAT64 = new TypeReference(new Name("float64"));
+
+	public static TypeReference FLOAT32 = new TypeReference(new Name("float32"));
+
+	public static TypeReference STRING = new TypeReference(new Name("string"));
+
+	public static TypeReference BOOL = new TypeReference(new Name("bool"));
+
 	private Package pack;
 
 	private TypeDeclaration type;

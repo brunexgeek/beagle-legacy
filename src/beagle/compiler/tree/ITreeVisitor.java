@@ -142,4 +142,18 @@ public interface ITreeVisitor
 	boolean visit(FunctionList functionList);
 
 	void finish(FunctionList functionList);
+
+	void finish(StorageList storageList);
+
+	boolean visit(StorageList storageList);
+
+	boolean visit(StorageDeclaration item);
+
+	boolean visit(Structure structure);
+
+	void finish(Structure structure);
+
+	boolean visit(StructureList structureList);
+
+	void finish(StructureList structureList);
 }

@@ -15,34 +15,33 @@ import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
-import beagle.compiler.tree.Block;
-import beagle.compiler.tree.IExpression;
-import beagle.compiler.tree.Package;
-import beagle.compiler.tree.IStatement;
-import beagle.compiler.tree.TypeDeclarationList;
-import beagle.compiler.tree.TypeImport;
-import beagle.compiler.tree.TypeReference;
-import beagle.compiler.tree.IfThenElseStmt;
-import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.Function;
 import beagle.compiler.tree.FunctionList;
+import beagle.compiler.tree.IExpression;
+import beagle.compiler.tree.IStatement;
+import beagle.compiler.tree.IfThenElseStmt;
+import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.Modifiers;
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.NameLiteral;
 import beagle.compiler.tree.NullLiteral;
+import beagle.compiler.tree.Package;
 import beagle.compiler.tree.ReturnStmt;
 import beagle.compiler.tree.StorageDeclaration;
 import beagle.compiler.tree.StringLiteral;
-import beagle.compiler.tree.TreeVisitor;
+import beagle.compiler.tree.Structure;
+import beagle.compiler.tree.StructureList;
 import beagle.compiler.tree.TypeBody;
 import beagle.compiler.tree.TypeDeclaration;
+import beagle.compiler.tree.TypeDeclarationList;
+import beagle.compiler.tree.TypeImport;
 import beagle.compiler.tree.TypeImportList;
 import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.TypeReferenceList;
 import beagle.compiler.tree.UnaryExpression;
 import beagle.compiler.tree.VariableDeclaration;
 
-public class HtmlVisitor extends TreeVisitor
+public class HtmlVisitor
 {
 
 	PrintStream out;
@@ -158,7 +157,7 @@ public class HtmlVisitor extends TreeVisitor
 		return true;
 	}
 
-	public boolean visit(CompilationUnit target)
+	public boolean print(CompilationUnit target)
 	{
 		printCompilationUnit(target);
 		return false;
@@ -230,11 +229,26 @@ public class HtmlVisitor extends TreeVisitor
 		attribute("fileName", target.fileName());
 		printPackage(target.namespace());
 		printTypeImportList(target.imports());
+		printStructures(target.structures);
 		printFunctions(target.functions());
 		printTypes(target.types());
 		out.append("</body></html>");
 	}
 
+
+	private void printStructures(StructureList target)
+	{
+		open("structures", target.getClass());
+		for (Structure item: target)
+		{
+			open(item.getClass());
+			attribute("name", item.name.getClass(), item.name.qualifiedName());
+			printTypeReference("parent", item.parent);
+			printTypeBody(item.body);
+			close();
+		}
+		close();
+	}
 
 	public void printFunctions( FunctionList target )
 	{
@@ -313,15 +327,14 @@ public class HtmlVisitor extends TreeVisitor
 
 	public void printTypeBody(TypeBody target)
 	{
+		if (target.storages.size() == 0 && target.functions.size() == 0) return;
+
 		open("body", target.getClass());
 
-		for (ConstantDeclaration item : target.constants())
+		for (StorageDeclaration item : target.storages)
 			printConstantOrVariable(true, item);
 
-		for (VariableDeclaration item : target.variables())
-			printConstantOrVariable(true, item);
-
-		for (Function item : target.methods())
+		for (Function item : target.functions)
 			printFunction(item);
 
 		close();
@@ -330,6 +343,8 @@ public class HtmlVisitor extends TreeVisitor
 
 	public void printTypes(TypeDeclarationList target)
 	{
+		if (target.size() == 0) return;
+
 		open("types", target.getClass());
 		for (TypeDeclaration item : target)
 		{
@@ -370,17 +385,22 @@ public class HtmlVisitor extends TreeVisitor
 
 	public void printTypeReference(TypeReference target)
 	{
+		printTypeReference("type", target);
+	}
+
+	public void printTypeReference(String name, TypeReference target)
+	{
 		if (target == null) return;
 
 		if (target.parent() instanceof TypeReferenceList)
 		{
 			open(target.getClass());
-			attribute("type", target.getClass(), target.qualifiedName());
+			attribute(name, target.getClass(), target.qualifiedName());
 			close();
 		}
 		else
 		{
-			attribute("type", target.getClass(), target.qualifiedName());
+			attribute(name, target.getClass(), target.qualifiedName());
 		}
 	}
 

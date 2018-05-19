@@ -1,18 +1,15 @@
 package beagle.compiler.tree;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class TypeBody extends TreeElement
 {
 
-	List<ConstantDeclaration> constants;
+	public List<StorageDeclaration> storages;
 
-	List<VariableDeclaration> variables;
+	public List<Function> functions;
 
-	List<Function> methods;
-
-	TypeDeclaration parent;
+	public TypeDeclaration parent;
 
 	public TypeBody()
 	{
@@ -21,45 +18,9 @@ public class TypeBody extends TreeElement
 
 	public TypeBody( TypeDeclaration parent )
 	{
-		this.methods = new LinkedList<>();
-		this.variables = new LinkedList<>();
-		this.constants = new LinkedList<>();
+		this.functions = new FunctionList();
+		this.storages = new StorageList();
 		this.parent = parent;
-	}
-
-//	@Override
-//	public void print(Printer out, int level)
-//	{
-//		out.printTag("Body", level);
-//		out.println();
-//		for (IMethodDeclaration item : methods)
-//			item.print(out, level + 1);
-//	}
-
-	public List<Function> methods()
-	{
-		return methods;
-	}
-
-	@Override
-	public TypeDeclaration parent()
-	{
-		return parent;
-	}
-
-	public void parent( TypeDeclaration parent)
-	{
-		this.parent = parent;
-	}
-
-	public List<VariableDeclaration> variables()
-	{
-		return variables;
-	}
-
-	public List<ConstantDeclaration> constants()
-	{
-		return constants;
 	}
 
 	@Override
@@ -67,11 +28,9 @@ public class TypeBody extends TreeElement
 	{
 		if (visitor.visit(this))
 		{
-			for (ConstantDeclaration item : constants)
+			for (StorageDeclaration item : storages)
 				item.accept(visitor);
-			for (VariableDeclaration item : variables)
-				item.accept(visitor);
-			for (Function item : methods)
+			for (Function item : functions)
 				item.accept(visitor);
 		}
 		visitor.finish(this);

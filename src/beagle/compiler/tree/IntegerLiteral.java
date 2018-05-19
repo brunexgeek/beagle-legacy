@@ -21,4 +21,11 @@ public class IntegerLiteral extends Literal<Long>
 		return Long.toString(value);
 	}
 
+	@Override
+	public TypeReference type()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

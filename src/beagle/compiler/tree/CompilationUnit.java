@@ -13,6 +13,10 @@ public class CompilationUnit extends TreeElement
 
 	private FunctionList functionList;
 
+	private StorageList storage;
+
+	public StructureList structures;
+
 	public CompilationUnit( String fileName, Package pack )
 	{
 		this.fileName = fileName;
@@ -20,6 +24,13 @@ public class CompilationUnit extends TreeElement
 		importList = new TypeImportList();
 		typeList = new TypeDeclarationList();
 		functionList = new FunctionList();
+		storage = new StorageList();
+		structures = new StructureList();
+	}
+
+	public StorageList storages()
+	{
+		return storage;
 	}
 
 	@Override

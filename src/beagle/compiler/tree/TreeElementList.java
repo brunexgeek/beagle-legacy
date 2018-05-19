@@ -30,6 +30,7 @@ public abstract class TreeElementList<T extends ITreeElement> extends LinkedList
 	@Override
 	public boolean add(T value)
 	{
+		if (value == null) return false;
 		if (super.add(value))
 		{
 			value.parent(this);

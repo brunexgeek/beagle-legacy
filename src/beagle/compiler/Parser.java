@@ -3,8 +3,8 @@ package beagle.compiler;
 import static beagle.compiler.TokenType.TOK_AND;
 import static beagle.compiler.TokenType.TOK_ASSIGN;
 import static beagle.compiler.TokenType.TOK_COMA;
-import static beagle.compiler.TokenType.TOK_ELSE;
 import static beagle.compiler.TokenType.TOK_ELIF;
+import static beagle.compiler.TokenType.TOK_ELSE;
 import static beagle.compiler.TokenType.TOK_IF;
 import static beagle.compiler.TokenType.TOK_IN;
 import static beagle.compiler.TokenType.TOK_IS;
@@ -48,7 +48,9 @@ import beagle.compiler.tree.NameLiteral;
 import beagle.compiler.tree.NullLiteral;
 import beagle.compiler.tree.Package;
 import beagle.compiler.tree.ReturnStmt;
+import beagle.compiler.tree.StorageDeclaration;
 import beagle.compiler.tree.StringLiteral;
+import beagle.compiler.tree.Structure;
 import beagle.compiler.tree.TypeBody;
 import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeImport;
@@ -129,18 +131,89 @@ public class Parser implements IParser
 			if (tokens.peek().type == TokenType.TOK_AT)
 				annots = parseAnnotations();
 
+			// parse functions
 			if (tokens.peek().type == TokenType.TOK_DEF)
 			{
 				unit.functions().add(parseMethod(annots, null));
+			}
+			else
+			// parse variables and constants
+			if (tokens.peek().type == TokenType.TOK_VAR || tokens.peek().type == TokenType.TOK_CONST)
+			{
+				unit.storages().add((StorageDeclaration)parseVariableOrConstant(annots));
+			}
+			else
+			// parse structures
+			if (tokens.peek().type == TokenType.TOK_STRUCT)
+			{
+				unit.structures.add( parseStructure(annots) );
 			}
 			/*else
 			{
 				TypeDeclaration type = parseType(unit, annots);
 				unit.types().add(type);
 			}*/
-
+			else
+			{
+				context.listener.onError(null, "Unrecognized statement");
+				return null;
+			}
 		}
 		return unit;
+	}
+
+	Structure parseStructure(AnnotationList annots)
+	{
+		tokens.discard();
+
+		Structure current = new Structure();
+		if (expected(TokenType.TOK_NAME))
+			current.name = new Name(tokens.read().value);
+
+		if (tokens.peekType() == TokenType.TOK_COLON)
+		{
+			tokens.discard();
+			current.parent = new TypeReference(new Name(tokens.read().value));
+		}
+
+		current.body = parseTypeBody(false);
+		return current;
+	}
+
+	TypeBody parseTypeBody( boolean enableFunctions )
+	{
+		if (tokens.peekType() == TokenType.TOK_LEFT_BRACE)
+		{
+			tokens.discard();
+
+			TypeBody body = new TypeBody();
+
+			// parse every type member
+			while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
+			{
+				AnnotationList annots = parseAnnotations();
+				//IModifiers modifiers = parseModifiers();
+
+				// variable or constant
+				if (tokens.peekType() == TokenType.TOK_CONST || tokens.peekType() == TokenType.TOK_VAR)
+					body.storages.add( parseVariableOrConstant(annots) );
+				else
+				if (enableFunctions && tokens.peekType() == TokenType.TOK_DEF)
+				{
+					body.functions.add( parseMethod(annots, body) );
+				}
+				else
+				{
+					context.throwExpected(tokens.peek(), TokenType.TOK_VAR, TokenType.TOK_CONST);
+					break;
+				}
+			}
+
+			tokens.discard();
+			return body;
+		}
+
+		return null;
 	}
 
 	/**
@@ -317,15 +390,12 @@ public class Parser implements IParser
 				//IModifiers modifiers = parseModifiers();
 
 				// variable or constant
-				if (tokens.peekType() == TokenType.TOK_CONST)
-					body.constants().add( (ConstantDeclaration) parseVariableOrConstant(annots) );
-				else
-				if (tokens.peekType() == TokenType.TOK_VAR)
-					body.variables().add( (VariableDeclaration) parseVariableOrConstant(annots) );
+				if (tokens.peekType() == TokenType.TOK_CONST || tokens.peekType() == TokenType.TOK_VAR)
+					body.storages.add( (ConstantDeclaration) parseVariableOrConstant(annots) );
 				else
 				if (tokens.peekType() == TokenType.TOK_DEF)
 				{
-					body.methods().add( parseMethod(annots, body) );
+					body.functions.add( parseMethod(annots, body) );
 				}
 				else
 				{
@@ -354,7 +424,7 @@ public class Parser implements IParser
 	 *
 	 * @return
 	 */
-	ITreeElement parseVariableOrConstant( AnnotationList annots )
+	StorageDeclaration parseVariableOrConstant( AnnotationList annots )
 	{
 		// get 'var' or 'const' keyword
 		TokenType kind = tokens.peekType();

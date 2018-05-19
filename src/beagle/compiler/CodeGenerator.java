@@ -5,6 +5,7 @@ import java.io.PrintStream;
 
 import beagle.compiler.tree.Function;
 import beagle.compiler.tree.Module;
+import beagle.compiler.tree.StorageDeclaration;
 import beagle.compiler.tree.TreeVisitor;
 import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.VariableDeclaration;
@@ -31,7 +32,7 @@ public class CodeGenerator extends TreeVisitor
 		printer.print(current.qualifiedName());
 		printer.print(" = type { %.classref");
 
-		for (VariableDeclaration field : current.body().variables())
+		for (StorageDeclaration field : current.body().storages)
 		{
 			printer.print(", %.dyn.");
 			printer.print(field.type().qualifiedName());

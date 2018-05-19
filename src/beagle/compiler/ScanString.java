@@ -1,5 +1,7 @@
 package beagle.compiler;
 
+// TODO: read one character at time (instead of reading the entire file)
+
 /**
  * Class used by {@link Scanner} to retrieve characters from the input source code.
  */

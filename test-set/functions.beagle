@@ -3,7 +3,12 @@ package test
 
 import something.nice.to.see
 
+var counter = 0
 
+struct Test : Base
+{
+	var weight
+}
 
 def function1( value : int  )
 {
