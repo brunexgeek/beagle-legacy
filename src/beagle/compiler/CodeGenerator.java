@@ -53,13 +53,20 @@ public class CodeGenerator
 			printer.println("// " + value);
 	}
 
-	public void generate( CompilationUnit unit )
+	public void generate( Module module )
 	{
 		comment(" Beagle Compiler");
 		comment(" AUTO-GENERATED CODE - Do not edit!");
 
 		println("\n#include <beagle/base.h>");
 
+		generateStringTable();
+		for (CompilationUnit item : module.units.values())
+			generateUnit(item);
+	}
+
+	public void generateUnit( CompilationUnit unit )
+	{
 		generateStructures(unit.structures);
 	}
 
@@ -78,8 +85,9 @@ public class CodeGenerator
 
 	private void generateStructure(Structure item)
 	{
-		// static data
 		comment(item.name.qualifiedName());
+
+		// static data
 		print("typedef struct\n{\n   ");
 		if (item.parent != null)
 		{
@@ -95,7 +103,6 @@ public class CodeGenerator
 		// TODO: generate static fields
 
 		// dynamic data
-		comment(item.name.qualifiedName());
 		print("typedef struct\n{\n   ");
 		if (item.parent != null)
 		{
@@ -117,58 +124,52 @@ public class CodeGenerator
 		if (item.parent != null)
 			parentGlobal = nativeName("type_", item.parent.qualifiedName());
 
+		//
 		// global storage for static information
+		//
 		print("static ");
 		print(nativeTypeName(item.name.qualifiedName(), true));
 		print(" ");
 		print(typeGlobal);
-		print(";\n\n");
+		print(" = \n");
 
 		//
-		// static initializer function
+		// static initialization for global storage
 		//
 
 		// pointer to base type information
-		print("static void sinit_");
-		print(nativeName("", item.name.qualifiedName()));
-		print("()\n{\n   ");
-		print(typeGlobal);
-		print(".typeInfo__.base = ");
+		print("{\n   .typeInfo__.base = ");
 		if (item.parent == null)
-			print("NULL;\n");
+			print("NULL,\n");
 		else
 		{
 			print("&(");
 			print(parentGlobal);
-			print(".typeInfo__);\n");
+			print(".typeInfo__),\n");
 		}
 		// size of static information
 		print("   ");
-		print(typeGlobal);
-		print(".typeInfo__.staticSize = 0;\n");
+		print(".typeInfo__.staticSize = 0,\n");
 		// size of dynamic information
 		print("   ");
-		print(typeGlobal);
-		print(".typeInfo__.dynamicSize = 0;\n");
+		print(".typeInfo__.dynamicSize = 0,\n");
 		// qualified name
 		print("   ");
-		print(typeGlobal);
 		print(".typeInfo__.name = \"");
 		print(item.name.qualifiedName());
-		print("\";\n");
+		print("\",\n");
 		// pointer to base static information
 		print("   ");
-		print(typeGlobal);
 		print(".base__ = ");
 		if (item.parent == null)
-			print("NULL;\n");
+			print("NULL,\n");
 		else
 		{
 			print("&");
 			print(parentGlobal);
-			print(";\n");
+			print(",\n");
 		}
-		print("}\n\n");
+		print("};\n\n");
 	}
 
 	String nativeName( String prefix, String qualified )
@@ -186,22 +187,18 @@ public class CodeGenerator
 			return "dynamic_" + value + "_";
 	}
 
-	public boolean visit(TypeDeclaration current)
+	public void generateStringTable()
 	{
-		printer.println("; Type '" + current.qualifiedName() + "'");
+		comment("STRING TABLE");
+		print("static dynamic_string_ STRING_TABLE[] =\n{\n");
 
-		printer.print("%.dyn.");
-		printer.print(current.qualifiedName());
-		printer.print(" = type { %.classref");
+		print("   { .type__ = &type_string_, .length = ");
+		print("9");
+		print(", .content = \"");
+		print("My string");
+		print("\"},\n");
 
-		for (StorageDeclaration field : current.body().storages)
-		{
-			printer.print(", %.dyn.");
-			printer.print(field.type().qualifiedName());
-		}
-
-		printer.println(" }");
-		return true;
+		print("};");
 	}
 
 	public boolean visit(Module target)

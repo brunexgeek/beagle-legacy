@@ -5,6 +5,7 @@ import something.nice.to.see
 
 var counter = 0
 
+
 struct Fruit
 {
 	var weight : int
@@ -14,7 +15,9 @@ struct Fruit
 struct Apple : Fruit 
 {
 	var radius : float
+	var type : string
 }
+
 
 def function1( value : int  )
 {

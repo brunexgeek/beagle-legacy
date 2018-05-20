@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.Module;
+import beagle.compiler.tree.Name;
 
 public class Main
 {
@@ -38,10 +40,12 @@ public class Main
 				IParser parser = new Parser(context, scanner);
 				CompilationUnit unit = parser.parse();
 				if (unit == null) return;
+				Module module = new Module(new Name("myModule"));
+				module.units.put(unit.fileName(), unit);
 
 				FileOutputStream output = new FileOutputStream(outputName);
 				CodeGenerator codegen = new CodeGenerator(output);
-				codegen.generate(unit);
+				codegen.generate(module);
 				output.close();
 			}
 		}

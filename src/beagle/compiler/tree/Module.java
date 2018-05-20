@@ -6,9 +6,9 @@ import java.util.Map;
 public class Module extends TreeElement
 {
 
-	protected Name name;
+	public Name name;
 
-	protected HashMap<String, CompilationUnit> units;
+	public HashMap<String, CompilationUnit> units;
 
 	public Module( Name name )
 	{
