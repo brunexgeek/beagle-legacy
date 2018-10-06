@@ -2,15 +2,19 @@ package beagle.compiler;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Iterator;
 
+import beagle.compiler.tree.Block;
 import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.FormalParameter;
+import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.Function;
+import beagle.compiler.tree.FunctionList;
 import beagle.compiler.tree.Module;
-import beagle.compiler.tree.Name;
 import beagle.compiler.tree.StorageDeclaration;
+import beagle.compiler.tree.StorageList;
 import beagle.compiler.tree.Structure;
 import beagle.compiler.tree.StructureList;
-import beagle.compiler.tree.TypeDeclaration;
 import beagle.compiler.tree.TypeReference;
 
 public class CodeGenerator
@@ -20,10 +24,13 @@ public class CodeGenerator
 
 	protected PrintStream printer;
 
-	public CodeGenerator( OutputStream output )
+	protected CompilationContext context;
+
+	public CodeGenerator( CompilationContext context, OutputStream output )
 	{
 		this.output = output;
 		this.printer = new PrintStream(output);
+		this.context = context;
 	}
 
 	protected void println()
@@ -68,6 +75,51 @@ public class CodeGenerator
 	public void generateUnit( CompilationUnit unit )
 	{
 		generateStructures(unit.structures);
+		generateFunctions(unit.functions);
+	}
+
+	private void generateFunctions(FunctionList functions)
+	{
+		println();
+		comment("\nFUNCTIONS\n ");
+		println();
+
+		// generate C types and global variables;
+		for (Function item : functions)
+		{
+			generateFunction(item);
+		}
+	}
+
+	private void generateFunction(Function function)
+	{
+		comment(function.name().qualifiedName());
+		if (function.returnType() != null)
+			printTypeReference(function.returnType());
+		print("  ");
+		print(nativeName("def_", function.name().qualifiedName()));
+		generateParameterList(function.parameters());
+		generateBlock(function.body());
+		println();
+	}
+
+	private void generateParameterList( FormalParameterList params )
+	{
+		print("(");
+		for (Iterator<FormalParameter> it = params.iterator(); it.hasNext();)
+		{
+			FormalParameter current = it.next();
+			printTypeReference(current.type());
+			print(current.name().qualifiedName());
+
+			if (it.hasNext()) print(", ");
+		}
+		print(")");
+	}
+
+	private void generateBlock( Block block )
+	{
+		print("{ }");
 	}
 
 	private void generateStructures(StructureList structures)
@@ -113,11 +165,13 @@ public class CodeGenerator
 			comment("no base type");
 		print("   ");
 		print(nativeTypeName(item.name.qualifiedName(), true));
-		print(" *type__;");
-		print("\n   // no dynamic fields\n} ");
+		print(" *type__;\n");
+		//print("\n   // no dynamic fields\n} ");
+		generateStorageList(item.body.storages);
+		print("\n} ");
 		print(nativeTypeName(item.name.qualifiedName(), false));
 		print(";\n\n");
-		// TODO: generate static fields
+
 
 		String typeGlobal = nativeName("type_", item.name.qualifiedName());
 		String parentGlobal = null;
@@ -149,10 +203,14 @@ public class CodeGenerator
 		}
 		// size of static information
 		print("   ");
-		print(".typeInfo__.staticSize = 0,\n");
+		print(".typeInfo__.staticSize = sizeof(");
+		print(nativeTypeName(item.name.qualifiedName(), true));
+		print("),\n");
 		// size of dynamic information
 		print("   ");
-		print(".typeInfo__.dynamicSize = 0,\n");
+		print(".typeInfo__.dynamicSize = sizeof(");
+		print(nativeTypeName(item.name.qualifiedName(), false));
+		print("),\n");
 		// qualified name
 		print("   ");
 		print(".typeInfo__.name = \"");
@@ -172,6 +230,21 @@ public class CodeGenerator
 		print("};\n\n");
 	}
 
+	void generateStorageList( StorageList storages )
+	{
+		if (storages.isEmpty())
+		{
+			print("   // no dynamic fields\n");
+			return;
+		}
+		for (StorageDeclaration storage : storages)
+		{
+			printTypeReference(storage.type());
+			print(storage.name().qualifiedName());
+			print(";\n");
+		}
+	}
+
 	String nativeName( String prefix, String qualified )
 	{
 		String value = qualified.replaceAll("\\.", "_");
@@ -187,31 +260,36 @@ public class CodeGenerator
 			return "dynamic_" + value + "_";
 	}
 
+	void printTypeReference( TypeReference ref )
+	{
+		if (ref.isPrimitive)
+		{
+			print("beagle_");
+			print(ref.qualifiedName());
+		}
+		else
+		{
+			print(nativeTypeName(ref.qualifiedName(), false));
+			print("*");
+		}
+		print(" ");
+	}
+
 	public void generateStringTable()
 	{
 		comment("STRING TABLE");
-		print("static dynamic_string_ STRING_TABLE[] =\n{\n");
+		print("static const dynamic_string_ STRING_TABLE[] =\n{\n");
 
-		print("   { .type__ = &type_string_, .length = ");
-		print("9");
-		print(", .content = \"");
-		print("My string");
-		print("\"},\n");
+		for (String item : context.stringTable)
+		{
+			print("   { .type__ = &type_string_, .length = ");
+			print(Integer.toString(item.length()));
+			print(", .content = \"");
+			print(item);
+			print("\"},\n");
+		}
 
 		print("};");
-	}
-
-	public boolean visit(Module target)
-	{
-		printer.println("; module '" + target.name().qualifiedName() + "'");
-		return true;
-	}
-
-	public boolean visit(Function target)
-	{
-		printer.println("; method of '" + "'");
-		printer.println("define void @" + target.name().qualifiedName() + "() {}");
-		return true;
 	}
 
 }

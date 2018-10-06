@@ -3,10 +3,17 @@ package beagle.compiler;
 import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.FormalParameter;
+import beagle.compiler.tree.FormalParameterList;
+import beagle.compiler.tree.Function;
+import beagle.compiler.tree.FunctionList;
 import beagle.compiler.tree.IExpression;
 import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.StorageDeclaration;
+import beagle.compiler.tree.StorageList;
 import beagle.compiler.tree.StringLiteral;
+import beagle.compiler.tree.Structure;
+import beagle.compiler.tree.StructureList;
 import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.UnaryExpression;
 
@@ -20,14 +27,52 @@ public class Semantic
 		this.context = context;
 	}
 
-	public void processStogare( CompilationUnit unit )
+	public void typeInference( CompilationUnit unit )
+	{
+		// evaluate variables and constants
+		typeInference(unit.storages());
+		// evaluate structures
+		typeInference(unit.structures);
+		// evaluate functions
+		typeInference(unit.functions);
+	}
+
+	public void typeInference( StorageList storages )
+	{
+		for (StorageDeclaration item : storages )
+		{
+			if (item.type() != null) continue;
+			if (item.initializer() == null)
+			{
+				context.listener.onError(item.location(), "Missing type or initializer");
+				return;
+			}
+			item.type( evaluateExpression(item.initializer()) );
+		}
+	}
+
+	public void typeInference( StructureList structures )
+	{
+		for (Structure item : structures )
+			typeInference(item.body.storages);
+	}
+
+	public void typeInference( FunctionList functions )
+	{
+		for (Function function : functions )
+		{
+			// TODO: iterate recursively into function blocks looking for storages
+		}
+	}
+
+	public void processStorage( CompilationUnit unit )
 	{
 		for (StorageDeclaration item : unit.storages() )
 		{
 			if (item.type() != null) continue;
 			if (item.initializer() == null)
 			{
-				context.listener.onError(null, "Missing type");
+				context.listener.onError(item.location(), "Missing type");
 				return;
 			}
 
@@ -65,7 +110,7 @@ public class Semantic
 				case TOK_GT:
 					if (left != right)
 					{
-						context.listener.onError(null, "Binary expression with argument of different type");
+						context.listener.onError(expr.location(), "Binary expression with arguments of different type");
 						return null;
 					}
 					return TypeReference.BOOL;

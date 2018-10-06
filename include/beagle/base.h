@@ -38,4 +38,6 @@ static static_string_ type_string_ =
    .base__ = NULL
 };
 
+typedef const dynamic_string_ *beagle_string;
+
 #endif // BEAGLE_BASE_H

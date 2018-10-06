@@ -1,10 +1,13 @@
 package beagle.compiler.tree;
 
+import beagle.compiler.SourceLocation;
 
 public abstract class TreeElement implements ITreeElement
 {
 
 	protected ITreeElement parent;
+
+	protected SourceLocation location;
 
 	@Override
 	public void accept(ITreeVisitor visitor, ITreeElement child)
@@ -22,6 +25,17 @@ public abstract class TreeElement implements ITreeElement
 	public void parent(ITreeElement parent)
 	{
 		this.parent = parent;
+	}
+
+	@Override
+	public SourceLocation location()
+	{
+		return location;
+	}
+
+	public void location( SourceLocation location )
+	{
+		this.location = location;
 	}
 
 	/*@Override

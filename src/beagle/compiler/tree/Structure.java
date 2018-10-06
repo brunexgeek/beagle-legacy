@@ -5,7 +5,9 @@ public class Structure extends TreeElement
 
 	public TypeReference parent;
 
-	public StorageList storages;
+	//public StorageList storages = new StorageList();
+
+	//public FunctionList functions = new FunctionList();
 
 	public Name name;
 
@@ -16,9 +18,9 @@ public class Structure extends TreeElement
 	{
 		if (visitor.visit(this))
 		{
-			visitor.visit(parent);
-			for (StorageDeclaration item : storages)
-				visitor.visit(item);
+			visitor.visit(body);
+			//for (StorageDeclaration item : storages)
+			//	visitor.visit(item);
 		}
 		visitor.finish(this);
 	}

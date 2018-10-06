@@ -240,7 +240,8 @@ public class ScanString
 		return ' ';
 	}
 
-    private int hexDigit(char value) {
+    private int hexDigit(char value)
+    {
         if (value >= '0' && value <= '9')
         	return value - '0';
     	if (value >= 'a' && value <= 'f')

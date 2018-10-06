@@ -59,7 +59,7 @@ public class PrintTree
 			visitor.print(unit);
 
 			Semantic sem = new Semantic(context);
-			sem.processStogare(unit);
+			sem.processStorage(unit);
 		}
 
 		os.close();

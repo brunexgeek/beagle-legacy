@@ -104,6 +104,7 @@ public enum TokenType
 	TOK_SHR_ASSIGN(">>=", false),
 	TOK_STATIC("static", true),
 	TOK_STRING_LITERAL("string literal", false),
+	TOK_MSTRING_LITERAL("multiline string literal", false),
 	TOK_SUPER("super", true),
 	TOK_SUSPEND("suspend", true),
 	TOK_SWITCH("switch", true),

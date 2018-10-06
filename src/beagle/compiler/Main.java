@@ -43,10 +43,14 @@ public class Main
 				Module module = new Module(new Name("myModule"));
 				module.units.put(unit.fileName(), unit);
 
+				Semantic semantic = new Semantic(context);
+				semantic.typeInference(unit);
+
 				FileOutputStream output = new FileOutputStream(outputName);
-				CodeGenerator codegen = new CodeGenerator(output);
+				CodeGenerator codegen = new CodeGenerator(context, output);
 				codegen.generate(module);
 				output.close();
+				System.out.println("Generated '" + outputName + "'");
 			}
 		}
 	}

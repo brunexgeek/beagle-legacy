@@ -353,6 +353,8 @@ public class Scanner implements IScanner
 	Token processString()
 	{
 		char type = source.peek();
+		if (source.lookahead(type, type, type) == LookaheadStatus.MATCH)
+			return processMultilineString();
 		source.next();
 
 		Capture capture = new Capture();
@@ -368,6 +370,32 @@ public class Scanner implements IScanner
 		}
 		else
 			return createToken(TokenType.TOK_STRING_LITERAL, capture.toString());
+	}
+
+	Token processMultilineString()
+	{
+		char type = source.peek();
+		source.next(3);
+		Capture capture = new Capture();
+		while (source.lookahead(type, type, type) != LookaheadStatus.MATCH && source.peek() != ScanString.EOI)
+		{
+			// FIXME: validate and expands escape sequences
+			char c = source.peek();
+			if (c == '\n')
+				capture.push("\\n");
+			else
+				capture.push(c);
+			source.next();
+		}
+		if (source.peek() != type)
+		{
+			return returnError("Unterminated string");
+		}
+		else
+		{
+			source.next(2);
+			return createToken(TokenType.TOK_MSTRING_LITERAL, capture.toString());
+		}
 	}
 
 	Comment processBlockComment()

@@ -39,7 +39,6 @@ import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.Function;
 import beagle.compiler.tree.IExpression;
 import beagle.compiler.tree.IStatement;
-import beagle.compiler.tree.ITreeElement;
 import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.Modifiers;
@@ -134,7 +133,7 @@ public class Parser implements IParser
 			// parse functions
 			if (tokens.peek().type == TokenType.TOK_DEF)
 			{
-				unit.functions().add(parseMethod(annots, null));
+				unit.functions.add(parseFunction(annots, null));
 			}
 			else
 			// parse variables and constants
@@ -147,6 +146,13 @@ public class Parser implements IParser
 			if (tokens.peek().type == TokenType.TOK_STRUCT)
 			{
 				unit.structures.add( parseStructure(annots) );
+			}
+			else
+			// parse block comments (originally a multiline string literal)
+			if (tokens.peek().type == TokenType.TOK_MSTRING_LITERAL)
+			{
+				context.stringTable.add(tokens.peek().value);
+				tokens.discard();
 			}
 			/*else
 			{
@@ -173,12 +179,45 @@ public class Parser implements IParser
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
 			tokens.discard();
-			current.parent = new TypeReference(new Name(tokens.read().value));
+			current.parent = TypeReference.fromName(new Name(tokens.read().value));
 		}
 
 		current.body = parseTypeBody(false);
 		return current;
 	}
+/*
+	void parseStructureBody( Structure structure, boolean enableFunctions )
+	{
+		if (tokens.peekType() == TokenType.TOK_LEFT_BRACE)
+		{
+			tokens.discard();
+
+			// parse every type member
+			while (tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
+			{
+				AnnotationList annots = parseAnnotations();
+				//IModifiers modifiers = parseModifiers();
+
+				// variable or constant
+				if (tokens.peekType() == TokenType.TOK_CONST || tokens.peekType() == TokenType.TOK_VAR)
+					structure.storages.add( parseVariableOrConstant(annots) );
+				else
+				if (enableFunctions && tokens.peekType() == TokenType.TOK_DEF)
+				{
+					// TODO: should set the parent
+					structure.functions.add( parseFunction(annots, null) );
+				}
+				else
+				{
+					context.throwExpected(tokens.peek(), TokenType.TOK_VAR, TokenType.TOK_CONST);
+					break;
+				}
+			}
+
+			tokens.discard();
+		}
+	}*/
+
 
 	TypeBody parseTypeBody( boolean enableFunctions )
 	{
@@ -200,7 +239,7 @@ public class Parser implements IParser
 				else
 				if (enableFunctions && tokens.peekType() == TokenType.TOK_DEF)
 				{
-					body.functions.add( parseMethod(annots, body) );
+					body.functions.add( parseFunction(annots, body) );
 				}
 				else
 				{
@@ -241,6 +280,7 @@ public class Parser implements IParser
 		if (!expected(TokenType.TOK_NAME))
 			return null;
 
+		SourceLocation location = tokens.peek().location;
 		Name result = new Name(tokens.peek().value);
 		tokens.discard();
 
@@ -252,6 +292,7 @@ public class Parser implements IParser
 			tokens.discard(2);
 		}
 
+		result.location(location);
 		return result;
 	}
 
@@ -395,7 +436,7 @@ public class Parser implements IParser
 				else
 				if (tokens.peekType() == TokenType.TOK_DEF)
 				{
-					body.functions.add( parseMethod(annots, body) );
+					body.functions.add( parseFunction(annots, body) );
 				}
 				else
 				{
@@ -431,6 +472,7 @@ public class Parser implements IParser
 		tokens.discard();
 
 		Name name = parseName(false);
+		SourceLocation location = name.location();
 		TypeReference type = null;
 		IExpression initializer = null;
 
@@ -438,7 +480,7 @@ public class Parser implements IParser
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
 			tokens.discard(1);
-			type = new TypeReference( parseName() );
+			type = TypeReference.fromName( parseName() );
 		}
 
 		if (tokens.peekType() == TokenType.TOK_ASSIGN)
@@ -453,10 +495,13 @@ public class Parser implements IParser
 			return null;
 		}
 
+		StorageDeclaration result;
 		if (kind == TokenType.TOK_CONST)
-			return new ConstantDeclaration(annots, name, type, initializer);
+			result = new ConstantDeclaration(annots, name, type, initializer);
 		else
-			return new VariableDeclaration(annots, name, type, initializer);
+			result = new VariableDeclaration(annots, name, type, initializer);
+		result.location(location);
+		return result;
 	}
 
 
@@ -469,7 +514,7 @@ public class Parser implements IParser
 	 * @param type
 	 * @param body
 	 */
-	Function parseMethod( AnnotationList annots, TypeBody body )
+	Function parseFunction( AnnotationList annots, TypeBody body )
 	{
 		if (!expected(TokenType.TOK_DEF)) return null;
 		tokens.discard();
@@ -483,7 +528,8 @@ public class Parser implements IParser
 		if (tokens.peekType() == TokenType.TOK_COLON)
 		{
 			tokens.discard(1);
-			type = new TypeReference( parseName() );
+			type = TypeReference.fromName( parseName() );
+			type.location(type.name().location());
 		}
 
 		Block block = parseBlock();
@@ -526,7 +572,7 @@ public class Parser implements IParser
 			if (!expected(TokenType.TOK_COLON)) return null;
 			tokens.discard();
 			typeName = parseName();
-			output.add( new FormalParameter(name, new TypeReference(typeName)) );
+			output.add( new FormalParameter(name, TypeReference.fromName(typeName)) );
 		}
 
 		tokens.discard(); // )
@@ -555,7 +601,7 @@ public class Parser implements IParser
 			}
 
 			extended = new TypeReferenceList();
-			extended.add( new TypeReference( parseName() ) );
+			extended.add( TypeReference.fromName( parseName() ) );
 
 			while (true)
 			{
@@ -563,7 +609,7 @@ public class Parser implements IParser
 					break;
 
 				tokens.discard();
-				extended.add( new TypeReference( parseName() ) );
+				extended.add( TypeReference.fromName( parseName() ) );
 			}
 		}
 
@@ -591,7 +637,7 @@ public class Parser implements IParser
 			tokens.discard();
 			Name name = parseName();
 			if (name == null) return null;
-			output.add( new Annotation( new TypeReference(name)));
+			output.add( new Annotation( TypeReference.fromName(name)));
 		}
 
 		return output;
@@ -1221,7 +1267,9 @@ public class Parser implements IParser
 
 	StringLiteral parseStringLiteral()
 	{
-		return new StringLiteral(tokens.read().value);
+		String value = tokens.read().value;
+		context.stringTable.add(value);
+		return new StringLiteral(value);
 	}
 
 	BooleanLiteral parseBooleanLiteral()

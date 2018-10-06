@@ -6,6 +6,11 @@ import something.nice.to.see
 var counter = 0
 
 
+'''
+This string spans
+   across multiple
+      lines.
+'''
 struct Fruit
 {
 	var weight : int
@@ -15,7 +20,7 @@ struct Fruit
 struct Apple : Fruit 
 {
 	var radius : float
-	var type : string
+	var type : string = "Teste "
 }
 
 
@@ -27,7 +32,7 @@ def function1( value : int  )
 }
 
 
-def function2( x : float, y : float )
+def function2( x : float, y : float ) : float
 {
 	return (x / y) + 22
 }
@@ -35,11 +40,12 @@ def function2( x : float, y : float )
 
 def function3( value : int  ) : string
 {
+	var bla  = "Hello"
 	var temp = 66
 	if value > 0 then
 	{ 
 		temp *= 1
-		bla = 0
+		bla = bla + " world!"
 	}
 	elif value == 0 then
 		temp += 88 / 9 % 3

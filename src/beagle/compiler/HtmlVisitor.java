@@ -230,7 +230,7 @@ public class HtmlVisitor
 		printPackage(target.namespace());
 		printTypeImportList(target.imports());
 		printStructures(target.structures);
-		printFunctions(target.functions());
+		printFunctions(target.functions);
 		printTypes(target.types());
 		out.append("</body></html>");
 	}

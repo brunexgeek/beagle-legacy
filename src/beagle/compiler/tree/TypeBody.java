@@ -1,13 +1,11 @@
 package beagle.compiler.tree;
 
-import java.util.List;
-
 public class TypeBody extends TreeElement
 {
 
-	public List<StorageDeclaration> storages;
+	public StorageList storages;
 
-	public List<Function> functions;
+	public FunctionList functions;
 
 	public TypeDeclaration parent;
 

@@ -1,6 +1,8 @@
 package beagle.compiler;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import beagle.compiler.tree.Name;
 import beagle.compiler.tree.Package;
@@ -27,12 +29,15 @@ public class CompilationContext
 
 	public CompilationListener listener;
 
+	public Set<String> stringTable;
+
 
 	public CompilationContext( CompilationListener listener )
 	{
 		this.types = new HashMap<>();
 		this.packages = new HashMap<>();
 		this.listener = listener;
+		this.stringTable = new HashSet<String>();
 	}
 
 

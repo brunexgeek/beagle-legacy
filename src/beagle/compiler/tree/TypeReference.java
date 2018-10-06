@@ -3,29 +3,29 @@ package beagle.compiler.tree;
 public class TypeReference extends TreeElement
 {
 
-	public static TypeReference UINT64 = new TypeReference(new Name("uint64"));
+	public static TypeReference UINT64 = new TypeReference(new Name("uint64"), true);
 
-	public static TypeReference UINT32 = new TypeReference(new Name("uint32"));
+	public static TypeReference UINT32 = new TypeReference(new Name("uint32"), true);
 
-	public static TypeReference UINT16 = new TypeReference(new Name("uint16"));
+	public static TypeReference UINT16 = new TypeReference(new Name("uint16"), true);
 
-	public static TypeReference UINT8 = new TypeReference(new Name("uint8"));
+	public static TypeReference UINT8 = new TypeReference(new Name("uint8"), true);
 
-	public static TypeReference INT64 = new TypeReference(new Name("int64"));
+	public static TypeReference INT64 = new TypeReference(new Name("int64"), true);
 
-	public static TypeReference INT32 = new TypeReference(new Name("int32"));
+	public static TypeReference INT32 = new TypeReference(new Name("int32"), true);
 
-	public static TypeReference INT16 = new TypeReference(new Name("int16"));
+	public static TypeReference INT16 = new TypeReference(new Name("int16"), true);
 
-	public static TypeReference INT8 = new TypeReference(new Name("int8"));
+	public static TypeReference INT8 = new TypeReference(new Name("int8"), true);
 
-	public static TypeReference FLOAT64 = new TypeReference(new Name("float64"));
+	public static TypeReference FLOAT64 = new TypeReference(new Name("float64"), true);
 
-	public static TypeReference FLOAT32 = new TypeReference(new Name("float32"));
+	public static TypeReference FLOAT32 = new TypeReference(new Name("float32"), true);
 
-	public static TypeReference STRING = new TypeReference(new Name("string"));
+	public static TypeReference STRING = new TypeReference(new Name("string"), true);
 
-	public static TypeReference BOOL = new TypeReference(new Name("bool"));
+	public static TypeReference BOOL = new TypeReference(new Name("bool"), true);
 
 	private Package pack;
 
@@ -34,6 +34,8 @@ public class TypeReference extends TreeElement
 	private Name typeName;
 
 	private Name packageName;
+
+	public boolean isPrimitive = false;
 
 	public TypeReference( Name qualifiedName )
 	{
@@ -58,6 +60,11 @@ public class TypeReference extends TreeElement
 		this.packageName = packageName;
 	}
 
+	private TypeReference( Name typeName, boolean isPrimitive )
+	{
+		this.typeName= typeName;
+		this.isPrimitive = isPrimitive;
+	}
 
 	public Name name()
 	{
@@ -107,12 +114,54 @@ public class TypeReference extends TreeElement
 		visitor.finish(this);
 	}
 
-//	@Override
-//	public void print(Printer out, int level)
-//	{
-//		out.printTag(getClass().getSimpleName(), level);
-//		out.printAttribute("type", getQualifiedName());
-//		out.println();
-//	}
+	public static TypeReference fromName( Name name )
+	{
+		if (name.qualifiedName().equals("int"))
+			return INT32;
+		else
+		if (name.qualifiedName().equals(STRING.qualifiedName()))
+			return STRING;
+		else
+		if (name.qualifiedName().equals(BOOL.qualifiedName()))
+			return BOOL;
+		else
+		if (name.qualifiedName().equals("float"))
+			return FLOAT32;
+		else
+		if (name.qualifiedName().equals("double"))
+			return FLOAT64;
+		else
+		if (name.qualifiedName().equals(UINT64.qualifiedName()))
+			return UINT64;
+		else
+		if (name.qualifiedName().equals(UINT32.qualifiedName()))
+			return UINT32;
+		else
+		if (name.qualifiedName().equals(UINT16.qualifiedName()))
+			return UINT16;
+		else
+		if (name.qualifiedName().equals(UINT8.qualifiedName()))
+			return UINT8;
+		else
+		if (name.qualifiedName().equals(INT64.qualifiedName()))
+			return INT64;
+		else
+		if (name.qualifiedName().equals(INT32.qualifiedName()))
+			return INT32;
+		else
+		if (name.qualifiedName().equals(INT16.qualifiedName()))
+			return INT16;
+		else
+		if (name.qualifiedName().equals(INT8.qualifiedName()))
+			return INT8;
+		else
+		if (name.qualifiedName().equals(FLOAT64.qualifiedName()))
+			return FLOAT64;
+		else
+		if (name.qualifiedName().equals(FLOAT32.qualifiedName()))
+			return FLOAT32;
+		else
+			return new TypeReference(name);
+	}
 
 }

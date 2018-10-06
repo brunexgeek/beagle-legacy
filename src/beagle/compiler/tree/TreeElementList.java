@@ -2,12 +2,16 @@ package beagle.compiler.tree;
 
 import java.util.LinkedList;
 
+import beagle.compiler.SourceLocation;
+
 public abstract class TreeElementList<T extends ITreeElement> extends LinkedList<T> implements ITreeElementList<T>
 {
 
 	private static final long serialVersionUID = -7963184275285204232L;
 
 	protected ITreeElement parent;
+
+	protected SourceLocation location;
 
 	@Override
 	public void accept(ITreeVisitor visitor, ITreeElement child)
@@ -37,5 +41,16 @@ public abstract class TreeElementList<T extends ITreeElement> extends LinkedList
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public SourceLocation location()
+	{
+		return location;
+	}
+
+	public void location( SourceLocation location )
+	{
+		this.location = location;
 	}
 }

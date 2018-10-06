@@ -11,8 +11,11 @@ public class CompilationUnit extends TreeElement
 
 	private TypeDeclarationList typeList;
 
-	private FunctionList functionList;
+	public FunctionList functions;
 
+	/**
+	 * Global variables and constants.
+	 */
 	private StorageList storage;
 
 	public StructureList structures;
@@ -23,7 +26,7 @@ public class CompilationUnit extends TreeElement
 		this.pack = pack;
 		importList = new TypeImportList();
 		typeList = new TypeDeclarationList();
-		functionList = new FunctionList();
+		functions = new FunctionList();
 		storage = new StorageList();
 		structures = new StructureList();
 	}
@@ -41,7 +44,7 @@ public class CompilationUnit extends TreeElement
 			accept(visitor, pack);
 			accept(visitor, importList);
 			accept(visitor, typeList);
-			accept(visitor, functionList);
+			accept(visitor, functions);
 		}
 		visitor.finish(this);
 	}
@@ -74,11 +77,6 @@ public class CompilationUnit extends TreeElement
 	public TypeDeclarationList types()
 	{
 		return typeList;
-	}
-
-	public FunctionList functions()
-	{
-		return functionList;
 	}
 
 }
