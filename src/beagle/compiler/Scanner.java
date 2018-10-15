@@ -479,6 +479,12 @@ public class Scanner implements IScanner
 		return (value >= '0' && value <= '9');
 	}
 
+	/**
+	 * Read a number (decimal, hexadecimal, binary or octal) and
+	 * leave the cursor at the last digit.
+	 *
+	 * @return
+	 */
 	Token processNumber()
 	{
 		TokenType type = TokenType.TOK_DEC_LITERAL;
@@ -496,10 +502,13 @@ public class Scanner implements IScanner
 		}
 
 		Capture capture = new Capture();
-
+		// first digit
+		value = source.peek();
+		if (isDigit(value)) capture.push(value);
+		// remaining digits
 		while (true)
 		{
-			value = source.peek();
+			value = source.peek(1);
 			if (isDigit(value))
 			{
 				capture.push(value);
@@ -509,9 +518,9 @@ public class Scanner implements IScanner
 				break;
 		}
 
-		if (source.peek() == '.')
+		if (source.peek(1) == '.')
 		{
-			if (isDigit(source.peek(1)))
+			if (isDigit(source.peek(2)))
 			{
 				// we have a floating-point number
 				capture.push('.');
@@ -519,7 +528,7 @@ public class Scanner implements IScanner
 
 				while (true)
 				{
-					value = source.peek();
+					value = source.peek(1);
 					if (isDigit(value))
 					{
 						capture.push(value);
@@ -533,7 +542,6 @@ public class Scanner implements IScanner
 			}
 		}
 
-		source.previous();
 		return createToken(type, capture.toString());
 	}
 

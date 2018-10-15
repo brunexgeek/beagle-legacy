@@ -180,21 +180,6 @@ public class ScanString
 		return buffer[index];
 	}
 
-	protected char previous()
-	{
-		return previous(1);
-	}
-
-	protected char previous( int count )
-	{
-		if (count <= 0) return peek();
-		if (index - count >= 0)
-			index -= count;
-		else
-			index = 0;
-		return peek();
-	}
-
     public void unescape( char[] data )
     {
 		Integer i = new Integer(0);

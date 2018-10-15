@@ -1145,7 +1145,7 @@ public class Parser implements IParser
 		if (tokens.lookahead(TOK_NAME, TOK_ASSIGN))
 		{
 			name = parseName();
-			tokens.discard();
+			tokens.discard(2);
 		}
 
 		return new Argument(name, parseExpression());
