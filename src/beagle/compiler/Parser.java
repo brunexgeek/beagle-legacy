@@ -22,6 +22,7 @@ import static beagle.compiler.TokenType.TOK_RIGHT_PAR;
 import static beagle.compiler.TokenType.TOK_THEN;
 import static beagle.compiler.TokenType.TOK_TRUE;
 import static beagle.compiler.TokenType.TOK_FOR;
+import static beagle.compiler.TokenType.TOK_FP_LITERAL;
 
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
@@ -35,6 +36,7 @@ import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.ExpressionStmt;
+import beagle.compiler.tree.FloatLiteral;
 import beagle.compiler.tree.ForEachStmt;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
@@ -1246,6 +1248,8 @@ public class Parser implements IParser
 			case TOK_OCT_LITERAL:
 			case TOK_DEC_LITERAL:
 				return parseIntegerLiteral();
+			case TOK_FP_LITERAL:
+				return parseFloatLiteral();
 			case TOK_STRING_LITERAL:
 				return parseStringLiteral();
 			default:
@@ -1310,5 +1314,12 @@ public class Parser implements IParser
 			stmts = parseStatement();
 
 		return new ForEachStmt(storage, expr, stmts);
+	}
+
+	FloatLiteral parseFloatLiteral()
+	{
+		if (!expected(TOK_FP_LITERAL)) return null;
+		Token tok = tokens.read();
+		return new FloatLiteral(Float.valueOf(tok.value));
 	}
 }

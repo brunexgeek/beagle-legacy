@@ -57,9 +57,6 @@ public class PrintTree
 			if (unit == null) return;
 			HtmlVisitor visitor = new HtmlVisitor(new PrintStream(os));
 			visitor.print(unit);
-
-			Semantic sem = new Semantic(context);
-			sem.processStorage(unit);
 		}
 
 		os.close();

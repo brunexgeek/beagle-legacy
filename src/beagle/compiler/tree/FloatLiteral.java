@@ -1,9 +1,9 @@
 package beagle.compiler.tree;
 
-public class IntegerLiteral extends Literal<Long>
+public class FloatLiteral extends Literal<Float>
 {
 
-	public IntegerLiteral(Long value)
+	public FloatLiteral(Float value)
 	{
 		super(value);
 	}
@@ -18,14 +18,15 @@ public class IntegerLiteral extends Literal<Long>
 	@Override
 	public String toString()
 	{
-		return Long.toString(value);
+		return Float.toString(value);
 	}
 
 	@Override
 	public TypeReference type()
 	{
 		// TODO: detect input type
-		return TypeReference.INT32;
+		return TypeReference.FLOAT32;
 	}
+
 
 }

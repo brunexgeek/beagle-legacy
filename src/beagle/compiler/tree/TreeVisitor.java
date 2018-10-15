@@ -451,4 +451,16 @@ public class TreeVisitor implements ITreeVisitor
 		return visit();
 	}
 
+	@Override
+	public void visit(FloatLiteral floatLiteral)
+	{
+		visit();
+	}
+
+	@Override
+	public void finish(FloatLiteral floatLiteral)
+	{
+		finish();
+	}
+
 }

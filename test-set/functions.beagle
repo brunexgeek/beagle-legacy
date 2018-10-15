@@ -33,23 +33,29 @@ def function1( value : int  )
 	return value * 5
 }
 
-def function2( x : float, y : float ) : int
+def function2( x : float, y : float )
 {
-	return (x / y) + 22
+	return (x / y) + 22.0
 }
 
 def function3( value : int  ) : string
 {
 	var bla  = "Hello"
 	var temp = 66
-	if value > 0 then
+	if temp > 0 then
 	{ 
 		temp *= 1
 		bla = bla + " world!"
 	}
-	elif value == 0 then
+	elif temp == 0 then
 		temp += 88 / 9 % 3
 	else
 		temp = 0
 	return "value"
+}
+
+def function4()
+{
+	var name = "bla"
+	return name
 }
