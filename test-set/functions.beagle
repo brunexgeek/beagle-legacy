@@ -1,10 +1,8 @@
 package test
 
-
 import something.nice.to.see
 
 var counter = 0
-
 
 '''
 This string spans
@@ -16,27 +14,29 @@ struct Fruit
 	var weight : int
 }
 
-
 struct Apple : Fruit 
 {
 	var radius : float
 	var type : string = "Teste "
 }
 
-
 def function1( value : int  )
 {
 	var temp = 66
-	if value > 0 then temp *= 1 
+	if value > 0 then temp *= 1
+	
+	for i in range(10)
+	{
+		value += i
+	}
+	
 	return value * 5
 }
 
-
-def function2( x : float, y : float ) : float
+def function2( x : float, y : float ) : int
 {
 	return (x / y) + 22
 }
-
 
 def function3( value : int  ) : string
 {
@@ -51,5 +51,5 @@ def function3( value : int  ) : string
 		temp += 88 / 9 % 3
 	else
 		temp = 0
-	return value * 5
+	return "value"
 }

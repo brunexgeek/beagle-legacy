@@ -21,6 +21,7 @@ import static beagle.compiler.TokenType.TOK_RIGHT_BRACKET;
 import static beagle.compiler.TokenType.TOK_RIGHT_PAR;
 import static beagle.compiler.TokenType.TOK_THEN;
 import static beagle.compiler.TokenType.TOK_TRUE;
+import static beagle.compiler.TokenType.TOK_FOR;
 
 import beagle.compiler.tree.Annotation;
 import beagle.compiler.tree.AnnotationList;
@@ -34,11 +35,13 @@ import beagle.compiler.tree.CompilationUnit;
 import beagle.compiler.tree.ConstantDeclaration;
 import beagle.compiler.tree.ExpressionList;
 import beagle.compiler.tree.ExpressionStmt;
+import beagle.compiler.tree.ForEachStmt;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.Function;
 import beagle.compiler.tree.IExpression;
 import beagle.compiler.tree.IStatement;
+import beagle.compiler.tree.ITreeVisitor;
 import beagle.compiler.tree.IfThenElseStmt;
 import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.Modifiers;
@@ -691,6 +694,8 @@ public class Parser implements IParser
 			case TOK_VAR:
 			case TOK_CONST:
 				return (IStatement) parseVariableOrConstant(null);
+			case TOK_FOR:
+				return (IStatement) parseForEach();
 			default:
 				break;
 		}
@@ -755,11 +760,14 @@ public class Parser implements IParser
 	IStatement parseReturnStmt()
 	{
 		if (!expected(TOK_RETURN)) return null;
+		SourceLocation location = tokens.peek().location;
 		tokens.discard();
 
 		IExpression expr = parseExpression();
 
-		return new ReturnStmt(expr);
+		ReturnStmt result = new ReturnStmt(expr);
+		result.location(location);
+		return result;
 	}
 
 	/**
@@ -934,7 +942,9 @@ public class Parser implements IParser
 		else
 			return null;
 
-		return new BinaryExpression(left, type, right);
+		BinaryExpression result = new BinaryExpression(left, type, right);
+		result.location(left.location());
+		return result;
 	}
 
 	/**
@@ -1280,4 +1290,25 @@ public class Parser implements IParser
 		return new BooleanLiteral(value);
 	}
 
+	ForEachStmt parseForEach()
+	{
+		if (!expected(TOK_FOR)) return null;
+		tokens.discard();
+
+		StorageDeclaration storage = new VariableDeclaration(null, parseName(), null, null);
+
+		if (!expected(TOK_IN)) return null;
+		tokens.discard();
+
+		IExpression expr = parseExpression();
+
+		IStatement stmts;
+
+		if (tokens.peekType() == TOK_LEFT_BRACE)
+			stmts = parseBlock();
+		else
+			stmts = parseStatement();
+
+		return new ForEachStmt(storage, expr, stmts);
+	}
 }

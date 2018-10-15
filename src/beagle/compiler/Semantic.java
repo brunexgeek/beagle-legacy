@@ -1,14 +1,17 @@
 package beagle.compiler;
 
+import beagle.compiler.tree.AtomicExpression;
 import beagle.compiler.tree.BinaryExpression;
+import beagle.compiler.tree.Block;
 import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
-import beagle.compiler.tree.FormalParameter;
-import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.Function;
 import beagle.compiler.tree.FunctionList;
 import beagle.compiler.tree.IExpression;
+import beagle.compiler.tree.IStatement;
 import beagle.compiler.tree.IntegerLiteral;
+import beagle.compiler.tree.NameLiteral;
+import beagle.compiler.tree.ReturnStmt;
 import beagle.compiler.tree.StorageDeclaration;
 import beagle.compiler.tree.StorageList;
 import beagle.compiler.tree.StringLiteral;
@@ -16,6 +19,7 @@ import beagle.compiler.tree.Structure;
 import beagle.compiler.tree.StructureList;
 import beagle.compiler.tree.TypeReference;
 import beagle.compiler.tree.UnaryExpression;
+import jdk.nashorn.internal.ir.FunctionCall;
 
 public class Semantic
 {
@@ -41,13 +45,7 @@ public class Semantic
 	{
 		for (StorageDeclaration item : storages )
 		{
-			if (item.type() != null) continue;
-			if (item.initializer() == null)
-			{
-				context.listener.onError(item.location(), "Missing type or initializer");
-				return;
-			}
-			item.type( evaluateExpression(item.initializer()) );
+			typeInference(item);
 		}
 	}
 
@@ -61,8 +59,45 @@ public class Semantic
 	{
 		for (Function function : functions )
 		{
-			// TODO: iterate recursively into function blocks looking for storages
+			typeInference(function);
 		}
+	}
+
+	public void typeInference( Function function )
+	{
+		typeInference(function.body(), function);
+	}
+
+	public void typeInference( Block block, Function function )
+	{
+		for (IStatement statement: block )
+		{
+			if (statement instanceof Block) typeInference((Block) statement, function);
+			if (statement instanceof StorageDeclaration) typeInference((StorageDeclaration) statement);
+			if (statement instanceof ReturnStmt)
+			{
+				TypeReference type = evaluateExpression(((ReturnStmt) statement).expression());
+				if (function.returnType() == null)
+					function.returnType(type);
+				else
+				if (!function.returnType().equals(type))
+				{
+					context.listener.onError(statement.location(), "Returning value with wrong type");
+					return;
+				}
+			}
+		}
+	}
+
+	public void typeInference( StorageDeclaration storage )
+	{
+		if (storage.type() != null) return;
+		if (storage.initializer() == null)
+		{
+			context.listener.onError(storage.location(), "Missing type or initializer");
+			return;
+		}
+		storage.type( evaluateExpression(storage.initializer()) );
 	}
 
 	public void processStorage( CompilationUnit unit )
@@ -102,28 +137,24 @@ public class Semantic
 			TypeReference left = evaluateExpression(((BinaryExpression)expr).left());
 			TypeReference right= evaluateExpression(((BinaryExpression)expr).right());
 
-			switch (((BinaryExpression)expr).operation())
+			if (left != right)
 			{
-				case TOK_LE:
-				case TOK_LT:
-				case TOK_GE:
-				case TOK_GT:
-					if (left != right)
-					{
-						context.listener.onError(expr.location(), "Binary expression with arguments of different type");
-						return null;
-					}
-					return TypeReference.BOOL;
-				default:
+				context.listener.onError(expr.location(), "Binary expression with arguments of different type");
+				return null;
 			}
-			context.listener.onError(null, "Unhandled binary expression");
-			return null;
+			return left;
 		}
 		else
 		if (expr instanceof UnaryExpression)
 		{
 			return evaluateExpression(((UnaryExpression)expr).expression());
 		}
+		else
+		if (expr instanceof NameLiteral)
+			return TypeReference.INT32;
+		else
+		if (expr instanceof AtomicExpression)
+			return evaluateExpression(((AtomicExpression)expr).value());
 
 		context.listener.onError(null, "Unrecognized expression");
 		return null;

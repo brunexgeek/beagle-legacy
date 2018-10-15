@@ -440,4 +440,15 @@ public class TreeVisitor implements ITreeVisitor
 		finish();
 	}
 
+	@Override
+	public void finish(ForEachStmt forEach)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(ForEachStmt forEach) {
+		return visit();
+	}
+
 }

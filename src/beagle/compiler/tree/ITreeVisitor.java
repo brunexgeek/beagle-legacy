@@ -3,7 +3,7 @@ package beagle.compiler.tree;
 public interface ITreeVisitor
 {
 
-	void finish();
+	void finish(ForEachStmt forEach);
 
 	void finish(BooleanLiteral target);
 
@@ -51,7 +51,7 @@ public interface ITreeVisitor
 
 	void finish(StringLiteral target);
 
-	boolean visit();
+	boolean visit(ForEachStmt forEach);
 
 	boolean visit(BooleanLiteral target);
 

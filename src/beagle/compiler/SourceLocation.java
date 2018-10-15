@@ -53,6 +53,6 @@ public class SourceLocation implements Cloneable
 	@Override
 	public SourceLocation clone()
 	{
-		return new SourceLocation(fileName, line, column);		
+		return new SourceLocation(fileName, line, column);
 	}
 }
