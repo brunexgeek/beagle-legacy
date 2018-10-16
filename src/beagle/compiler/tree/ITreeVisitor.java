@@ -157,7 +157,11 @@ public interface ITreeVisitor
 
 	void finish(StructureList structureList);
 
-	void visit(FloatLiteral floatLiteral);
+	boolean visit(FloatLiteral floatLiteral);
 
 	void finish(FloatLiteral floatLiteral);
+
+	boolean visit(ExpressionStmt expressionStmt);
+
+	void finish(ExpressionStmt expressionStmt);
 }

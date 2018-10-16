@@ -452,13 +452,25 @@ public class TreeVisitor implements ITreeVisitor
 	}
 
 	@Override
-	public void visit(FloatLiteral floatLiteral)
+	public boolean visit(FloatLiteral floatLiteral)
 	{
-		visit();
+		return visit();
 	}
 
 	@Override
 	public void finish(FloatLiteral floatLiteral)
+	{
+		finish();
+	}
+
+	@Override
+	public boolean visit(ExpressionStmt expressionStmt)
+	{
+		return visit();
+	}
+
+	@Override
+	public void finish(ExpressionStmt expressionStmt)
 	{
 		finish();
 	}

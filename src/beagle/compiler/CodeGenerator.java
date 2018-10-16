@@ -4,18 +4,33 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import beagle.compiler.tree.BinaryExpression;
 import beagle.compiler.tree.Block;
+import beagle.compiler.tree.BooleanLiteral;
 import beagle.compiler.tree.CompilationUnit;
+import beagle.compiler.tree.ConstantDeclaration;
+import beagle.compiler.tree.ExpressionStmt;
+import beagle.compiler.tree.FloatLiteral;
+import beagle.compiler.tree.ForEachStmt;
 import beagle.compiler.tree.FormalParameter;
 import beagle.compiler.tree.FormalParameterList;
 import beagle.compiler.tree.Function;
 import beagle.compiler.tree.FunctionList;
+import beagle.compiler.tree.IExpression;
+import beagle.compiler.tree.IStatement;
+import beagle.compiler.tree.IfThenElseStmt;
+import beagle.compiler.tree.IntegerLiteral;
 import beagle.compiler.tree.Module;
+import beagle.compiler.tree.NameLiteral;
+import beagle.compiler.tree.NullLiteral;
+import beagle.compiler.tree.ReturnStmt;
 import beagle.compiler.tree.StorageDeclaration;
 import beagle.compiler.tree.StorageList;
+import beagle.compiler.tree.StringLiteral;
 import beagle.compiler.tree.Structure;
 import beagle.compiler.tree.StructureList;
 import beagle.compiler.tree.TypeReference;
+import beagle.compiler.tree.UnaryExpression;
 
 public class CodeGenerator
 {
@@ -119,7 +134,114 @@ public class CodeGenerator
 
 	private void generateBlock( Block block )
 	{
-		print("{ }");
+		println("{");
+		for (IStatement stmt : block)
+		{
+			generateStatement(stmt);
+		}
+		println("}");
+	}
+
+	private void generateStatement( IStatement stmt )
+	{
+		if (stmt instanceof StorageDeclaration)
+			generateStorage(((StorageDeclaration)stmt));
+		else
+		if (stmt instanceof IfThenElseStmt)
+			generateIfThenElse(((IfThenElseStmt)stmt));
+		else
+		if (stmt instanceof ExpressionStmt)
+			generateExpression(((ExpressionStmt)stmt).expression());
+		else
+		if (stmt instanceof ReturnStmt)
+			generateReturn((ReturnStmt)stmt);
+		else
+		if (stmt instanceof ForEachStmt)
+			generateForEach((ForEachStmt)stmt);
+		else
+		if (stmt instanceof Block)
+			generateBlock((Block)stmt);
+		else
+			context.listener.onError(null, "Unknown statement " + stmt.getClass().getName());
+	}
+
+	private void generateForEach(ForEachStmt stmt)
+	{
+		print("for (size_t i = 0; i < 5; ++i) {");
+		generateStatement(stmt.statement);
+		println("}");
+	}
+
+	private void generateReturn(ReturnStmt stmt)
+	{
+		print("return ");
+		generateExpression(stmt.expression());
+		println();
+	}
+
+	private void generateIfThenElse(IfThenElseStmt cond)
+	{
+		print("if (");
+		generateExpression(cond.condition());
+		println(")");
+		generateStatement(cond.thenSide());
+		if (cond.elseSide() != null)
+		{
+			println(" else ");
+			generateStatement(cond.elseSide());
+		}
+	}
+
+	private void generateExpression(IExpression expr)
+	{
+		if (expr instanceof Block)
+			generateBlock((Block)expr);
+		else
+		if (expr instanceof NullLiteral)
+			print("BGL_NULL");
+		else
+		if (expr instanceof UnaryExpression)
+		{
+			UnaryExpression unary = (UnaryExpression) expr;
+			print(unary.operation().name());
+			generateExpression(unary.expression());
+		}
+		else
+		if (expr instanceof BinaryExpression)
+		{
+			BinaryExpression binary = (BinaryExpression) expr;
+			generateExpression(binary.left());
+			print(" ");
+			print(binary.operation().name());
+			print(" ");
+			generateExpression(binary.right());
+		}
+		else
+		if (expr instanceof StringLiteral)
+			print(((StringLiteral)expr).value());
+		else
+		if (expr instanceof IntegerLiteral)
+			print(Long.toString(((IntegerLiteral)expr).value()));
+		else
+		if (expr instanceof FloatLiteral)
+			print(Float.toString(((FloatLiteral)expr).value()));
+		else
+		if (expr instanceof BooleanLiteral)
+			print(Boolean.toString(((BooleanLiteral)expr).value()));
+		else
+		if (expr instanceof NameLiteral)
+			print("local_" + (((NameLiteral)expr).value()));
+		else
+			context.listener.onError(null, "Unknown expression " + expr.getClass().getName());
+	}
+
+	private void generateStorage(StorageDeclaration storage)
+	{
+		if (storage instanceof ConstantDeclaration)
+			print("const ");
+		printTypeReference(storage.type());
+		print(nativeName("local_", storage.name().qualifiedName()));
+		println(";");
 	}
 
 	private void generateStructures(StructureList structures)
