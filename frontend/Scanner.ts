@@ -1,3 +1,6 @@
+/// <reference path="tree.ts" />
+/// <reference path="ScanString.ts" />
+
 namespace beagle.compiler {
 
 
@@ -5,10 +8,6 @@ class CompilationContext
 {
 }
 
-class Comment
-{
-
-}
 
 enum LineBreak
 {
@@ -21,12 +20,12 @@ enum LineBreak
 class Token
 {
     type : TokenType;
-	value : String;
+	value : string;
 	location : SourceLocation;
 	lineBreak : number;
-    comments : Comment[];
+    comments : beagle.compiler.tree.Comment[];
 
-    constructor(location : SourceLocation, lineBreak : number, comments : Comment[], type : TokenType, value : string = "")
+    constructor(location : SourceLocation, lineBreak : number, comments : beagle.compiler.tree.Comment[], type : TokenType, value : string = "")
 	{
 		//this.location = location.clone();
 		this.lineBreak = lineBreak;
@@ -85,7 +84,7 @@ const TOK_DOT = new TokenType(".", false);
 const TOK_ELIF = new TokenType("elif", true);
 //TOK_DOUBLE("double", true),
 const TOK_ELSE = new TokenType("else", true);
-const TOK_EOF = new TokenType("end of file", false);
+export const TOK_EOF = new TokenType("end of file", false);
 const TOK_EOL = new TokenType("end of line", false);
 const TOK_EQ = new TokenType("==", false);
 const TOK_EXTENDS = new TokenType("extends", true);
@@ -181,7 +180,7 @@ export class Scanner
 	listener : CompilationListener;
 	context : CompilationContext;
 	lineBreak : boolean = false;
-	comments : Comment[];
+	comments : beagle.compiler.tree.Comment[] = [];
 
 	constructor( context : CompilationContext, source : ScanString )
 	{
@@ -549,7 +548,7 @@ export class Scanner
 		}
 	}
 
-	processBlockComment() : Comment
+	processBlockComment() : beagle.compiler.tree.Comment
 	{
 		let type = TOK_COMMENT;
 		this.source.nextAt(2);
@@ -578,7 +577,7 @@ export class Scanner
 			this.source.nextAt(1); // skip the '*' (but not the '/')
 			this.discardWhiteSpaces();
 
-			return new tree.Comment(capture.toString(), type == TOK_DOCSTRING);
+			return new beagle.compiler.tree.Comment(capture.toString(), type == TOK_DOCSTRING);
 		}
 	}
 
@@ -599,7 +598,7 @@ export class Scanner
 		}
 	}
 
-	processInlineComment() : Comment
+	processInlineComment() : beagle.compiler.tree.Comment
 	{
 		this.source.nextAt(2);
 
@@ -609,7 +608,7 @@ export class Scanner
 			capture += this.source.peek();
 			this.source.next();
 		}
-		return new tree.Comment(capture.toString(), false);
+		return new beagle.compiler.tree.Comment(capture.toString(), false);
 	}
 
 	/*private Token emitIfLookahead( TokenType type, char... values)
@@ -799,3 +798,5 @@ export class Scanner
 }
 
 }
+
+

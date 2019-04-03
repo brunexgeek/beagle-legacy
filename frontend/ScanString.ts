@@ -92,7 +92,6 @@ export class ScanString
 
         // ensure space for ending EOL+EOI markers
         this.buffer.length = content.length + 2;
-        console.log(this.buffer.length);
 
         let i = 0, j = 0;
 
@@ -258,7 +257,7 @@ export class ScanString
 }
 
 }
-
+/*
 let scanner = new beagle.compiler.ScanString("bla.bgl", "hello world!");
 let body = document.getElementsByTagName("body")[0];
 while (scanner.hasNext())
@@ -267,3 +266,4 @@ while (scanner.hasNext())
     tmp.innerText = scanner.next();
     body.appendChild(tmp);
 }
+*/
