@@ -1,6 +1,7 @@
 
 namespace beagle.compiler.tree {
 
+
 export class CompilationUnit
 {
     fileName : string;
@@ -21,10 +22,32 @@ export class Comment
 	}
 }
 
-class Name
+export class Name
 {
     names : string[] = [];
-	qualifiedName : String;
+	qualifiedName : string;
+	location : SourceLocation;
+}
+
+export function createName(value : string) : Name
+{
+    if (value === "") return null;
+
+    let output = new Name();
+    output.names.push(value);
+    output.qualifiedName = value;
+    return output;
+}
+
+export function appendName(self : Name, value : string )
+{
+    self.names.push(value);
+    self.qualifiedName = self.qualifiedName + "." + value;
+}
+
+export function isQualified( self : Name ) : boolean
+{
+	return self.names.length > 1;
 }
 
 class Package
@@ -33,11 +56,21 @@ class Package
     types : TypeDeclaration[];
 }
 
-class TypeImport
+export class TypeImport
 {
     package : Package;
 	name : Name;
+	isWildcard : boolean;
 	alias : Name;
+}
+
+export function createTypeImport( name : Name, isWildcard : boolean = false, alias : Name = null ) : TypeImport
+{
+	let temp = new TypeImport;
+	temp.alias = alias;
+	temp.name = name;
+	temp.isWildcard = isWildcard;
+	return temp;
 }
 
 class TypeDeclaration
@@ -94,20 +127,17 @@ class FormalParameter
     name : Name;
 }
 
-export function createName(value : string) : Name
-{
-    if (value === "") return null;
 
-    let output = new Name();
-    output.names.push(value);
-    output.qualifiedName = value;
-    return output;
+export class Decorator
+{
+	name : Name;
 }
 
-function append(self : Name, value : string )
+export function createDecorator( name : Name ) : Decorator
 {
-    self.names.push(value);
-    self.qualifiedName = self.qualifiedName + "." + value;
+	let temp = new Decorator();
+	temp.name = name;
+	return temp;
 }
 
 }

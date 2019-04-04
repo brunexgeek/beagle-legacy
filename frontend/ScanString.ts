@@ -7,10 +7,6 @@ export class SourceLocation
     }
 }
 
-export class CompilationListener
-{
-}
-
 export enum LookaheadStatus
 {
 	MATCH,
@@ -53,15 +49,16 @@ export class ScanString
 
 	bufferSize : number;
 
-	listener : CompilationListener;
+	context : CompilationContext;
 
 	location : SourceLocation;
 
 	/**
 	 * Create a scanner from the input array.
 	 */
-	constructor(fileName : string, content : string)
+	constructor(context : CompilationContext, fileName : string, content : string)
 	{
+		this.context = context;
 		let location = new SourceLocation(fileName);
 		//unescape(input);
 

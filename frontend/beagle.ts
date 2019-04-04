@@ -1,21 +1,53 @@
 
 /// <reference path="Scanner.ts" />
+/// <reference path="Parser.ts" />
+/// <reference path="context.ts" />
+
+
+class MyListener implements beagle.compiler.CompilationListener
+{
+	onStart() {
+		throw new Error("Method not implemented.");
+	}
+	onError(location: beagle.compiler.SourceLocation, message: string): boolean {
+		throw new Error("Method not implemented.");
+	}
+	onWarning(location: beagle.compiler.SourceLocation, message: string): boolean {
+		throw new Error("Method not implemented.");
+	}
+	onFinish() {
+		throw new Error("Method not implemented.");
+	}
+
+}
+
 
 declare var require: any;
 let fs = require("fs");
+let util = require("util");
 let content = fs.readFileSync("input.txt");
 
+let ctx = new beagle.compiler.CompilationContext();
+ctx.listener = new MyListener();
+
 //let body = document.getElementsByTagName("body")[0];
-let ss = new beagle.compiler.ScanString("bla", content.toString() /*"function abobrinha { }"*/);
-let sc = new beagle.compiler.Scanner(null, ss);
-while (sc.readToken)
+let ss = new beagle.compiler.ScanString(ctx, "bla", content.toString() /*"function abobrinha { }"*/);
+let sc = new beagle.compiler.Scanner(ctx, ss);
+/*
+let tarr = new beagle.compiler.TokenArray(sc);
+let tok = null;
+while ((tok = tarr.read()) != null)
 {
-	let tok = sc.readToken();
-	if (tok.type == beagle.compiler.TOK_EOF) break;
-	let text = '[' + ((tok.type === null) ? "???" : tok.type.token) + '] ' +
-		"'" + tok.value + "'";
+	if (tok.type == beagle.compiler.TokenType.TOK_EOF) break;
+	let text = '[' + ((tok.type === null) ? "???" : tok.type.token) + '] ';
+	if (tok.value != null) text += "'" + tok.value + "'";
 	console.log(text);
-	/*let tmp = document.createElement("span");
-	tmp.innerHTML = tok.value;
-	body.appendChild(tmp);*/
-}
+	///let tmp = document.createElement("span");
+	//tmp.innerHTML = tok.value;
+	//body.appendChild(tmp);
+}*/
+
+let pa = new beagle.compiler.Parser(ctx, sc);
+let unit = pa.parse();
+
+console.log(util.inspect(unit, {showHidden: false, depth: null}))
