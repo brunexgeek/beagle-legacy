@@ -12,7 +12,9 @@ while (sc.readToken)
 {
 	let tok = sc.readToken();
 	if (tok.type == beagle.compiler.TOK_EOF) break;
-	console.log("'" + tok.value + "'");
+	let text = '[' + ((tok.type === null) ? "???" : tok.type.token) + '] ' +
+		"'" + tok.value + "'";
+	console.log(text);
 	/*let tmp = document.createElement("span");
 	tmp.innerHTML = tok.value;
 	body.appendChild(tmp);*/

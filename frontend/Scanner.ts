@@ -33,148 +33,142 @@ class Token
 		this.type = type;
 		this.value = value;
     }
-    
+
 }
 
 class TokenType
 {
     name : string;
-    isKeyword : boolean;
+	isKeyword : boolean;
+	token : string;
 
-    constructor(name : string = "", isKeyword : boolean = false)
+    constructor(name : string = "", isKeyword : boolean = false, token : string = "")
     {
         this.name = name;
-        this.isKeyword = isKeyword;
+		this.isKeyword = isKeyword;
+		this.token = token;
     }
 }
 
-const TOK_ABSTRACT = new TokenType("abstract", true);
-const TOK_AND = new TokenType("and", true);
-const TOK_AS = new TokenType("as", true);
-const TOK_ASSIGN = new TokenType("=", false);
-const TOK_AT = new TokenType("@", false);
-const TOK_BACK_SLASH = new TokenType("\\", false);
-const TOK_BAND = new TokenType("&", false);
-const TOK_BAND_ASSIGN = new TokenType("&=", false);
-const TOK_BANG = new TokenType("!", false);
-const TOK_BIN_LITERAL = new TokenType;
-const TOK_BOOL_LITERAL = new TokenType;
-const TOK_BOOLEAN = new TokenType("bool", true);
-const TOK_BOR = new TokenType("|", false);
-const TOK_BOR_ASSIGN = new TokenType("|=", false);
-const TOK_BREAK = new TokenType("break", true);
-const TOK_CASE = new TokenType("case", true);
-const TOK_CATCH = new TokenType("catch", true);
-const TOK_CHAR = new TokenType("char", true);
-const TOK_CLASS = new TokenType("class", true);
-const TOK_COLON = new TokenType(":", false);
-const TOK_COMA = new TokenType(",", false);
-const TOK_COMMENT = new TokenType;
-const TOK_CONST = new TokenType("const", true);
-const TOK_CONTINUE = new TokenType("continue", true);
-const TOK_DEC = new TokenType("--", false);
-const TOK_DEC_LITERAL = new TokenType;
-const TOK_DEDENT = new TokenType;
-const TOK_DEF = new TokenType("def", true);
-const TOK_DEFAULT = new TokenType("default", true);
-const TOK_DIV = new TokenType("/", false);
-const TOK_DIV_ASSIGN = new TokenType("/=", false);
-const TOK_DOCSTRING = new TokenType;
-const TOK_DOT = new TokenType(".", false);
-const TOK_ELIF = new TokenType("elif", true);
-//TOK_DOUBLE("double", true),
-const TOK_ELSE = new TokenType("else", true);
-export const TOK_EOF = new TokenType("end of file", false);
-const TOK_EOL = new TokenType("end of line", false);
-const TOK_EQ = new TokenType("==", false);
-const TOK_EXTENDS = new TokenType("extends", true);
-const TOK_FALSE = new TokenType("false", true);
-const TOK_FINALLY = new TokenType("finally", true);
-//TOK_FLOAT("float", true),
-const TOK_FOR = new TokenType("for", true);
-const TOK_FP_LITERAL = new TokenType;
-const TOK_GE = new TokenType(">=", false);
-const TOK_GT = new TokenType(">", false);
-const TOK_HEX_LITERAL = new TokenType;
-const TOK_IF = new TokenType("if", true);
-const TOK_IMPLEMENTS = new TokenType("implements", true);
-const TOK_IMPORT = new TokenType("import", true);
-const TOK_IN = new TokenType("in", true);
-const TOK_INC = new TokenType("++", false);
-const TOK_INDENT = new TokenType();
-const TOK_INTERFACE = new TokenType("interface", true);
-const TOK_IS = new TokenType("is", true);
-const TOK_LE = new TokenType("<=", false);
-const TOK_LEFT_BRACE = new TokenType("{", false);
-const TOK_LEFT_BRACKET = new TokenType("[", false);
-const TOK_LEFT_PAR = new TokenType("(", false);
-const TOK_LONG = new TokenType("long", true);
-const TOK_LT = new TokenType("<", false);
-const TOK_MINUS = new TokenType("-", false);
-const TOK_MINUS_ASSIGN = new TokenType("-=", false);
-const TOK_MOD = new TokenType("%", false);
-const TOK_MOD_ASSIGN = new TokenType("%=", false);
-const TOK_MUL = new TokenType("*", false);
-const TOK_MUL_ASSIGN = new TokenType("*=", false);
-const TOK_NAME = new TokenType();
-const TOK_NATIVE = new TokenType("native", true);
-const TOK_NE = new TokenType("!=", false);
-const TOK_NEG_ASSIGN = new TokenType("~=", false);
-const TOK_NEW = new TokenType("new", true);
-const TOK_NIN = new TokenType("not in", false);
-const TOK_NIS = new TokenType("not is", false);
-const TOK_NOT = new TokenType("not", true);
-const TOK_NOT_ASSIGN = new TokenType("!=", false);
-const TOK_NULL = new TokenType("null", true);
-const TOK_OCT_LITERAL = new TokenType;
-const TOK_OR = new TokenType("or", true);
-//TOK_INTERNAL("internal", true),
-const TOK_PACKAGE = new TokenType("package", true);
-const TOK_PLUS = new TokenType("+", false);
-const TOK_PLUS_ASSIGN = new TokenType("+=", false);
-const TOK_QUEST = new TokenType("?", false);
-const TOK_READLOCK = new TokenType("readlock", true);
-//TOK_PRIVATE("private", true),
-//TOK_PROTECTED("protected", true),
-//TOK_PUBLIC("public", true),
-const TOK_RETURN = new TokenType("return", true);
-const TOK_RIGHT_BRACE = new TokenType("}", false);
-const TOK_RIGHT_BRACKET = new TokenType("]", false);
-const TOK_RIGHT_PAR = new TokenType(")", false);
-const TOK_SEMICOLON = new TokenType(";", false);
-const TOK_SHL = new TokenType("<<", false);
-const TOK_SHL_ASSIGN = new TokenType("<<=", false);
-const TOK_SHR = new TokenType(">>", false);
-const TOK_SHR_ASSIGN = new TokenType(">>=", false);
-const TOK_STATIC = new TokenType("static", true);
-const TOK_STRING_LITERAL = new TokenType("string literal", false);
-const TOK_MSTRING_LITERAL = new TokenType("multiline string literal", false);
-const TOK_SUPER = new TokenType("super", true);
-const TOK_SUSPEND = new TokenType("suspend", true);
-const TOK_SWITCH = new TokenType("switch", true);
-const TOK_THEN = new TokenType("then", true);
-const TOK_THIS = new TokenType("this", true);
-const TOK_THROW = new TokenType("throw", true);
-const TOK_TILDE = new TokenType("~", false);
-//TOK_UINT8("uint8", true),
-//TOK_UINT16("uint16", true),
-//TOK_UINT32("uint32", true),
-//TOK_UINT64("uint64", true),
-//TOK_INT8("int8", true),
-//TOK_INT16("int16", true),
-//TOK_INT32("int32", true),
-//TOK_INT64("int64", true),
-const TOK_TRUE = new TokenType("true", true);
-const TOK_TRY = new TokenType("try", true);
-const TOK_VAR = new TokenType("var", true);
-const TOK_VARARG = new TokenType("vararg", true);
-const TOK_WHILE = new TokenType("while", true);
-const TOK_WRITELOCK = new TokenType("writelock", true);
-const TOK_XOR = new TokenType("^", false);
-const TOK_XOR_ASSIGN = new TokenType("^=", false);
-const TOK_STRUCT = new TokenType("struct", true);
+export const TOK_ABSTRACT = new TokenType("abstract", true, 'TOK_ABSTRACT');
+export const TOK_AND = new TokenType("and", true, 'TOK_AND');
+export const TOK_AS = new TokenType("as", true, 'TOK_AS');
+export const TOK_ASSIGN = new TokenType("=", false, 'TOK_ASSIGN');
+export const TOK_AT = new TokenType("@", false, 'TOK_AT');
+export const TOK_BACK_SLASH = new TokenType("\\", false, 'TOK_BACK_SLASH');
+export const TOK_BAND = new TokenType("&", false, 'TOK_BAND');
+export const TOK_BAND_ASSIGN = new TokenType("&=", false, 'TOK_BAND_ASSIGN');
+export const TOK_BANG = new TokenType("!", false, 'TOK_BANG');
+export const TOK_BIN_LITERAL = new TokenType("", false, 'TOK_BIN_LITERAL');
+export const TOK_BOOL_LITERAL = new TokenType("", false, 'TOK_BOOL_LITERAL');
+export const TOK_BOOLEAN = new TokenType("bool", true, 'TOK_BOOLEAN');
+export const TOK_BOR = new TokenType("|", false, 'TOK_BOR');
+export const TOK_BOR_ASSIGN = new TokenType("|=", false, 'TOK_BOR_ASSIGN');
+export const TOK_BREAK = new TokenType("break", true, 'TOK_BREAK');
+export const TOK_CASE = new TokenType("case", true, 'TOK_CASE');
+export const TOK_CATCH = new TokenType("catch", true, 'TOK_CATCH');
+export const TOK_CHAR = new TokenType("char", true, 'TOK_CHAR');
+export const TOK_CLASS = new TokenType("class", true, 'TOK_CLASS');
+export const TOK_COLON = new TokenType(":", false, 'TOK_COLON');
+export const TOK_COMA = new TokenType(",", false, 'TOK_COMA');
+export const TOK_COMMENT = new TokenType("", false, 'TOK_COMMENT');
+export const TOK_CONST = new TokenType("const", true, 'TOK_CONST');
+export const TOK_CONTINUE = new TokenType("continue", true, 'TOK_CONTINUE');
+export const TOK_DEC = new TokenType("--", false, 'TOK_DEC');
+export const TOK_DEC_LITERAL = new TokenType("", false, 'TOK_DEC_LITERAL');
+export const TOK_DEDENT = new TokenType("", false, 'TOK_DEDENT');
+export const TOK_DEF = new TokenType("def", true, 'TOK_DEF');
+export const TOK_DEFAULT = new TokenType("default", true, 'TOK_DEFAULT');
+export const TOK_DIV = new TokenType("/", false, 'TOK_DIV');
+export const TOK_DIV_ASSIGN = new TokenType("/=", false, 'TOK_DIV_ASSIGN');
+export const TOK_DOCSTRING = new TokenType("", false, 'TOK_DOCSTRING');
+export const TOK_DOT = new TokenType(".", false, 'TOK_DOT');
+export const TOK_ELIF = new TokenType("elif", true, 'TOK_ELIF');
+export const TOK_DOUBLE = new TokenType("double", true, 'TOK_DOUBLE');
+export const TOK_ELSE = new TokenType("else", true, 'TOK_ELSE');
+export const TOK_EOF = new TokenType("end of file", false, 'TOK_EOF');
+export const TOK_EOL = new TokenType("end of line", false, 'TOK_EOL');
+export const TOK_EQ = new TokenType("==", false, 'TOK_EQ');
+export const TOK_EXTENDS = new TokenType("extends", true, 'TOK_EXTENDS');
+export const TOK_FALSE = new TokenType("false", true, 'TOK_FALSE');
+export const TOK_FINALLY = new TokenType("finally", true, 'TOK_FINALLY');
+export const TOK_FLOAT = new TokenType("float", true, 'TOK_FLOAT');
+export const TOK_FOR = new TokenType("for", true, 'TOK_FOR');
+export const TOK_FP_LITERAL = new TokenType("", false, 'TOK_FP_LITERAL');
+export const TOK_GE = new TokenType(">=", false, 'TOK_GE');
+export const TOK_GT = new TokenType(">", false, 'TOK_GT');
+export const TOK_HEX_LITERAL = new TokenType("", false, 'TOK_HEX_LITERAL');
+export const TOK_IF = new TokenType("if", true, 'TOK_IF');
+export const TOK_IMPLEMENTS = new TokenType("implements", true, 'TOK_IMPLEMENTS');
+export const TOK_IMPORT = new TokenType("import", true, 'TOK_IMPORT');
+export const TOK_IN = new TokenType("in", true, 'TOK_IN');
+export const TOK_INC = new TokenType("++", false, 'TOK_INC');
+export const TOK_INDENT = new TokenType("", false, 'TOK_INDENT');
+export const TOK_INTERFACE = new TokenType("interface", true, 'TOK_INTERFACE');
+export const TOK_IS = new TokenType("is", true, 'TOK_IS');
+export const TOK_LE = new TokenType("<=", false, 'TOK_LE');
+export const TOK_LEFT_BRACE = new TokenType("{", false, 'TOK_LEFT_BRACE');
+export const TOK_LEFT_BRACKET = new TokenType("[", false, 'TOK_LEFT_BRACKET');
+export const TOK_LEFT_PAR = new TokenType("(", false, 'TOK_LEFT_PAR');
+export const TOK_LONG = new TokenType("long", true, 'TOK_LONG');
+export const TOK_LT = new TokenType("<", false, 'TOK_LT');
+export const TOK_MINUS = new TokenType("-", false, 'TOK_MINUS');
+export const TOK_MINUS_ASSIGN = new TokenType("-=", false, 'TOK_MINUS_ASSIGN');
+export const TOK_MOD = new TokenType("%", false, 'TOK_MOD');
+export const TOK_MOD_ASSIGN = new TokenType("%=", false, 'TOK_MOD_ASSIGN');
+export const TOK_MUL = new TokenType("*", false, 'TOK_MUL');
+export const TOK_MUL_ASSIGN = new TokenType("*=", false, 'TOK_MUL_ASSIGN');
+export const TOK_NAME = new TokenType("", false, 'TOK_NAME');
+export const TOK_NATIVE = new TokenType("native", true, 'TOK_NATIVE');
+export const TOK_NE = new TokenType("!=", false, 'TOK_NE');
+export const TOK_NEG_ASSIGN = new TokenType("~=", false, 'TOK_NEG_ASSIGN');
+export const TOK_NEW = new TokenType("new", true, 'TOK_NEW');
+export const TOK_NIN = new TokenType("not in", false, 'TOK_NIN');
+export const TOK_NIS = new TokenType("not is", false, 'TOK_NIS');
+export const TOK_NOT = new TokenType("not", true, 'TOK_NOT');
+export const TOK_NOT_ASSIGN = new TokenType("!=", false, 'TOK_NOT_ASSIGN');
+export const TOK_NULL = new TokenType("null", true, 'TOK_NULL');
+export const TOK_OCT_LITERAL = new TokenType("", false, 'TOK_OCT_LITERAL');
+export const TOK_OR = new TokenType("or", true, 'TOK_OR');
+export const TOK_INTERNAL = new TokenType("internal", true, 'TOK_INTERNAL');
+export const TOK_PACKAGE = new TokenType("package", true, 'TOK_PACKAGE');
+export const TOK_PLUS = new TokenType("+", false, 'TOK_PLUS');
+export const TOK_PLUS_ASSIGN = new TokenType("+=", false, 'TOK_PLUS_ASSIGN');
+export const TOK_QUEST = new TokenType("?", false, 'TOK_QUEST');
+export const TOK_READLOCK = new TokenType("readlock", true, 'TOK_READLOCK');
+export const TOK_PRIVATE = new TokenType("private", true, 'TOK_PRIVATE');
+export const TOK_PROTECTED = new TokenType("protected", true, 'TOK_PROTECTED');
+export const TOK_PUBLIC = new TokenType("public", true, 'TOK_PUBLIC');
+export const TOK_RETURN = new TokenType("return", true, 'TOK_RETURN');
+export const TOK_RIGHT_BRACE = new TokenType("}", false, 'TOK_RIGHT_BRACE');
+export const TOK_RIGHT_BRACKET = new TokenType("]", false, 'TOK_RIGHT_BRACKET');
+export const TOK_RIGHT_PAR = new TokenType(")", false, 'TOK_RIGHT_PAR');
+export const TOK_SEMICOLON = new TokenType(";", false, 'TOK_SEMICOLON');
+export const TOK_SHL = new TokenType("<<", false, 'TOK_SHL');
+export const TOK_SHL_ASSIGN = new TokenType("<<=", false, 'TOK_SHL_ASSIGN');
+export const TOK_SHR = new TokenType(">>", false, 'TOK_SHR');
+export const TOK_SHR_ASSIGN = new TokenType(">>=", false, 'TOK_SHR_ASSIGN');
+export const TOK_STATIC = new TokenType("static", true, 'TOK_STATIC');
+export const TOK_STRING_LITERAL = new TokenType("string literal", false, 'TOK_STRING_LITERAL');
+export const TOK_MSTRING_LITERAL = new TokenType("multiline string literal", false, 'TOK_MSTRING_LITERAL');
+export const TOK_SUPER = new TokenType("super", true, 'TOK_SUPER');
+export const TOK_SUSPEND = new TokenType("suspend", true, 'TOK_SUSPEND');
+export const TOK_SWITCH = new TokenType("switch", true, 'TOK_SWITCH');
+export const TOK_THEN = new TokenType("then", true, 'TOK_THEN');
+export const TOK_THIS = new TokenType("this", true, 'TOK_THIS');
+export const TOK_THROW = new TokenType("throw", true, 'TOK_THROW');
+export const TOK_TILDE = new TokenType("~", false, 'TOK_TILDE');
+export const TOK_TRUE = new TokenType("true", true, 'TOK_TRUE');
+export const TOK_TRY = new TokenType("try", true, 'TOK_TRY');
+export const TOK_VAR = new TokenType("var", true, 'TOK_VAR');
+export const TOK_VARARG = new TokenType("vararg", true, 'TOK_VARARG');
+export const TOK_WHILE = new TokenType("while", true, 'TOK_WHILE');
+export const TOK_WRITELOCK = new TokenType("writelock", true, 'TOK_WRITELOCK');
+export const TOK_XOR = new TokenType("^", false, 'TOK_XOR');
+export const TOK_XOR_ASSIGN = new TokenType("^=", false, 'TOK_XOR_ASSIGN');
+export const TOK_STRUCT = new TokenType("struct", true, 'TOK_STRUCT');
 
-export class Scanner 
+export class Scanner
 {
 	source : ScanString;
 	listener : CompilationListener;
@@ -200,7 +194,7 @@ export class Scanner
 
 		return state;
 	}
-    
+
 	createToken( type : TokenType, name : string = "" ) : Token
 	{
 		let state = this.getLineBreak();
@@ -780,9 +774,9 @@ export class Scanner
 				break;
 		}
 
-		return this.createToken(null, capture);
+		return this.createToken(TOK_NAME, capture);
     }
-    
+
     isWhitespace(symbol : string) : boolean
     {
         switch (symbol)
