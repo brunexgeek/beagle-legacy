@@ -15,16 +15,18 @@ export interface CompilationListener
 
 export class CompilationContext
 {
-    listener : CompilationListener = null;
+	listener : CompilationListener = null;
 
-    public throwExpected( found : Token, ...types : TokenType[] )
+	stringTable : string[];
+
+    public throwExpected( found : Token, types : TokenType[] )
     {
 		let first = true;
 		let message = "Syntax error, expected ";
 		for (let type of types)
 		{
 			if (!first) message += " or ";
-			message += "'" + type.token + "'";
+			message += "'" + type.name + "'";
 			first = false;
 
 		}

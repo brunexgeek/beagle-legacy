@@ -14,11 +14,11 @@ enum LineBreak
 
 export class Token
 {
-    type : TokenType;
-	value : string;
-	location : SourceLocation;
-	lineBreak : number;
-    comments : beagle.compiler.tree.Comment[];
+    public type : TokenType;
+	public value : string;
+	public location : SourceLocation;
+	public lineBreak : number;
+    public comments : beagle.compiler.tree.Comment[];
 
     constructor(location : SourceLocation, lineBreak : number, comments : beagle.compiler.tree.Comment[], type : TokenType, value : string = "")
 	{
@@ -111,6 +111,7 @@ export class TokenType
 	static readonly TOK_MUL = new TokenType("*", false, 'TOK_MUL');
 	static readonly TOK_MUL_ASSIGN = new TokenType("*=", false, 'TOK_MUL_ASSIGN');
 	static readonly TOK_NAME = new TokenType("", false, 'TOK_NAME');
+	static readonly TOK_NAMESPACE = new TokenType("namespace", true, 'TOK_NAMESPACE');
 	static readonly TOK_NATIVE = new TokenType("native", true, 'TOK_NATIVE');
 	static readonly TOK_NE = new TokenType("!=", false, 'TOK_NE');
 	static readonly TOK_NEG_ASSIGN = new TokenType("~=", false, 'TOK_NEG_ASSIGN');

@@ -7,16 +7,16 @@
 class MyListener implements beagle.compiler.CompilationListener
 {
 	onStart() {
-		throw new Error("Method not implemented.");
+
 	}
 	onError(location: beagle.compiler.SourceLocation, message: string): boolean {
-		throw new Error("Method not implemented.");
+		throw new Error(message);
 	}
 	onWarning(location: beagle.compiler.SourceLocation, message: string): boolean {
-		throw new Error("Method not implemented.");
+		throw new Error(message);
 	}
 	onFinish() {
-		throw new Error("Method not implemented.");
+
 	}
 
 }
