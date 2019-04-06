@@ -2,9 +2,8 @@ namespace beagle.compiler {
 
 export class SourceLocation
 {
-    constructor( value : string )
-    {
-    }
+	line : number;
+	column : number;
 }
 
 export enum LookaheadStatus
@@ -59,7 +58,9 @@ export class ScanString
 	constructor(context : CompilationContext, fileName : string, content : string)
 	{
 		this.context = context;
-		let location = new SourceLocation(fileName);
+		this.location = new SourceLocation();
+		this.location.column = 1;
+		this.location.line = 1;
 		//unescape(input);
 
         this.preprocess(content);
@@ -174,7 +175,7 @@ export class ScanString
 		{
 			++this.index;
 			--count;
-			//location.update(buffer[index]);
+			this.update(this.buffer[this.index]);
         }
 
         if (count > 0)
@@ -246,11 +247,19 @@ export class ScanString
         	return value - 'A' + 10;
     	throw new NumberFormatException("'" + value + "' is not a valid hexadecimal digit");
     }
+*/
 
-	public SourceLocation getLocation()
+	public update(value : number)
 	{
-		return location;
-	}*/
+		if (value == 0x0A)
+		{
+			++this.location.line;
+			this.location.column = 1;
+		} else
+		{
+			++this.location.column;
+		}
+	}
 }
 
 }

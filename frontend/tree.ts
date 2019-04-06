@@ -6,7 +6,7 @@ export class CompilationUnit
 {
     fileName : string;
 	importList : TypeImport[];
-	namespaces : Namespace[];
+	members : Namespace;
 }
 
 export class Comment
@@ -160,9 +160,10 @@ export function createAnnotation( name : Name ) : Annotation
 export class Namespace
 {
 	name : Name;
-	typeList : TypeDeclaration[];
+	structures : Structure[];
 	functions : Function[];
 	storages : StorageDeclaration[];
+	namespaces : Namespace[];
 }
 
 export function createNamespace( name : Name) : Namespace
@@ -170,7 +171,8 @@ export function createNamespace( name : Name) : Namespace
 	let temp = new Namespace();
 	temp.functions = [];
 	temp.storages = [];
-	temp.typeList = [];
+	temp.structures = [];
+	temp.namespaces = [];
 	temp.name = name;
 	return temp;
 }
@@ -334,6 +336,24 @@ export function createFloatLiteral( value : string ) : FloatLiteral
 {
 	let temp = new FloatLiteral();
 	this.value = value;
+	return temp;
+}
+
+export class Structure
+{
+	parent : TypeReference;
+	name : Name;
+	storages : StorageDeclaration[];
+	functions : Function[];
+}
+
+export function createStructure() : Structure
+{
+	let temp = new Structure();
+	temp.functions = [];
+	temp.name = null;
+	temp.parent = null;
+	temp.storages = [];
 	return temp;
 }
 

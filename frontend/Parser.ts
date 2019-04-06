@@ -167,7 +167,7 @@ export class Parser
 
 		let unit = new tree.CompilationUnit();
 		unit.importList = [];
-		unit.namespaces = [];
+		unit.members = tree.createNamespace(null);
 
 		current = this.tokens.peek();
 		while (current != null && current.type == TokenType.TOK_IMPORT)
@@ -178,25 +178,8 @@ export class Parser
 			current = this.tokens.peek();
 		}
 
-		while (current.type != TokenType.TOK_EOF)
-		{
-			console.log("Current is " + current.type.token);
-			if (current.type == TokenType.TOK_NAMESPACE)
-			{
-				this.tokens.discard();
-				let name = this.parseName();
-				if (!this.expectedOneOf(TokenType.TOK_LEFT_BRACE)) return null;
-				let ns = tree.createNamespace(name);
-				if (!this.parseNamespace(ns)) return null;
-				unit.namespaces.push(ns);
-			}
-			else
-			{
-				this.context.listener.onError(null, "Expecting namespace");
-				return null;
-			}
-			current = this.tokens.peek();
-        }
+		if (!this.parseMembers(unit.members)) return null;
+
 		return unit;
 	}
 
@@ -253,14 +236,33 @@ export class Parser
 		return null;
 	}
 
-    private parseNamespace( ns : tree.Namespace ) : boolean
+	private parseNamespace() : tree.Namespace
     {
-		if (!this.expectedOneOf(TokenType.TOK_LEFT_BRACE)) return false;
+		// TOK_NAMESPACE
+		this.tokens.discard();
+		// TOK_NAME
+		let name = this.parseName();
+		if (name == null) return null;
+		// TOK_LEFT_BRACE
+		if (!this.expectedOneOf(TokenType.TOK_LEFT_BRACE)) return null;
 		this.tokens.discard();
 
-		while (this.tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
+		let ns = tree.createNamespace(name);
+		if (!this.parseMembers(ns)) return null;
+
+		// TOK_RIGHT_BRACE
+		this.tokens.discard();
+
+		return ns;
+	}
+
+    private parseMembers( ns : tree.Namespace ) : boolean
+    {
+		while (true)
 		{
 			let tt = this.tokens.peekType();
+			if ((ns.name != null && tt == TokenType.TOK_RIGHT_BRACE) || tt == TokenType.TOK_EOF) break;
+
 			let annots = null;
 
 			if (tt == TokenType.TOK_AT)
@@ -270,6 +272,13 @@ export class Parser
 				tt = this.tokens.peekType();
 			}
 
+			if (tt == TokenType.TOK_NAMESPACE)
+			{
+				let ns = this.parseNamespace();
+				if (ns == null) return null;
+				ns.namespaces.push(ns);
+			}
+			else
 			if (tt == TokenType.TOK_VAR)
 			{
 				let storage = this.parseVariableOrConstant(annots);
@@ -277,8 +286,15 @@ export class Parser
 				ns.storages.push(storage);
 			}
 			else
+			if (tt == TokenType.TOK_STRUCT)
 			{
-				this.context.listener.onError(null, "Unrecognized statement");
+				let struct = this.parseStructure(annots);
+				if (struct == null) return null;
+				ns.structures.push(struct);
+			}
+			else
+			{
+				this.context.listener.onError(null, "Unrecognized statement" + tt.token);
 				return false;
 			}
 		}
@@ -336,6 +352,73 @@ export class Parser
 
         return decors;
 	}
+
+	private parseStructure(annots : tree.Annotation[]) : tree.Structure
+	{
+		this.tokens.discard();
+
+		let output = tree.createStructure();
+		if (this.expectedOneOf(TokenType.TOK_NAME))
+			output.name = this.parseName();
+
+		if (this.tokens.peekType() == TokenType.TOK_COLON)
+		{
+			this.tokens.discard();
+			output.parent = tree.createTypeReference(this.parseName(false));
+		}
+
+		if (this.tokens.peekType() == TokenType.TOK_LEFT_BRACE)
+		{
+			this.tokens.discard();
+
+			// parse every type member
+			while (this.tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
+			{
+				let annots = this.parseAnnotations();
+				//IModifiers modifiers = parseModifiers();
+
+				// variable or constant
+				if (this.tokens.peekType() == TokenType.TOK_CONST || this.tokens.peekType() == TokenType.TOK_VAR)
+					output.storages.push( this.parseVariableOrConstant(annots) );
+				else
+				{
+					this.context.throwExpected(this.tokens.peek(), [TokenType.TOK_VAR, TokenType.TOK_CONST]);
+					break;
+				}
+			}
+
+			this.tokens.discard();
+			return output;
+		}
+
+		return null;
+	}
+
+	/*parseFunction( annots : AnnotationList, body : TypeBody ) : Function
+	{
+		if (!expected(TokenType.TOK_DEF)) return null;
+		tokens.discard();
+
+		TypeReference type = null;
+		Name name = parseName();
+
+		if (!expected(TokenType.TOK_LEFT_PAR)) return null;
+		FormalParameterList params = parseFormalParameters();
+
+		if (tokens.peekType() == TokenType.TOK_COLON)
+		{
+			tokens.discard(1);
+			type = TypeReference.fromName( parseName() );
+			type.location(type.name().location());
+		}
+
+		Block block = parseBlock();
+
+		Function method = new Function(annots, type, name, params, block);
+		method.parent(body);
+
+		return method;
+	}*/
 
 	private parseVariableOrConstant( annots : tree.Annotation[]) : tree.StorageDeclaration
 	{

@@ -30,7 +30,7 @@ export class CompilationContext
 			first = false;
 
 		}
-		message += " but found '" + found.type.name + "'";
+		message += " but found '" + ((found.type.name == "") ? found.value : found.type.name) + "'";
 		this.listener.onError(found.location, message);
 	}
 }

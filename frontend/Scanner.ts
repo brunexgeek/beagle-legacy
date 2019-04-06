@@ -22,7 +22,11 @@ export class Token
 
     constructor(location : SourceLocation, lineBreak : number, comments : beagle.compiler.tree.Comment[], type : TokenType, value : string = "")
 	{
-		//this.location = location.clone();
+		// clone location object
+		this.location = new SourceLocation();
+		this.location.line = location.line;
+		this.location.column = location.column;
+
 		this.lineBreak = lineBreak;
 		this.comments = comments;
 		this.value = null;
@@ -102,6 +106,7 @@ export class TokenType
 	static readonly TOK_LEFT_BRACE = new TokenType("{", false, 'TOK_LEFT_BRACE');
 	static readonly TOK_LEFT_BRACKET = new TokenType("[", false, 'TOK_LEFT_BRACKET');
 	static readonly TOK_LEFT_PAR = new TokenType("(", false, 'TOK_LEFT_PAR');
+	static readonly TOK_LET = new TokenType("let", true, 'TOK_LET');
 	static readonly TOK_LONG = new TokenType("long", true, 'TOK_LONG');
 	static readonly TOK_LT = new TokenType("<", false, 'TOK_LT');
 	static readonly TOK_MINUS = new TokenType("-", false, 'TOK_MINUS');
@@ -209,7 +214,8 @@ export class Scanner
 		let state = this.getLineBreak();
 		this.lineBreak = false;
 
-		let output = new Token(null, state, (this.comments.length > 0) ? this.comments : null, type, name);
+		let output = new Token(this.source.location, state,
+			(this.comments.length > 0) ? this.comments : null, type, name);
 
 		if (this.comments.length > 0) this.comments = [];
 		return output;
@@ -497,7 +503,7 @@ export class Scanner
 				default:
 					if (this.isWhitespace(this.source.peek()) || this.source.peek() == ScanString.BOI)
 						break;
-					//listener.onError(this.source.location, "Invalid character '" + this.source.peek() + "'");
+					this.context.listener.onError(this.source.location, "Invalid character '" + this.source.peek() + "'");
 					break;
 			}
 		}
@@ -691,11 +697,11 @@ export class Scanner
 						break;
 				}
 
-				return this.createToken(TokenType.TOK_FP_LITERAL, capture.toString());
+				return this.createToken(TokenType.TOK_FP_LITERAL, capture);
 			}
 		}
 
-		return this.createToken(type, capture.toString());
+		return this.createToken(type, capture);
 	}
 
 	returnError( message : string ) : Token
@@ -724,7 +730,7 @@ export class Scanner
 		}
 
 		if (capture.length > 2)
-			return this.createToken(TokenType.TOK_HEX_LITERAL, capture.toString());
+			return this.createToken(TokenType.TOK_HEX_LITERAL, capture);
 		else
 		{
 			return this.returnError("Invalid hexadecimal literal");
@@ -749,7 +755,7 @@ export class Scanner
 		}
 
 		if (capture.length > 2)
-			return this.createToken(TokenType.TOK_BIN_LITERAL, capture.toString());
+			return this.createToken(TokenType.TOK_BIN_LITERAL, capture);
 		else
 		{
 			return this.returnError("Invalid binary literal");
