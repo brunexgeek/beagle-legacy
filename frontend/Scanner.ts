@@ -73,7 +73,7 @@ export class TokenType
 	static readonly TOK_DEC = new TokenType("--", false, 'TOK_DEC');
 	static readonly TOK_DEC_LITERAL = new TokenType("", false, 'TOK_DEC_LITERAL');
 	static readonly TOK_DEDENT = new TokenType("", false, 'TOK_DEDENT');
-	static readonly TOK_DEF = new TokenType("def", true, 'TOK_DEF');
+	static readonly TOK_FUNCTION = new TokenType("function", true, 'TOK_FUNCTION');
 	static readonly TOK_DEFAULT = new TokenType("default", true, 'TOK_DEFAULT');
 	static readonly TOK_DIV = new TokenType("/", false, 'TOK_DIV');
 	static readonly TOK_DIV_ASSIGN = new TokenType("/=", false, 'TOK_DIV_ASSIGN');

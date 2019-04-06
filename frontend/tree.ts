@@ -127,6 +127,8 @@ export function createStorageDeclaration( annots : Annotation[], name : Name, ty
 
 export class Function
 {
+	annotations : Annotation[];
+	access : AccessMode;
 	name : Name;
 	parameters : FormalParameter[];
 	type : TypeReference;
@@ -134,14 +136,34 @@ export class Function
 	parent : CompilationUnit | TypeDeclaration;
 }
 
-interface IStatement
+export function createFunction( annots : Annotation[], name : Name, type : TypeReference,
+	params : FormalParameter[], body : IStatement[] ) : Function
+{
+	let temp = new Function();
+	temp.annotations = annots;
+	temp.access = AccessMode.PROTECTED;
+	temp.name = name;
+	temp.type = type;
+	temp.body = body;
+	return temp;
+}
+
+export interface IStatement
 {
 }
 
-class FormalParameter
+export class FormalParameter
 {
     type : TypeReference;
     name : Name;
+}
+
+export function createFormalParameter( name : Name, type : TypeReference ) : FormalParameter
+{
+	let temp = new FormalParameter();
+	temp.name = name;
+	temp.type = type;
+	return temp;
 }
 
 
@@ -164,6 +186,7 @@ export class Namespace
 	functions : Function[];
 	storages : StorageDeclaration[];
 	namespaces : Namespace[];
+	annotations : Annotation[];
 }
 
 export function createNamespace( name : Name) : Namespace
@@ -173,6 +196,7 @@ export function createNamespace( name : Name) : Namespace
 	temp.storages = [];
 	temp.structures = [];
 	temp.namespaces = [];
+	temp.annotations = [];
 	temp.name = name;
 	return temp;
 }

@@ -236,7 +236,7 @@ export class Parser
 		return null;
 	}
 
-	private parseNamespace() : tree.Namespace
+	private parseNamespace( annots : tree.Annotation[] ) : tree.Namespace
     {
 		// TOK_NAMESPACE
 		this.tokens.discard();
@@ -248,6 +248,7 @@ export class Parser
 		this.tokens.discard();
 
 		let ns = tree.createNamespace(name);
+		ns.annotations = annots;
 		if (!this.parseMembers(ns)) return null;
 
 		// TOK_RIGHT_BRACE
@@ -265,6 +266,7 @@ export class Parser
 
 			let annots = null;
 
+			// parse annotations
 			if (tt == TokenType.TOK_AT)
 			{
 				if (this.tokens.peek().type == TokenType.TOK_AT)
@@ -272,20 +274,23 @@ export class Parser
 				tt = this.tokens.peekType();
 			}
 
+			// parse namespaces
 			if (tt == TokenType.TOK_NAMESPACE)
 			{
-				let temp = this.parseNamespace();
+				let temp = this.parseNamespace(annots);
 				if (temp == null) return null;
 				ns.namespaces.push(temp);
 			}
-			/*else
+			else
+			// parse variables
 			if (tt == TokenType.TOK_VAR)
 			{
 				let storage = this.parseVariableOrConstant(annots);
 				if (storage == null) return null;
 				ns.storages.push(storage);
-			}*/
+			}
 			else
+			// parse structures
 			if (tt == TokenType.TOK_STRUCT)
 			{
 				let struct = this.parseStructure(annots);
@@ -293,8 +298,15 @@ export class Parser
 				ns.structures.push(struct);
 			}
 			else
+			// parse functions
+			if (tt == TokenType.TOK_FUNCTION)
 			{
-				this.context.listener.onError(null, "Unrecognized statement" + tt.token);
+				let func = this.parseFunction(annots);
+				if (func == null) return null;
+				ns.functions.push(func);
+			}
+			{
+				this.context.listener.onError(this.tokens.peek().location, "Unrecognized statement " + tt.token);
 				return false;
 			}
 		}
@@ -303,7 +315,7 @@ export class Parser
 		return true;
 /*
         // parse functions
-        if (this.tokens.peek().type == TokenType.TOK_DEF)
+        if (this.tokens.peek().type == TokenType.TOK_FUNCTION)
         {
             unit.functions.push(this.parseFunction(decors, null));
         }
@@ -351,6 +363,47 @@ export class Parser
         }
 
         return decors;
+	}
+
+	private parseBlock() : tree.IExpression[]
+	{
+		if (!this.expectedOneOf(TokenType.TOK_LEFT_BRACE)) return null;
+		this.tokens.discard();
+
+		let block : tree.IExpression[] = [];
+
+		while (this.tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
+		{
+			let current = this.parseStatement();
+			if (current == null) return null;
+
+			block.push(current);
+		}
+		this.tokens.discard();
+
+		return block;
+	}
+
+	private parseStatement() : tree.IStatement
+	{
+		switch (this.tokens.peekType())
+		{
+			case TokenType.TOK_RETURN:
+				return this.parseReturnStmt();
+			case TokenType.TOK_IF:
+				return this.parseIfThenElseStmt();
+			case TokenType.TOK_VAR:
+			case TokenType.TOK_CONST:
+				return <tree.IStatement> this.parseVariableOrConstant(null);
+			case TokenType.TOK_FOR:
+				return <tree.IStatement> this.parseForEach();
+			default:
+				break;
+		}
+
+		let expr = this.parseExpression();
+		if (expr == null) return null;
+		return new tree.ExpressionStmt(expr);
 	}
 
 	private parseStructure(annots : tree.Annotation[]) : tree.Structure
@@ -418,31 +471,58 @@ export class Parser
 		return tree.AccessMode.PROTECTED;
 	}
 
-	/*parseFunction( annots : AnnotationList, body : TypeBody ) : Function
+	private parseFunction( annots : tree.Annotation[] ) : tree.Function
 	{
-		if (!expected(TokenType.TOK_DEF)) return null;
-		tokens.discard();
+		if (!this.expectedOneOf(TokenType.TOK_FUNCTION)) return null;
+		this.tokens.discard();
 
-		TypeReference type = null;
-		Name name = parseName();
-
-		if (!expected(TokenType.TOK_LEFT_PAR)) return null;
-		FormalParameterList params = parseFormalParameters();
-
-		if (tokens.peekType() == TokenType.TOK_COLON)
+		let type : tree.TypeReference = null;
+		// name
+		let name = this.parseName();
+		// parameters
+		if (!this.expectedOneOf(TokenType.TOK_LEFT_PAR)) return null;
+		let params = this.parseFormalParameters();
+		// return type
+		if (this.tokens.peekType() == TokenType.TOK_COLON)
 		{
-			tokens.discard(1);
-			type = TypeReference.fromName( parseName() );
-			type.location(type.name().location());
+			this.tokens.discard(1);
+			type = tree.createTypeReference( this.parseName() );
+			//type.location = type.name.location;
+		}
+		// body
+		let block = this.parseBlock();
+
+		let func = tree.createFunction(annots, name, type, params, block);
+
+		return func;
+	}
+
+	private parseFormalParameters() : tree.FormalParameter[]
+	{
+		if (this.tokens.peekType() != TokenType.TOK_LEFT_PAR) return null;
+		this.tokens.discard();
+
+		let output : tree.FormalParameter[] = [];
+		let typeName : tree.Name, name : tree.Name;
+
+		while (this.tokens.peekType() != TokenType.TOK_RIGHT_PAR)
+		{
+			if (this.tokens.peekType() == TokenType.TOK_COMA)
+			{
+				this.tokens.discard();
+				continue;
+			}
+
+			name = this.parseName();
+			if (!this.expectedOneOf(TokenType.TOK_COLON)) return null;
+			this.tokens.discard();
+			typeName = this.parseName();
+			output.push( tree.createFormalParameter(name, tree.createTypeReference(typeName)) );
 		}
 
-		Block block = parseBlock();
-
-		Function method = new Function(annots, type, name, params, block);
-		method.parent(body);
-
-		return method;
-	}*/
+		this.tokens.discard(); // )
+		return output;
+	}
 
 	private parseProperty( annots : tree.Annotation[], access : tree.AccessMode, name : tree.Name ) : tree.Property
 	{

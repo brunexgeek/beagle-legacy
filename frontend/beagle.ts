@@ -12,10 +12,10 @@ class MyListener implements beagle.compiler.CompilationListener
 
 	}
 	onError(location: beagle.compiler.SourceLocation, message: string): boolean {
-		throw new Error(message);
+		throw new Error(message + " at " + location.line + ":" + location.column);
 	}
 	onWarning(location: beagle.compiler.SourceLocation, message: string): boolean {
-		throw new Error(message);
+		throw new Error(message + " at " + location.line + ":" + location.column);
 	}
 	onFinish() {
 
@@ -54,6 +54,5 @@ while ((tok = tarr.read()) != null)
 let pa = new beagle.compiler.Parser(ctx, sc);
 let unit = pa.parse();
 
-//console.log(util.inspect(unit, {showHidden: false, depth: null}))
-
-beagle.compiler.printCompilationUnit(unit);
+console.log(util.inspect(unit, {showHidden: false, depth: null}))
+//beagle.compiler.printCompilationUnit(unit);
