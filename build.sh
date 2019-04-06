@@ -1,3 +1,3 @@
 #!/bin/bash -x
 
-tsc frontend/beagle.ts --removeComments --outFile frontend/beagle.js
+tsc frontend/beagle.ts --sourceMap --removeComments --outFile frontend/beagle.js

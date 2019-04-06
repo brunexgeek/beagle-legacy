@@ -274,17 +274,17 @@ export class Parser
 
 			if (tt == TokenType.TOK_NAMESPACE)
 			{
-				let ns = this.parseNamespace();
-				if (ns == null) return null;
-				ns.namespaces.push(ns);
+				let temp = this.parseNamespace();
+				if (temp == null) return null;
+				ns.namespaces.push(temp);
 			}
-			else
+			/*else
 			if (tt == TokenType.TOK_VAR)
 			{
 				let storage = this.parseVariableOrConstant(annots);
 				if (storage == null) return null;
 				ns.storages.push(storage);
-			}
+			}*/
 			else
 			if (tt == TokenType.TOK_STRUCT)
 			{
@@ -375,11 +375,12 @@ export class Parser
 			while (this.tokens.peekType() != TokenType.TOK_RIGHT_BRACE)
 			{
 				let annots = this.parseAnnotations();
-				//IModifiers modifiers = parseModifiers();
+				let access = this.parseAccessMode();
+				let name = this.parseName();
 
 				// variable or constant
-				if (this.tokens.peekType() == TokenType.TOK_CONST || this.tokens.peekType() == TokenType.TOK_VAR)
-					output.storages.push( this.parseVariableOrConstant(annots) );
+				if (this.tokens.peekType() == TokenType.TOK_COLON || this.tokens.peekType() == TokenType.TOK_ASSIGN)
+					output.properties.push( this.parseProperty(annots, access, name) );
 				else
 				{
 					this.context.throwExpected(this.tokens.peek(), [TokenType.TOK_VAR, TokenType.TOK_CONST]);
@@ -392,6 +393,29 @@ export class Parser
 		}
 
 		return null;
+	}
+
+	parseAccessMode() : tree.AccessMode
+	{
+		if (this.tokens.peekType() == TokenType.TOK_PUBLIC)
+		{
+			this.tokens.discard();
+			return tree.AccessMode.PUBLIC;
+		}
+		else
+		if (this.tokens.peekType() == TokenType.TOK_PROTECTED)
+		{
+			this.tokens.discard();
+			return tree.AccessMode.PROTECTED;
+		}
+		else
+		if (this.tokens.peekType() == TokenType.TOK_PRIVATE)
+		{
+			this.tokens.discard();
+			return tree.AccessMode.PRIVATE;
+		}
+
+		return tree.AccessMode.PROTECTED;
 	}
 
 	/*parseFunction( annots : AnnotationList, body : TypeBody ) : Function
@@ -420,7 +444,35 @@ export class Parser
 		return method;
 	}*/
 
-	private parseVariableOrConstant( annots : tree.Annotation[]) : tree.StorageDeclaration
+	private parseProperty( annots : tree.Annotation[], access : tree.AccessMode, name : tree.Name ) : tree.Property
+	{
+		let location = name.location;
+		let type : tree.TypeReference;
+		let initializer : tree.IExpression = null;
+
+		// check whether we have type annotation
+		if (this.tokens.peekType() == TokenType.TOK_COLON)
+		{
+			this.tokens.discard(1);
+			type = tree.createTypeReference( this.parseName() );
+		}
+		// check whether we have an initializer expression
+		if (this.tokens.peekType() == TokenType.TOK_ASSIGN)
+		{
+			this.tokens.discard(); // =
+			initializer = this.parseExpression();
+		}
+
+		// discard the semicolon
+		if (!this.expectedOneOf(TokenType.TOK_SEMICOLON)) return null;
+		this.tokens.discard();
+
+		let result = tree.createProperty(annots, access, name, type, initializer);
+		return result;
+	}
+
+
+	private parseVariableOrConstant( annots : tree.Annotation[] ) : tree.StorageDeclaration
 	{
 		// get 'var' or 'const' keyword
 		let kind = this.tokens.peekType();
@@ -431,7 +483,7 @@ export class Parser
 		let type : tree.TypeReference;
 		let initializer : tree.IExpression = null;
 
-		// check whether we have the var/const type
+		// check whether we have type annotation
 		if (this.tokens.peekType() == TokenType.TOK_COLON)
 		{
 			this.tokens.discard(1);

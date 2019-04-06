@@ -339,21 +339,51 @@ export function createFloatLiteral( value : string ) : FloatLiteral
 	return temp;
 }
 
+export enum AccessMode
+{
+	PUBLIC,
+	PROTECTED,
+	PRIVATE
+}
+
 export class Structure
 {
-	parent : TypeReference;
+	annotations : Annotation[];
+	access : AccessMode;
 	name : Name;
-	storages : StorageDeclaration[];
-	functions : Function[];
+	parent : TypeReference;
+	properties : Property[];
 }
 
 export function createStructure() : Structure
 {
 	let temp = new Structure();
-	temp.functions = [];
+	temp.annotations = [];
+	temp.access = AccessMode.PRIVATE;
 	temp.name = null;
 	temp.parent = null;
-	temp.storages = [];
+	temp.properties = [];
+	return temp;
+}
+
+export class Property
+{
+	name : Name;
+	access : AccessMode;
+	annotations : Annotation[];
+	type : TypeReference;
+	initializer : IExpression;
+}
+
+export function createProperty( annots : Annotation[], access : AccessMode, name : Name,
+	type : TypeReference, initializer : IExpression = null ) : Property
+{
+	let temp = new Property();
+	temp.name = name;
+	temp.access = access;
+	temp.annotations = annots;
+	temp.type = type;
+	temp.initializer = initializer;
 	return temp;
 }
 
