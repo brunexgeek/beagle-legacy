@@ -365,7 +365,7 @@ export class Parser
         return decors;
 	}
 
-	private parseBlock() : tree.IExpression[]
+	private parseBlock() : tree.BlockStmt
 	{
 		if (!this.expectedOneOf(TokenType.TOK_LEFT_BRACE)) return null;
 		this.tokens.discard();
@@ -381,7 +381,7 @@ export class Parser
 		}
 		this.tokens.discard();
 
-		return block;
+		return new tree.BlockStmt(block);
 	}
 
 	private parseStatement() : tree.IStatement
@@ -404,6 +404,93 @@ export class Parser
 		let expr = this.parseExpression();
 		if (expr == null) return null;
 		return new tree.ExpressionStmt(expr);
+	}
+
+/**
+	 *
+	 * IfThenElse: "if" Expression "then" BlockOrStatement ( "else" BlockOrStatement )?
+	 *
+	 * @return
+	 */
+	private parseIfThenElseStmt() : tree.IfThenElseStmt
+	{
+		if (!this.expectedOneOf(TokenType.TOK_IF, TokenType.TOK_ELIF)) return null;
+		this.tokens.discard();
+
+		let condition = this.parseExpression();
+
+		if (!this.expectedOneOf(TokenType.TOK_THEN)) return null;
+		this.tokens.discard();
+
+		let thenSide : tree.IStatement = null;
+		let elseSide : tree.IStatement = null;
+
+		// required 'then' block
+		if (this.tokens.peekType() == TokenType.TOK_LEFT_BRACE)
+			thenSide = this.parseBlock();
+		else
+			thenSide = this.parseStatement();
+		if (thenSide == null) return null;
+
+		// optional 'elif' block
+		if (this.tokens.peekType() == TokenType.TOK_ELIF)
+		{
+			elseSide = this.parseIfThenElseStmt();
+			if (elseSide == null) return null;
+		}
+		else
+		// optional 'else' block
+		if (this.tokens.peekType() == TokenType.TOK_ELSE)
+		{
+			this.tokens.discard();
+
+			if (this.tokens.peekType() == TokenType.TOK_LEFT_BRACE)
+				elseSide = this.parseBlock();
+			else
+				elseSide = this.parseStatement();
+			if (elseSide == null) return null;
+		}
+
+		return new tree.IfThenElseStmt(condition, thenSide, elseSide);
+	}
+
+	private parseForEach() : tree.ForEachStmt
+	{
+		if (!this.expectedOneOf(TokenType.TOK_FOR)) return null;
+		this.tokens.discard();
+
+		let storage = new tree.StorageDeclaration(null, this.parseName(), null, false, null);
+
+		if (!this.expectedOneOf(TokenType.TOK_IN)) return null;
+		this.tokens.discard();
+
+		let expr = this.parseExpression();
+
+		let block : tree.IStatement = null;
+
+		if (this.tokens.peekType() == TokenType.TOK_LEFT_BRACE)
+			block = this.parseBlock();
+		else
+			block = this.parseStatement();
+
+		return new tree.ForEachStmt(storage, expr, block);
+	}
+
+	/**
+	 * Return: "return" Expression
+	 *
+	 * @return
+	 */
+	private parseReturnStmt() : tree.IStatement
+	{
+		if (!this.expectedOneOf(TokenType.TOK_RETURN)) return null;
+		let location = this.tokens.peek().location;
+		this.tokens.discard();
+
+		let expr = this.parseExpression();
+
+		let result = new tree.ReturnStmt(expr);
+		return result;
 	}
 
 	private parseStructure(annots : tree.Annotation[]) : tree.Structure
@@ -492,7 +579,7 @@ export class Parser
 		// body
 		let block = this.parseBlock();
 
-		let func = tree.createFunction(annots, name, type, params, block);
+		let func = new tree.Function(annots, name, type, params, block);
 
 		return func;
 	}
@@ -587,7 +674,7 @@ export class Parser
 		this.tokens.discard();
 
 		let result : tree.StorageDeclaration;
-		result = tree.createStorageDeclaration(annots, name, type, kind == TokenType.TOK_CONST, initializer);
+		result = new tree.StorageDeclaration(annots, name, type, kind == TokenType.TOK_CONST, initializer);
 		return result;
 	}
 

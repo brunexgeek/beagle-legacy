@@ -37,7 +37,7 @@ ctx.listener = new MyListener();
 let ss = new beagle.compiler.ScanString(ctx, "bla", content.toString() /*"function abobrinha { }"*/);
 let sc = new beagle.compiler.Scanner(ctx, ss);
 
-/*let tarr = new beagle.compiler.TokenArray(sc);
+let tarr = new beagle.compiler.TokenArray(sc);
 let tok : beagle.compiler.Token = null;
 while ((tok = tarr.read()) != null)
 {
@@ -49,10 +49,11 @@ while ((tok = tarr.read()) != null)
 	///let tmp = document.createElement("span");
 	//tmp.innerHTML = tok.value;
 	//body.appendChild(tmp);
-}*/
-
+}
+/*
 let pa = new beagle.compiler.Parser(ctx, sc);
 let unit = pa.parse();
 
 console.log(util.inspect(unit, {showHidden: false, depth: null}))
 //beagle.compiler.printCompilationUnit(unit);
+*/

@@ -112,8 +112,17 @@ export class StorageDeclaration implements IStatement
 	initializer : IExpression;
 	isConst : boolean;
 	annots : Annotation[];
-}
 
+	constructor( annots : Annotation[], name : Name, type : TypeReference, isConst : boolean, expr : IExpression = null )
+	{
+		this.annots = annots;
+		this.name = name;
+		this.type = type;
+		this.initializer = expr;
+		this.isConst = isConst;
+	}
+}
+/*
 export function createStorageDeclaration( annots : Annotation[], name : Name, type : TypeReference, isConst : boolean, expr : IExpression = null ) : StorageDeclaration
 {
 	let temp = new StorageDeclaration();
@@ -123,7 +132,7 @@ export function createStorageDeclaration( annots : Annotation[], name : Name, ty
 	temp.initializer = expr;
 	temp.isConst = isConst;
 	return temp;
-}
+}*/
 
 export class Function
 {
@@ -132,21 +141,21 @@ export class Function
 	name : Name;
 	parameters : FormalParameter[];
 	type : TypeReference;
-	body : IStatement[];
+	body : IStatement;
 	parent : CompilationUnit | TypeDeclaration;
+
+	constructor( annots : Annotation[], name : Name, type : TypeReference,
+		params : FormalParameter[], body : IStatement )
+	{
+		this.annotations = annots;
+		this.access = AccessMode.PROTECTED;
+		this.name = name;
+		this.type = type;
+		this.body = body;
+	}
 }
 
-export function createFunction( annots : Annotation[], name : Name, type : TypeReference,
-	params : FormalParameter[], body : IStatement[] ) : Function
-{
-	let temp = new Function();
-	temp.annotations = annots;
-	temp.access = AccessMode.PROTECTED;
-	temp.name = name;
-	temp.type = type;
-	temp.body = body;
-	return temp;
-}
+
 
 export interface IStatement
 {
@@ -409,6 +418,64 @@ export function createProperty( annots : Annotation[], access : AccessMode, name
 	temp.type = type;
 	temp.initializer = initializer;
 	return temp;
+}
+
+export class ReturnStmt
+{
+	expr : IExpression;
+
+	constructor( expr : IExpression )
+	{
+		this.expr = expr;
+	}
+}
+
+export class ExpressionStmt
+{
+	expr : IExpression;
+
+	constructor( expr : IExpression )
+	{
+		this.expr = expr;
+	}
+}
+
+export class IfThenElseStmt
+{
+	condition : IExpression;
+	thenSide : IStatement;
+	elseSide : IStatement;
+
+	constructor( condition : IExpression, thenSide : IStatement, elseSide : IStatement = null)
+	{
+		this.condition = condition;
+		this.thenSide = thenSide;
+		this.elseSide = elseSide;
+	}
+}
+
+export class ForEachStmt implements IStatement
+{
+	statement : IStatement;
+	iterator : StorageDeclaration;
+	expression : IExpression;
+
+	constructor(iterator : StorageDeclaration, expr : IExpression, stmt : IStatement )
+	{
+		this.statement = stmt;
+		this.iterator = iterator;
+		this.expression = expr;
+	}
+}
+
+export class BlockStmt implements IStatement
+{
+	statements : IStatement[];
+
+	constructor( stmts : IStatement[] = [] )
+	{
+		this.statements = stmts;
+	}
 }
 
 }
